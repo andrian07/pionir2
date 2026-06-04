@@ -24,10 +24,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 
-$config['base_url']    = 'http://localhost/tokopionir/';
-$config['header'] = "tokopionir/application/views/Pages/header.php";
-$config['headerdetail'] = "tokopionir/application/views/Pages/headerdetail.php";
-$config['footer'] = "tokopionir/application/views/Pages/footer.php";
+$config['base_url']    = 'http://localhost/pionir2/';
+$config['header'] = "pionir2/application/views/Pages/header.php";
+$config['headerdetail'] = "pionir2/application/views/Pages/headerdetail.php";
+$config['footer'] = "pionir2/application/views/Pages/footer.php";
 
 /*
 |--------------------------------------------------------------------------

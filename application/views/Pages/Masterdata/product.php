@@ -326,18 +326,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           </div>
 
                           <label for="inlineinput" class="col-md-12 col-form-label">Catatan Penting:</label>
-                          <div class="card-body activity" id="timeline-note">
-                            <div class="d-flex">
-                              <div class="flex-1 ms-3 pt-1">
-                                <span class="text-muted">PT SERU 2026-05-05 JNE<br /> Rp. 100.000 - (10% +20% +0%) = @Rp. 1.973.600 (20)catatan <br /> Ongkir: Rp. 180</span>
-                              </div>
-                              <div class="float-end pt-1">
-                                <small class="text-muted">
-                                  <button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes(1)"><i class="fas fa-trash-alt sizing-fa"></i></button>
-                                </small>
-                              </div>
-                            </div>
-                            <div class="separator-dashed"></div>
+                          <div class="col-md-12 p-0">
+                            <textarea class="form-control" id="product_note_edit" name="product_note_edit" rows="20"></textarea>
                           </div>
 
                         </div>
@@ -859,6 +849,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
           modal.find('#product_purchase_record_edit').val(row.product_purchase_record)
           modal.find('#product_search_key_edit').val(row.product_key)
           modal.find('#product_status_edit').val(row.product_status)
+          modal.find('#product_note_edit').val(row.product_note.replace(/<br\s*\/?>/gi, "\n"))
 
 
           var elem = document.createElement("img");

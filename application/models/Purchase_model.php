@@ -697,6 +697,22 @@ class purchase_model extends CI_Model {
 
     //purchase
 
+    public function get_last_note_product($product_id_note)
+    {
+        $this->db->select('product_note');
+        $this->db->from('ms_product');
+        $this->db->where('product_id', $product_id_note);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function update_note_product($product_id_note, $new_note)
+    {
+        $this->db->set('product_note', $new_note);
+        $this->db->where('product_id', $product_id_note);
+        $this->db->update('ms_product');
+    }
+
     public function copy_temp_purchase($data_copy_temp)
     {
         $this->db->insert('temp_purchase', $data_copy_temp);

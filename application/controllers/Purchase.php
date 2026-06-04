@@ -509,8 +509,9 @@ class Purchase extends CI_Controller {
 					$discount_product_satuan_3 = 0;
 				}
 
+				$nominal_discount_satuan =  $row['temp_purchase_price'];
 				if($edit_footer_discount_percentage1_submit > 0){
-					$nominal_discount_satuan = $row['temp_purchase_total'] - $discount_product_satuan_1;
+					$nominal_discount_satuan = $row['temp_purchase_price'] - $discount_product_satuan_1;
 				}
 				if($edit_footer_discount_percentage2_submit > 0){
 					$nominal_discount_satuan = $nominal_discount_satuan - $discount_product_satuan_2;
@@ -521,13 +522,19 @@ class Purchase extends CI_Controller {
 
 				$get_ekspedisi_name = $this->masterdata_model->get_ekspedisi_name($purchase_ekspedisi);
 				$ekspedisi_name = $get_ekspedisi_name[0]->ekspedisi_name;
-				$product_desc = $supplier_name.' '.$purchase_date.' '.$ekspedisi_name.'<br /> Rp. '.number_format($row['temp_purchase_price'], 0, ',', '.').' - ('.$edit_footer_discount_percentage1_submit.'% +'.$edit_footer_discount_percentage2_submit.'% +'.$edit_footer_discount_percentage3_submit.'%) = @Rp. '.number_format($nominal_discount_satuan, 0, ',', '.').' ('.$row['temp_purchase_qty'].') '.$row['temp_purchase_note']. '<br /> Ongkir: Rp. '.number_format($row['temp_purchase_total_ongkir'], 0, ',', '.');
+
+				$product_desc = $supplier_name.' '.$purchase_date.' '.$ekspedisi_name.'<br />Rp. '.number_format($row['temp_purchase_price'], 0, ',', '.').' - ('.$edit_footer_discount_percentage1_submit.'% +'.$edit_footer_discount_percentage2_submit.'% +'.$edit_footer_discount_percentage3_submit.'%) = @Rp. '.number_format($nominal_discount_satuan, 0, ',', '.').' ('.$row['temp_purchase_qty'].') PCS '.$row['temp_purchase_note']. '<br />Ongkir: Rp. '.number_format($row['temp_purchase_total_ongkir'], 0, ',', '.'). '<br />';
 				$data_insert_note = array(
 					'product_id'			=> $row['temp_product_id'],
 					'product_desc'			=> $product_desc
 				);
 
+				$product_id_note = $row['temp_product_id'];
 				$save_note_product = $this->purchase_model->save_note_product($data_insert_note);
+				$get_last_note_product = $this->purchase_model->get_last_note_product($product_id_note)->result_array();
+				$last_note = $get_last_note_product[0]['product_note'];
+				$new_note = $last_note.'<br />'.$product_desc;
+				$update_note_product = $this->purchase_model->update_note_product($product_id_note, $new_note);
 
 			}
 

@@ -1386,6 +1386,7 @@ class Masterdata extends CI_Controller {
 			$product_description		= $this->input->post('product_description_edit');
 			$product_search_key			= $this->input->post('product_search_key_edit');
 			$product_status				= $this->input->post('product_status_edit');
+			$product_note				= $this->input->post('product_note_edit');
 			$user_id 					= $_SESSION['user_id'];
 			$product_supplier_id_tag 	= implode(",",$product_supplier);
 
@@ -1429,7 +1430,8 @@ class Masterdata extends CI_Controller {
 				//'product_purchase_record'   => $product_purchase_record,
 				'product_key'				=> $product_search_key,
 				'product_image' 			=> $new_image_name,
-				'product_status'			=> $product_status
+				'product_status'			=> $product_status,
+				'product_note'				=> $product_note
 			);	
 
 
