@@ -53,9 +53,23 @@ class Search extends CI_Controller {
 		$status 	  = $this->input->post('status');
 		$paket 		  = $this->input->post('paket');
 		$ppn 		  = $this->input->post('ppn');
+		$limit        = (int)$this->input->post('limit', true) ?: 50;
+		$page         = (int)$this->input->post('page', true) ?: 1;
+		$offset       = ($page - 1) * $limit;
 
-		$product_list = $this->masterdata_model->search_product_list($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn)->result_array();
-		echo json_encode($product_list);
+		$product_list = $this->masterdata_model->search_product_list($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn, $limit, $offset)->result_array();
+		$total_items = $this->masterdata_model->search_product_list_count($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn);
+		$total_pages = ceil($total_items / $limit);
+		
+		$response = array(
+			'data' => $product_list,
+			'total_items' => $total_items,
+			'total_pages' => $total_pages,
+			'current_page' => $page,
+			'items_per_page' => $limit
+		);
+		
+		echo json_encode($response);
 	}
 
 	public function detailsearch(){
@@ -71,6 +85,10 @@ class Search extends CI_Controller {
 		
 	}
 
-}
+	public function search_item_selected(){
+		$item_id = $this->input->post('item_id');
+		$item_data = $this->masterdata_model->search_item_selected($item_id);
+		echo json_encode($item_data);
+	}
 
-?>
+}
