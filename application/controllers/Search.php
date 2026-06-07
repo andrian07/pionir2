@@ -20,18 +20,20 @@ class Search extends CI_Controller {
 			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
-		/*$access =  $this->uri->segment(2);
-		$permissions = $access.'_'.$permission;
-		print_r($permissions);die();*/
 	}
 
 	public function index(){
 		$modul = 'Search';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_auth_nav'][0]->view == 'Y'){
 			$unit_list['unit_list'] = $this->masterdata_model->unit_list();
 			$brand_list['brand_list'] = $this->masterdata_model->brand_list();
 			$category_list['category_list'] = $this->masterdata_model->category_list();
