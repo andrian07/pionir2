@@ -20,7 +20,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
               <div class="ms-md-auto py-2 py-md-0">
                 <button class="btn btn-info" id="reload"><span class="btn-label"><i class="fas fa-sync"></i></span> Reload</button>
 
-                <?php if($data['check_auth'][0]->add == 'N'){ ?>
+                <?php if($data['check_auth']['check_access'][0]->add == 'N'){ ?>
                   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" disabled="disabled"><span class="btn-label"><i class="fa fa-plus"></i></span> Tambah</button>
                 <?php }else{ ?>
                   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"><span class="btn-label"><i class="fa fa-plus"></i></span> Tambah</button>
@@ -146,12 +146,12 @@ require DOC_ROOT_PATH . $this->config->item('header');
                     <td><?php echo $row->supplier_address; ?></td>
                     <td><?php echo $row->supplier_phone; ?></td>
                     <td>
-                      <?php if($data['check_auth'][0]->delete == 'N'){ ?>
+                      <?php if($data['check_auth']['check_access'][0]->delete == 'N'){ ?>
                         <button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn delete" data-id="<?php echo $row->supplier_id; ?>" data-name="<?php echo $row->supplier_name; ?>" disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button>
                       <?php }else{ ?>
                         <button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn delete" data-id="<?php echo $row->supplier_id; ?>" data-name="<?php echo $row->supplier_name; ?>"><i class="fas fa-trash-alt sizing-fa"></i></button>
                       <?php } ?>
-                      <?php if($data['check_auth'][0]->edit == 'N'){ ?>
+                      <?php if($data['check_auth']['check_access'][0]->edit == 'N'){ ?>
                         <button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="<?php echo $row->supplier_id; ?>"  data-code="<?php echo $row->supplier_code; ?>" data-name="<?php echo $row->supplier_name; ?>" data-address="<?php echo $row->supplier_address; ?>" data-phone="<?php echo $row->supplier_phone; ?>" data-bs-toggle="modal" data-bs-target="#exampleModaledit" disabled="disabled"><i class="far fa-edit sizing-fa"></i></button>
                       <?php }else{ ?>
                         <button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="<?php echo $row->supplier_id; ?>"  data-code="<?php echo $row->supplier_code; ?>" data-name="<?php echo $row->supplier_name; ?>" data-address="<?php echo $row->supplier_address; ?>" data-phone="<?php echo $row->supplier_phone; ?>"  data-bs-toggle="modal" data-bs-target="#exampleModaledit"><i class="far fa-edit sizing-fa"></i></button>

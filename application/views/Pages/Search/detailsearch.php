@@ -50,6 +50,9 @@
     <div class="card-body" style="padding:0;">
       <?php foreach($data['get_product_by_id'] as $row){ ?>
         <div class="row">
+          <div class="col-md-2" style="padding: 10px;">
+            <img src="<?php echo base_url(); ?>assets/products/<?php echo $row->product_image; ?>" class="img-fluid" alt="Product Image">
+          </div>
           <div class="col-md-5">
             <div class="table-responsive">
               <table class="table table-bordered">
@@ -146,9 +149,7 @@
             </table>
           </div>
         </div>
-        <div class="col-md-1">
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
           <div class="table-responsive">
            <table class="table table-bordered">
             <tbody>

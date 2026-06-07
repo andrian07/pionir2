@@ -88,8 +88,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                 <label style="font-weight: 700; margin-bottom: 5px;">PPN:</label>
                 <select id="filter_ppn" class="form-control input-full js-example-basic-single">
                   <option value="">-- Semua --</option>
-                    <option value="N">Bukan PPN</option>
-                    <option value="Y">PPN</option>
+                    <option value="NON PPN">Bukan PPN</option>
+                    <option value="PPN">PPN</option>
                 </select>
               </div>
 
@@ -132,10 +132,20 @@ require DOC_ROOT_PATH . $this->config->item('header');
                   <option value="500">500 item</option>
                 </select>
               </div>
+              <div class="col-md-3">
+                <label style="font-weight: 700; margin-bottom: 5px;">Urutkan:</label>
+                <select id="sort_order" class="form-control">
+                  <option value="name_asc">Nama A - Z</option>
+                  <option value="name_desc">Nama Z - A</option>
+                  <option value="price_asc">Harga Terendah</option>
+                  <option value="price_desc">Harga Tertinggi</option>
+                  <option value="stock_asc">Stock Terendah</option>
+                  <option value="stock_desc">Stock Tertinggi</option>
+                </select>
+              </div>
               <div class="col-md-6 text-center">
                 <div id="pagination_info" style="padding-top: 32px; font-weight: 700;">Menampilkan 0 hasil</div>
               </div>
-              
             </div>
 
             <div class="table-responsive">
@@ -172,11 +182,61 @@ require DOC_ROOT_PATH . $this->config->item('header');
         </button>
       </div>
       <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_sku" checked>
+              <label class="form-check-label" for="summary_field_sku">SKU</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_kategori">
+              <label class="form-check-label" for="summary_field_kategori">Kategori</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_status" >
+              <label class="form-check-label" for="summary_field_status">Status</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_stock_total">
+              <label class="form-check-label" for="summary_field_stock_total">Stock Total</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_stock_per_warehouse">
+              <label class="form-check-label" for="summary_field_stock_per_warehouse">Stok Per Gudang</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_lokasi_stock">
+              <label class="form-check-label" for="summary_field_lokasi_stock">Lokasi Stock</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_supplier">
+              <label class="form-check-label" for="summary_field_supplier">Supplier</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_berat">
+              <label class="form-check-label" for="summary_field_berat">Berat</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_deskripsi">
+              <label class="form-check-label" for="summary_field_deskripsi">Deskripsi</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summary_field_satuan">
+              <label class="form-check-label" for="summary_field_satuan">Satuan</label>
+            </div>
+            <div class="form-check" style="display: none;"> 
+              <input class="form-check-input" type="checkbox" id="summary_field_foto">
+              <label class="form-check-label" for="summary_field_foto">Foto</label>
+            </div>
+          </div>
+        </div>
         <textarea id="summary_textarea" class="form-control" rows="10" readonly></textarea>
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="copyText()">Copy Text</button>
         <button type="button" class="btn btn-secondary" onclick="close_and_clear()">Batal</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Tutup</button>
       </div>
     </div>
   </div>
@@ -191,6 +251,12 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 
  $(document).ready(function() {
   product_list_table();
+
+  $('#rangkumanModal .form-check-input').on('change', function() {
+    if(summaryCache.length > 0) {
+      renderSummaryText();
+    }
+  });
 });
 
 
@@ -204,6 +270,7 @@ let current_page = 1;
 let items_per_page = 50;
 let select_mode = false;
 let selected_items = {};
+let summaryCache = [];
 
 $('#filter_unit, #filter_category, #filter_brand, #filter_supplier, #filter_status, #filter_paket, #filter_ppn')
 .on('change', function () {
@@ -212,9 +279,9 @@ $('#filter_unit, #filter_category, #filter_brand, #filter_supplier, #filter_stat
   product_list_table(key);
 });
 
-$('#items_per_page').on('change', function() {
+$('#items_per_page, #sort_order').on('change', function() {
   current_page = 1;
-  items_per_page = $(this).val();
+  items_per_page = $('#items_per_page').val();
   let key = $('#key').val();
   product_list_table(key);
 });
@@ -229,6 +296,7 @@ function product_list_table(key = '') {
   let status    = $('#filter_status').val();
   let paket     = $('#filter_paket').val();
   let ppn       = $('#filter_ppn').val();
+  let sort      = $('#sort_order').val();
 
   $.ajax({
     type: "POST",
@@ -243,6 +311,7 @@ function product_list_table(key = '') {
       status: status,
       paket: paket,
       ppn: ppn,
+      sort: sort,
       limit: items_per_page,
       page: current_page
     },
@@ -394,7 +463,11 @@ function toggle_item_selection(checkbox) {
 
 function show_summary() {
   if(Object.keys(selected_items).length === 0) {
-    alert('Pilih minimal 1 item terlebih dahulu!');
+    Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Silahkan Pilih Item Terlebih Dahulu!',
+              })
     return;
   }
 
@@ -403,7 +476,7 @@ function show_summary() {
     requests.push(new Promise((resolve, reject) => {
       $.ajax({
         type: "POST",
-        url: "<?php echo base_url(); ?>Search/search_item_selected",
+        url: "<?php echo base_url(); ?>Search/search_item_selected_details",
         dataType: "json",
         data: {item_id: product_id},
         success: function(data) {
@@ -418,28 +491,91 @@ function show_summary() {
 
   Promise.all(requests)
     .then(results => {
-      let summary = '';
-      let total_price = 0;
-      let item_count = 1;
-
-      results.forEach(data => {
-        if(Array.isArray(data) && data.length > 0) {
-          let item = data[0];
-          let price = parseInt(item.product_sell_price_1) || 0;
-          summary += item_count + '. ' + item.product_name + ' \n ' + formatter.format(price) + '\n\n';
-          total_price += price;
-          item_count++;
-        }
-      });
-
-
-      document.getElementById('summary_textarea').value = summary;
+      summaryCache = results;
+      renderSummaryText();
       $('#rangkumanModal').modal('show');
     })
     .catch(error => {
       console.error(error);
       alert('Gagal mengambil data item. Coba lagi.');
     });
+}
+
+function getSummaryFields() {
+  return {
+    sku: $('#summary_field_sku').is(':checked'),
+    kategori: $('#summary_field_kategori').is(':checked'),
+    status: $('#summary_field_status').is(':checked'),
+    stock_total: $('#summary_field_stock_total').is(':checked'),
+    stock_per_warehouse: $('#summary_field_stock_per_warehouse').is(':checked'),
+    lokasi_stock: $('#summary_field_lokasi_stock').is(':checked'),
+    supplier: $('#summary_field_supplier').is(':checked'),
+    berat: $('#summary_field_berat').is(':checked'),
+    deskripsi: $('#summary_field_deskripsi').is(':checked'),
+    satuan: $('#summary_field_satuan').is(':checked'),
+    foto: $('#summary_field_foto').is(':checked')
+  };
+}
+
+function renderSummaryText() {
+  if(!summaryCache || summaryCache.length === 0) {
+    document.getElementById('summary_textarea').value = '';
+    return;
+  }
+
+  let fields = getSummaryFields();
+  let summary = '';
+  let total_price = 0;
+  let item_count = 1;
+
+  summaryCache.forEach(result => {
+    let itemsToProcess = Array.isArray(result.item) ? result.item : (result.item ? [result.item] : []);
+    itemsToProcess.forEach(item => {
+      let stocks = Array.isArray(result.stocks) ? result.stocks : [];
+      let price = parseInt(item.product_sell_price_1) || 0;
+
+      summary += item_count + '. ' + item.product_name + '\n';
+      if(fields.sku) summary += 'SKU: ' + (item.product_code || '-') + '\n';
+      if(fields.kategori) summary += 'Kategori: ' + (item.category_name || '-') + '\n';
+      if(fields.status) summary += 'Status: ' + (item.product_status || '-') + '\n';
+      if(fields.supplier) summary += 'Supplier: ' + (item.product_supplier_tag || '-') + '\n';
+      if(fields.berat) summary += 'Berat: ' + (item.product_weight || '-') + '\n';
+      if(fields.satuan) summary += 'Satuan: ' + (item.unit_name || '-') + '\n';
+      if(fields.deskripsi) summary += 'Deskripsi: ' + (item.product_desc || '-') + '\n';
+      if(fields.stock_total) {
+        let totalStock = stocks.reduce((sum, row) => sum + (parseInt(row.stock) || 0), 0);
+        summary += 'Stock Total: ' + totalStock + '\n';
+      }
+      if(fields.stock_per_warehouse || fields.lokasi_stock) {
+        if(fields.stock_per_warehouse && fields.lokasi_stock) {
+          summary += 'Stok Per Gudang:\n';
+        } else if(fields.stock_per_warehouse) {
+          summary += 'Stok Per Gudang:\n';
+        } else {
+          summary += 'Lokasi Stock:\n';
+        }
+        if(stocks.length === 0) {
+          summary += '  - Tidak ada data stock\n';
+        } else {
+          stocks.forEach(row => {
+            let warehouseName = row.warehouse_name || row.warehouse_code || '-';
+            let stockValue = row.stock || 0;
+            let locationText = fields.lokasi_stock ? ' (' + warehouseName + ')' : '';
+            summary += '  - ' + (fields.stock_per_warehouse ? stockValue + ' ' + (item.unit_name || '') : '') + (fields.stock_per_warehouse ? locationText : warehouseName) + '\n';
+          });
+        }
+      }
+      if(fields.foto) {
+        let imageUrl = item.product_image ? '<?php echo base_url(); ?>assets/products/' + item.product_image : '-';
+        summary += 'Foto: ' + imageUrl + '\n';
+      }
+      summary += 'Harga: ' + formatter.format(price) + '\n\n';
+      total_price += price;
+      item_count++;
+    });
+  });
+
+  document.getElementById('summary_textarea').value = summary;
 }
 
 function reset_selection() {
@@ -452,12 +588,37 @@ function reset_selection() {
 
 function clear_selection() {
   reset_selection();
-  alert('Pilihan telah dihapus!');
+    let title = 'Batal';
+    let message = 'Pilihan item telah dibatalkan.';
+    let state = 'success';
+    notif_success(title, message, state);
+     $('#rangkumanModal').modal('hide');
+
 }
 
 function close_and_clear() {
   clear_selection();
   $('#rangkumanModal').modal('hide');
+}
+
+function copyText() {
+    const textarea = document.getElementById('summary_textarea');
+    
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // Untuk mobile
+
+    navigator.clipboard.writeText(textarea.value)
+        .then(() => {
+           $('#rangkumanModal').modal('hide');
+            let title = 'Copy Text';
+            let message = 'Teks berhasil disalin!';
+            let state = 'success';
+            notif_success(title, message, state);
+            
+        })
+        .catch(err => {
+            console.error('Gagal menyalin teks:', err);
+        });
 }
 
 </script>

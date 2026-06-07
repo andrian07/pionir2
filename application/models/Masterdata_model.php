@@ -593,6 +593,13 @@ class masterdata_model extends CI_Model {
         return $result;
     }
 
+    public function search_item_selected_details($item_id)
+    {
+        $query = $this->db->query("select * from ms_product join ms_brand  on ms_product.product_brand = ms_brand.brand_id JOIN ms_unit  ON ms_product.product_unit = ms_unit.unit_id JOIN ms_category  ON ms_product.product_category = ms_category.category_id WHERE ms_product.is_active = 'y' AND ms_product.product_id = '".$item_id."'");
+        $result = $query->result();
+        return $result;
+    }
+
     public function edit_product($data_edit, $product_id)
     {
         $this->db->set($data_edit);
@@ -636,7 +643,7 @@ class masterdata_model extends CI_Model {
 
     // search product //
 
-    public function search_product_list($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn, $limit = 50, $offset = 0)
+    public function search_product_list($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn, $sort = 'name_asc', $limit = 50, $offset = 0)
     {
         $this->db->select('*, sum(stock) as total_stock');
         $this->db->from('ms_product');
@@ -672,6 +679,28 @@ class masterdata_model extends CI_Model {
             $this->db->or_where('ms_product.product_supplier_name like "%'.$searchin_key.'%"');
             $this->db->or_where('ms_product.product_key like "%'.$searchin_key.'%"');
             $this->db->or_where('ms_product.product_desc like "%'.$searchin_key.'%"');
+        }
+        $sort = strtolower($sort);
+        switch($sort) {
+            case 'name_desc':
+                $this->db->order_by('ms_product.product_name', 'desc');
+                break;
+            case 'price_asc':
+                $this->db->order_by('ms_product.product_sell_price_1', 'asc');
+                break;
+            case 'price_desc':
+                $this->db->order_by('ms_product.product_sell_price_1', 'desc');
+                break;
+            case 'stock_asc':
+                $this->db->order_by('total_stock', 'asc');
+                break;
+            case 'stock_desc':
+                $this->db->order_by('total_stock', 'desc');
+                break;
+            case 'name_asc':
+            default:
+                $this->db->order_by('ms_product.product_name', 'asc');
+                break;
         }
         $this->db->limit($limit, $offset);
         $this->db->group_by('ms_product.product_id');

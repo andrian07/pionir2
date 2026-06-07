@@ -84,7 +84,7 @@
                 <p>Dashboard</p>
               </a>
             </li>
-
+            
             <li class="nav-item">
               <a data-bs-toggle="collapse" href="#master">
                 <i class="fas fa-layer-group"></i>
@@ -93,56 +93,76 @@
               </a>
               <div class="collapse" id="master">
                 <ul class="nav nav-collapse">
+                  <?php if($data['check_auth']['check_auth_nav'][0]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/brand">
                       <span class="sub-item">Brand</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][1]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/customer">
                       <span class="sub-item">Customer</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][2]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/ekspedisi">
                       <span class="sub-item">Expedisi</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][3]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/warehouse">
                       <span class="sub-item">Gudang</span>
                     </a>
                   </li>
+                  <?php } ?>
+                   <?php if($data['check_auth']['check_auth_nav'][4]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/category">
                       <span class="sub-item">Kategori</span>
                     </a>
                   </li>
+                  <?php } ?>
+                   <?php if($data['check_auth']['check_auth_nav'][5]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/product">
                       <span class="sub-item">Produk</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][6]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/payment">
                       <span class="sub-item">Pembayaran</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][7]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/salesman">
                       <span class="sub-item">Salesman</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][8]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/unit">
                       <span class="sub-item">Satuan</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][9]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Masterdata/supplier">
                       <span class="sub-item">Supplier</span>
                     </a>
                   </li>
+                  <?php } ?>
                 </ul>
               </div>
             </li>

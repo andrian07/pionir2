@@ -25,12 +25,16 @@ class Dashboard extends CI_Controller {
 	private function check_auth(){
 		
 		if(isset($_SESSION['user_name']) == null){
-			redirect('Dashboard', 'refresh');
+			redirect('Masterdata', 'refresh');
+		}else{
+			$user_role_id = $_SESSION['user_role_id'];
+			$check_access = $this->global_model->check_access_dashboard($user_role_id);
+			return($check_access);
 		}
 	}
 
 	public function Admin(){
-		$this->check_auth();
+		$check_auth = $this->check_auth();
 		$get_transaction_today['get_transaction_today'] = $this->global_model->get_transaction_today()->result_array();
 		$get_transaction_today_item['get_transaction_today_item'] = $this->global_model->get_transaction_today_item()->result_array();
 		$get_transaction_month['get_transaction_month'] = $this->global_model->get_transaction_month()->result_array();

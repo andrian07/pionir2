@@ -28,7 +28,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                   </ul>
                 </div>
                 <button class="btn btn-info" id="reload"><span class="btn-label"><i class="fas fa-sync"></i></span> Reload</button>
-                <?php if($data['check_auth'][0]->add == 'N'){ ?>
+                <?php if($data['check_auth']['check_access'][0]->add == 'N'){ ?>
                   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg" disabled="disabled"><span class="btn-label"><i class="fa fa-plus"></i></span> Tambah</button>
                 <?php }else{ ?>
                   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg"><span class="btn-label"><i class="fa fa-plus"></i></span> Tambah</button>
@@ -372,17 +372,17 @@ require DOC_ROOT_PATH . $this->config->item('header');
                               <td><?php foreach(explode(",",$row->customer_expedisi_tag) as $rows){ echo '<span class="badge badge-primary" style="margin-right:1px;">'.$rows.'</span>';} ?></td>
                               <td><?php echo $row->customer_poin; ?></td>
                               <td>
-                                <?php if($data['check_auth'][0]->view == 'N'){ ?>
+                                <?php if($data['check_auth']['check_access'][0]->view == 'N'){ ?>
                                   <a href="<?php echo base_url();?>Masterdata/detailcustomer?id=<?php echo $row->customer_id; ?>" data-fancybox data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn"><i class="fas fa-eye sizing-fa" disabled="disabled"></i></button></a>
                                 <?php }else{ ?> 
                                   <a href="<?php echo base_url();?>Masterdata/detailcustomer?id=<?php echo $row->customer_id; ?>" data-fancybox data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn"><i class="fas fa-eye sizing-fa"></i></button></a>
                                 <?php } ?>
-                                <?php if($data['check_auth'][0]->delete == 'N'){ ?>
+                                <?php if($data['check_auth']['check_access'][0]->delete == 'N'){ ?>
                                   <button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" data-id="<?php echo $row->customer_id; ?>" data-name="<?php echo $row->customer_name; ?>"><i class="fas fa-trash-alt sizing-fa" disabled="disabled"></i></button>
                                 <?php }else{ ?> 
                                   <button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" data-id="<?php echo $row->customer_id; ?>" data-name="<?php echo $row->customer_name; ?>"><i class="fas fa-trash-alt sizing-fa"></i></button>
                                 <?php } ?>
-                                <?php if($data['check_auth'][0]->edit == 'N'){ ?>
+                                <?php if($data['check_auth']['check_access'][0]->edit == 'N'){ ?>
                                   <button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="<?php echo $row->customer_id; ?>" data-name="<?php echo $row->customer_name; ?>" data-bs-toggle="modal" data-bs-target="#exampleModaledit" disabled="disabled"><i class="far fa-edit sizing-fa"></i></button>
                                 <?php }else{ ?> 
                                   <button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="<?php echo $row->customer_id; ?>" data-name="<?php echo $row->customer_name; ?>" data-bs-toggle="modal" data-bs-target="#exampleModaledit"><i class="far fa-edit sizing-fa"></i></button>

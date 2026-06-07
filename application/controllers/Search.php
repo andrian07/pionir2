@@ -53,11 +53,12 @@ class Search extends CI_Controller {
 		$status 	  = $this->input->post('status');
 		$paket 		  = $this->input->post('paket');
 		$ppn 		  = $this->input->post('ppn');
+		$sort         = $this->input->post('sort');
 		$limit        = (int)$this->input->post('limit', true) ?: 50;
 		$page         = (int)$this->input->post('page', true) ?: 1;
 		$offset       = ($page - 1) * $limit;
 
-		$product_list = $this->masterdata_model->search_product_list($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn, $limit, $offset)->result_array();
+		$product_list = $this->masterdata_model->search_product_list($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn, $sort, $limit, $offset)->result_array();
 		$total_items = $this->masterdata_model->search_product_list_count($searchin_key, $unit, $category, $brand, $supplier, $status, $paket, $ppn);
 		$total_pages = ceil($total_items / $limit);
 		
@@ -89,6 +90,13 @@ class Search extends CI_Controller {
 		$item_id = $this->input->post('item_id');
 		$item_data = $this->masterdata_model->search_item_selected($item_id);
 		echo json_encode($item_data);
+	}
+
+	public function search_item_selected_details(){
+		$item_id = $this->input->post('item_id');
+		$item_data = $this->masterdata_model->search_item_selected_details($item_id);
+		$stock_data = $this->masterdata_model->product_stock($item_id);
+		echo json_encode(['item' => $item_data, 'stocks' => $stock_data]);
 	}
 
 }

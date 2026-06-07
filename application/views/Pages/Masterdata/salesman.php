@@ -153,17 +153,17 @@ require DOC_ROOT_PATH . $this->config->item('header');
                     <td><?php echo $row->salesman_phone; ?></td>
                     <td><?php echo $row->warehouse_name; ?></td>
                     <td>
-                      <?php if($data['check_auth'][0]->view == 'N'){ ?>
+                      <?php if($data['check_auth']['check_access'][0]->view == 'N'){ ?>
                         <a href="<?php echo base_url();?>Masterdata/detailsalesman?id=<?php echo $row->salesman_id; ?>" data-fancybox data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn"><i class="fas fa-eye sizing-fa" disabled="disabled"></i></button></a>
                       <?php }else{ ?>
                         <a href="<?php echo base_url();?>Masterdata/detailsalesman?id=<?php echo $row->salesman_id; ?>" data-fancybox data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn"><i class="fas fa-eye sizing-fa"></i></button></a>
                       <?php } ?>
-                      <?php if($data['check_auth'][0]->delete == 'N'){ ?>
+                      <?php if($data['check_auth']['check_access'][0]->delete == 'N'){ ?>
                         <button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" data-id="<?php echo $row->salesman_id; ?>" data-name="<?php echo $row->salesman_name; ?>"><i class="fas fa-trash-alt sizing-fa" disabled="disabled"></i></button>
                       <?php }else{ ?> 
                         <button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" data-id="<?php echo $row->salesman_id; ?>" data-name="<?php echo $row->salesman_name; ?>"><i class="fas fa-trash-alt sizing-fa"></i></button>
                       <?php } ?>
-                      <?php if($data['check_auth'][0]->edit == 'N'){ ?>
+                      <?php if($data['check_auth']['check_access'][0]->edit == 'N'){ ?>
                         <button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="<?php echo $row->salesman_id; ?>" data-name="<?php echo $row->salesman_name; ?>" data-address="<?php echo $row->salesman_address; ?>" data-phone="<?php echo $row->salesman_phone; ?>" data-branch="<?php echo $row->salesman_branch; ?>" data-bs-toggle="modal" data-bs-target="#exampleModaledit" disabled="disabled"><i class="far fa-edit sizing-fa"></i></button>
                       <?php }else{ ?> 
                         <button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="<?php echo $row->salesman_id; ?>" data-name="<?php echo $row->salesman_name; ?>" data-address="<?php echo $row->salesman_address; ?>" data-phone="<?php echo $row->salesman_phone; ?>" data-branch="<?php echo $row->salesman_branch; ?>" data-bs-toggle="modal" data-bs-target="#exampleModaledit"><i class="far fa-edit sizing-fa"></i></button>

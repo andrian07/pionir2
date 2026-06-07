@@ -28,13 +28,14 @@ class Masterdata extends CI_Controller {
 			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
-		/*$access =  $this->uri->segment(2);
-		$permissions = $access.'_'.$permission;
-		print_r($permissions);die();*/
-		
 	}
 
 
@@ -43,9 +44,10 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Brand';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$brand_list['brand_list'] = $this->masterdata_model->brand_list();
 			$check_auth['check_auth'] = $check_auth;
+		
 			$data['data'] = array_merge($check_auth, $brand_list);
 			$this->load->view('Pages/Masterdata/brand', $data);
 		}else{
@@ -57,7 +59,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Brand';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$brand_name = $this->input->post('brand_name');
 			$brand_desc = $this->input->post('brand_desc');
 			$user_id 	= $_SESSION['user_id'];
@@ -89,7 +91,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Brand';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$brand_id  	= $this->input->post('id');
 			$user_id 	= $_SESSION['user_id'];
 			$this->masterdata_model->delete_brand($brand_id);
@@ -111,7 +113,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Brand';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$brand_id   	   = $this->input->post('brand_id');
 			$brand_name   	   = $this->input->post('brand_name_edit');
 			$brand_desc        = $this->input->post('brand_desc_edit');
@@ -161,7 +163,7 @@ class Masterdata extends CI_Controller {
 
 		$modul = 'Customer';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$customer_name 				= $this->input->post('customer_name');
 			$customer_dob 				= $this->input->post('customer_dob');
 			$customer_gender	 		= $this->input->post('customer_gender');
@@ -250,7 +252,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Customer';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$customer_id   				= $this->input->post('customer_id');
 			$customer_code 				= $this->input->post('customer_code');
 			$customer_name 				= $this->input->post('customer_name');
@@ -333,7 +335,7 @@ class Masterdata extends CI_Controller {
 	public function customer(){
 		$modul = 'Customer';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$check_auth['check_auth'] = $check_auth;
@@ -348,7 +350,7 @@ class Masterdata extends CI_Controller {
 	public function detailcustomer(){
 		$modul = 'Customer';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if(($check_auth['check_access'][0]->view == 'Y')){
 			$id = $this->input->get('id');
 			$get_customer_by_id['get_customer_by_id'] = $this->masterdata_model->get_customer_by_id($id);
 			$this->load->view('Pages/Masterdata/customer_detail', $get_customer_by_id);
@@ -369,7 +371,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Customer';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$customer_id  	= $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$this->masterdata_model->delete_customer($customer_id);
@@ -392,7 +394,7 @@ class Masterdata extends CI_Controller {
 	public function ekspedisi(){
 		$modul = 'Ekspedisi';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$check_auth['check_auth'] = $check_auth;
 			$data['data'] = array_merge($check_auth, $ekspedisi_list);
@@ -407,7 +409,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Ekspedisi';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$expedisi_name 		= $this->input->post('expedisi_name');
 			$expedisi_address 	= $this->input->post('expedisi_address');
 			$expedisi_phone 	= $this->input->post('expedisi_phone');
@@ -445,7 +447,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Ekspedisi';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$expedisi_id 		= $this->input->post('expedisi_id');
 			$expedisi_name 		= $this->input->post('expedisi_name');
 			$expedisi_address 	= $this->input->post('expedisi_address');
@@ -485,7 +487,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Ekspedisi';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$expedisi_id  	= $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$this->masterdata_model->delete_ekspedisi($expedisi_id);
@@ -509,7 +511,7 @@ class Masterdata extends CI_Controller {
 	public function warehouse(){
 		$modul = 'Warehouse';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$check_auth['check_auth'] = $check_auth;
 			$data['data'] = array_merge($check_auth, $warehouse_list);
@@ -524,7 +526,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Warehouse';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse_code 	= $this->input->post('warehouse_code');
 			$warehouse_name 	= $this->input->post('warehouse_name');
 			$warehouse_address 	= $this->input->post('warehouse_address');
@@ -564,7 +566,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Warehouse';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$warehouse_id 	 	= $this->input->post('warehouse_id');
 			$warehouse_code 	= $this->input->post('warehouse_code');
 			$warehouse_name 	= $this->input->post('warehouse_name');
@@ -605,7 +607,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Warehouse';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$warehouse_id  	= $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$this->masterdata_model->delete_warehouse($warehouse_id);
@@ -631,7 +633,7 @@ class Masterdata extends CI_Controller {
 	public function category(){
 		$modul = 'Category';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$category_list['category_list'] = $this->masterdata_model->category_list();
 			$check_auth['check_auth'] = $check_auth;
 			$data['data'] = array_merge($check_auth, $category_list);
@@ -646,7 +648,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Category';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$category_name 	= $this->input->post('category_name');
 			$category_desc 	= $this->input->post('category_desc');
 			$user_id 			= $_SESSION['user_id'];
@@ -679,7 +681,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Category';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$category_id 	= $this->input->post('category_id');
 			$category_name 	= $this->input->post('category_name');
 			$category_desc 	= $this->input->post('category_desc');
@@ -714,7 +716,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Category';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$category_id  	= $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$this->masterdata_model->delete_category($category_id);
@@ -737,7 +739,7 @@ class Masterdata extends CI_Controller {
 	public function salesman(){
 		$modul = 'Salesman';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$check_auth['check_auth'] = $check_auth;
@@ -753,7 +755,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Salesman';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$salesman_name 		= $this->input->post('salesman_name');
 			$salesman_phone 	= $this->input->post('salesman_phone');
 			$salesman_address 	= $this->input->post('salesman_address');
@@ -791,7 +793,7 @@ class Masterdata extends CI_Controller {
 
 		$modul = 'Salesman';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$salesman_id	 	= $this->input->post('salesman_id');
 			$salesman_name 		= $this->input->post('salesman_name');
 			$salesman_phone 	= $this->input->post('salesman_phone');
@@ -830,7 +832,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Salesman';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$salesman_id  	= $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$this->masterdata_model->delete_salesman($salesman_id);
@@ -852,7 +854,7 @@ class Masterdata extends CI_Controller {
 	public function detailsalesman(){
 		$modul = 'Salesman';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$id = $this->input->get('id');
 			$salesman_detail['salesman_detail'] = $this->masterdata_model->salesman_detail($id);
 			$this->load->view('Pages/Masterdata/salesman_detail', $salesman_detail);
@@ -865,7 +867,7 @@ class Masterdata extends CI_Controller {
 	public function unit(){
 		$modul = 'Unit';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$unit_list['unit_list'] = $this->masterdata_model->unit_list();
 			$check_auth['check_auth'] = $check_auth;
 			$data['data'] = array_merge($check_auth, $unit_list);
@@ -880,7 +882,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Unit';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$unit_name 	= $this->input->post('unit_name');
 			$unit_desc 	= $this->input->post('unit_desc');
 			$user_id 	= $_SESSION['user_id'];
@@ -914,7 +916,7 @@ class Masterdata extends CI_Controller {
 		
 		$modul = 'Unit';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$unit_id 	= $this->input->post('unit_id');
 			$unit_name 	= $this->input->post('unit_name');
 			$unit_desc 	= $this->input->post('unit_desc');
@@ -949,7 +951,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Unit';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$unit_id  		= $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$this->masterdata_model->delete_unit($unit_id);
@@ -972,7 +974,7 @@ class Masterdata extends CI_Controller {
 	public function supplier(){
 		$modul = 'Supplier';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
 			$check_auth['check_auth'] = $check_auth;
 			$data['data'] = array_merge($check_auth, $supplier_list);
@@ -987,7 +989,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Supplier';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$supplier_name 		= $this->input->post('supplier_name');
 			$supplier_telp 		= $this->input->post('supplier_telp');
 			$supplier_address 	= $this->input->post('supplier_address');
@@ -1035,7 +1037,7 @@ class Masterdata extends CI_Controller {
 		
 		$modul = 'Supplier';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$supplier_id 		= $this->input->post('supplier_id');
 			$supplier_name 		= $this->input->post('supplier_name');
 			$supplier_telp 		= $this->input->post('supplier_telp');
@@ -1073,7 +1075,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Supplier';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$supplier_id  		= $this->input->post('id');
 			$user_id 			= $_SESSION['user_id'];
 			$this->masterdata_model->delete_supplier($supplier_id);
@@ -1097,7 +1099,7 @@ class Masterdata extends CI_Controller {
 	public function product(){
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$category_list['category_list'] = $this->masterdata_model->category_list();
 			$brand_list['brand_list'] 		= $this->masterdata_model->brand_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
@@ -1116,52 +1118,20 @@ class Masterdata extends CI_Controller {
 		
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
+			$supplier_filter = $this->input->post('filter_supplier');
+			$category_filter = $this->input->post('filter_category');
+			$brand_filter = $this->input->post('filter_brand');
+			$product_status_filter = $this->input->post('filter_product_status');
+			$in_transit_filter = $this->input->post('filter_in_transit');
 
 			if($search != null){
 				$search = $search['value'];
 			}
 			$user_id = $_SESSION['user_id'];
-			$get_filter_value = $this->masterdata_model->get_filter_value($user_id);
-			if($get_filter_value != null){
-				if($get_filter_value[0]->supplier_filter == 0){
-					$supplier_filter = null;
-				}else{
-					$supplier_filter = $get_filter_value[0]->supplier_filter;
-				}
-
-				if($get_filter_value[0]->category_filter == 0){
-					$category_filter = null;
-				}else{
-					$category_filter = $get_filter_value[0]->category_filter;
-				}
-
-				if($get_filter_value[0]->brand_filter == 0){
-					$brand_filter = null;
-				}else{
-					$brand_filter = $get_filter_value[0]->brand_filter;
-				}
-				if($get_filter_value[0]->product_status_filter == 0){
-					$product_status_filter = null;
-				}else{
-					$product_status_filter = $get_filter_value[0]->product_status_filter;
-				}
-
-				if($get_filter_value[0]->in_transit_filter == 0){
-					$in_transit_filter = null;
-				}else{
-					$in_transit_filter = $get_filter_value[0]->in_transit_filter;
-				}
-			}else{	
-				$supplier_filter 			= null;
-				$category_filter 			= null;
-				$brand_filter    			= null;
-				$product_status_filter    	= null;
-				$in_transit_filter    		= null;
-			}
 			$list = $this->masterdata_model->product_list($search, $length, $start, $supplier_filter, $category_filter, $brand_filter,$product_status_filter, $in_transit_filter)->result_array();
 			$count_list = $this->masterdata_model->product_list_count($search, $supplier_filter, $category_filter, $brand_filter,$product_status_filter, $in_transit_filter)->result_array();
 			$total_row = $count_list[0]['total_row'];
@@ -1181,13 +1151,13 @@ class Masterdata extends CI_Controller {
 					$product_package = '<span class="badge badge-danger multi-badge"><i class="fas fa-times-circle"></i></span>';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" data-bs-toggle="modal" data-bs-target="#exampleModaledit" data-id="'.$field['product_id'].'" data-name="'.$field['product_name'].'"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn btnprice" onclick="setprice('.$field['product_id'].')""><i class="fas fa-cog sizing-fa"></i></button> ';
 				}else{
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-cog sizing-fa"></i></button> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['product_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 				}else{
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
@@ -1259,7 +1229,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$screenshoot 				= $this->input->post('screenshoot');
 			$product_name 				= $this->input->post('product_name');
 			$product_category 			= $this->input->post('product_category');
@@ -1365,7 +1335,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$screenshoot 				= $this->input->post('screenshoot_edit');
 			$product_id 				= $this->input->post('product_id_edit');
 			$product_code 				= $this->input->post('product_code_edit');
@@ -1467,7 +1437,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id 					= $this->input->post('item_id');
 			$item_purchase_price_val 		= $this->input->post('item_purchase_price_val');
 			$item_hpp_val 					= $this->input->post('item_hpp_val');
@@ -1521,7 +1491,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$id  		= $this->input->post('id');
 			$user_id 	= $_SESSION['user_id'];
 			$this->masterdata_model->delete_product($id);
@@ -1542,7 +1512,7 @@ class Masterdata extends CI_Controller {
 	public function settingproduct(){
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$id = $this->input->get('id');
 			$settingproduct['settingproduct'] = $this->masterdata_model->settingproduct($id);
 			$product_stock['product_stock'] = $this->masterdata_model->product_stock($id);
@@ -1558,7 +1528,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$id = $this->input->post('id');
 			$settingproduct = $this->masterdata_model->settingproduct($id);
 			$detail_note_product = $this->masterdata_model->detail_note_product($id);
@@ -1573,7 +1543,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Product';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$note_id = $this->input->post('note_id');
 			$this->masterdata_model->delete_product_note($note_id);
 			echo json_encode(['code'=>200, 'result'=>'Deleted']);die();
@@ -1625,7 +1595,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Payment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$check_auth['check_auth'] 			= $check_auth;
 			$payment_list['payment_list'] 		= $this->masterdata_model->payment_list();
 			$data['data'] = array_merge($check_auth, $payment_list);
@@ -1640,7 +1610,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Payment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$payment_name 	= $this->input->post('payment_name');
 			$payment_rek 	= $this->input->post('payment_rek');
 			$user_id 		= $_SESSION['user_id'];
@@ -1672,7 +1642,7 @@ class Masterdata extends CI_Controller {
 	{
 		$modul = 'Payment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$payment_id 	= $this->input->post('payment_id');
 			$payment_name 	= $this->input->post('payment_name');
 			$payment_rek 	= $this->input->post('payment_rek');
@@ -1708,7 +1678,7 @@ class Masterdata extends CI_Controller {
 
 		$modul = 'Payment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -1736,13 +1706,13 @@ class Masterdata extends CI_Controller {
 					$product_package = '<span class="badge badge-danger multi-badge"><i class="fas fa-times-circle"></i></span>';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" data-bs-toggle="modal" data-bs-target="#exampleModaledit" data-id="'.$field['product_id'].'" data-name="'.$field['product_name'].'"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn btnprice" onclick="setprice('.$field['product_id'].')""><i class="fas fa-cog sizing-fa"></i></button> ';
 				}else{
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-cog sizing-fa"></i></button> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['product_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 				}else{
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';

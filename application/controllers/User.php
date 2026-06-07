@@ -176,11 +176,13 @@
 
 				if($value_permission_view == 'true'){
 					$view = 'Y';
+					$navbar = 'Y';
 				}else{
 					$view 	= 'N';
 					$add 	= 'N';
 					$edit 	= 'N';
 					$delete = 'N';
+					$navbar = 'N';
 				}
 				
 				if($view == 'Y'){
@@ -212,6 +214,7 @@
 					'add'	  => $add,
 					'edit'	  => $edit,
 					'delete'  => $delete,
+					'nav_bar'  => $navbar,
 				);
 
 				$this->masterdata_model->update_role_permision($data_edit, $role_permission);

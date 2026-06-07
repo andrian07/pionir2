@@ -33,9 +33,9 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <label for="inlineinput" class="col-md-3 col-form-label">Supplier</label>
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="filter_supplier" name="filter_supplier">
-                              <option value="0">ALL</option>
+                              <option value="">ALL</option>
                               <?php foreach ($data['supplier_list'] as $row) { ?>
-                                <option value="<?php echo $row->supplier_id; ?>"><?php echo $row->supplier_name; ?></option>  
+                                <option value="<?php echo $row->supplier_name; ?>"><?php echo $row->supplier_name; ?></option>  
                               <?php } ?>
                             </select>
                           </div>
@@ -45,7 +45,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <label for="inlineinput" class="col-md-3 col-form-label">Kategori</label>
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="filter_category" name="filter_category">
-                              <option value="0">ALL</option>
+                              <option value="">ALL</option>
                               <?php foreach ($data['category_list'] as $row) { ?>
                                 <option value="<?php echo $row->category_id; ?>"><?php echo $row->category_name; ?></option>  
                               <?php } ?>
@@ -57,7 +57,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <label for="inlineinput" class="col-md-3 col-form-label">Brand</label>
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="filter_brand" name="filter_brand">
-                              <option value="0">ALL</option>
+                              <option value="">ALL</option>
                               <?php foreach ($data['brand_list'] as $row) { ?>
                                 <option value="<?php echo $row->brand_id; ?>"><?php echo $row->brand_name; ?></option>  
                               <?php } ?>
@@ -69,7 +69,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <label for="inlineinput" class="col-md-3 col-form-label">Product Status</label>
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="filter_product_status" name="filter_product_status">
-                              <option value="0">ALL</option>
+                              <option value="">ALL</option>
                               <option value="Aktif">Aktif</option>
                               <option value="Tidak Aktif">Tidak Aktif</option>
                               <option value="Discontinue">Discontinue</option>
@@ -82,7 +82,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <label for="inlineinput" class="col-md-3 col-form-label">In Transit</label>
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="filter_in_transit" name="filter_in_transit">
-                              <option value="0">ALL</option>
+                              <option value="">ALL</option>
                               <option value="1">None</option>
                               <option value="2">In Transit</option>
                             </select>
@@ -107,7 +107,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                   </ul>
                 </div>
                 <button class="btn btn-info" id="reload"><span class="btn-label"><i class="fas fa-sync"></i></span> Reload</button>
-                <?php if($data['check_auth'][0]->add == 'N'){ ?>
+                <?php if($data['check_auth']['check_access'][0]->add == 'N'){ ?>
                   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".bd-example-modal-xl" disabled="disabled"><span class="btn-label"><i class="fa fa-plus"></i></span> Tambah</button>
                 <?php }else{ ?>
                  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".bd-example-modal-xl"><span class="btn-label"><i class="fa fa-plus"></i></span> Tambah</button>
@@ -556,7 +556,13 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       ajax: {
         url: '<?php echo base_url(); ?>Masterdata/product_list',
         type: 'POST',
-        data:  {},
+        data: function (d) {
+          d.filter_supplier = $('#filter_supplier').val();
+          d.filter_category = $('#filter_category').val();
+          d.filter_brand = $('#filter_brand').val();
+          d.filter_product_status = $('#filter_product_status').val();
+          d.filter_in_transit = $('#filter_in_transit').val();
+        }
       },
       columns: 
       [
