@@ -34,11 +34,12 @@ class Search extends CI_Controller {
 		$modul = 'Search';
 		$check_auth = $this->check_auth($modul);
 		if($check_auth['check_auth_nav'][0]->view == 'Y'){
+			$check_auth['check_auth'] = $check_auth;
 			$unit_list['unit_list'] = $this->masterdata_model->unit_list();
 			$brand_list['brand_list'] = $this->masterdata_model->brand_list();
 			$category_list['category_list'] = $this->masterdata_model->category_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($unit_list, $brand_list, $category_list, $supplier_list);	
+			$data['data'] = array_merge($unit_list, $brand_list, $category_list, $supplier_list, $check_auth);	
 			$this->load->view('Pages/Search/search', $data);
 		}else{
 			print_r('Tidak Ada Akses');die();

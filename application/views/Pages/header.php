@@ -84,7 +84,8 @@
                 <p>Dashboard</p>
               </a>
             </li>
-            
+              
+            <?php if($data['check_auth']['check_auth_nav'][0]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][1]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][2]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][3]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][4]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][5]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][6]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][7]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][8]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][9]->nav_bar == 'Y' ){ ?>
             <li class="nav-item">
               <a data-bs-toggle="collapse" href="#master">
                 <i class="fas fa-layer-group"></i>
@@ -166,14 +167,18 @@
                 </ul>
               </div>
             </li>
+            <?php } ?>
 
+            <?php if($data['check_auth']['check_auth_nav'][15]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a href="<?php echo base_url(); ?>Search">
                 <i class="fas fa-search"></i>
                 <p>Cari Produk</p>
               </a>
             </li>
+            <?php } ?>
             
+            <?php if($data['check_auth']['check_auth_nav'][15]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a data-bs-toggle="collapse" href="#purchase">
                 <i class="fas fa-shopping-cart"></i>

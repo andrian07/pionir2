@@ -22,19 +22,25 @@ class Dashboard extends CI_Controller {
 		}
 	}
 
+
 	private function check_auth(){
-		
 		if(isset($_SESSION['user_name']) == null){
 			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access_dashboard($user_role_id);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
 	public function Admin(){
 		$check_auth = $this->check_auth();
+		$check_auth['check_auth'] = $check_auth;
 		$get_transaction_today['get_transaction_today'] = $this->global_model->get_transaction_today()->result_array();
 		$get_transaction_today_item['get_transaction_today_item'] = $this->global_model->get_transaction_today_item()->result_array();
 		$get_transaction_month['get_transaction_month'] = $this->global_model->get_transaction_month()->result_array();
@@ -47,7 +53,7 @@ class Dashboard extends CI_Controller {
 		$lost_faktur['lost_faktur'] = $this->global_model->lost_faktur()->result_array();
 		$top_product_3_month['top_product_3_month'] = $this->global_model->top_product_3_month()->result_array();
 		$get_note['get_note'] = $this->global_model->get_note()->result_array();
-		$data['data'] = array_merge($get_transaction_today, $get_transaction_month, $get_transaction_today_item, $get_transaction_month_item, $get_total_asset, $get_total_asset_item, $get_last_activity, $get_next_activity, $transfer_stock, $lost_faktur, $top_product_3_month, $get_note);
+		$data['data'] = array_merge($get_transaction_today, $get_transaction_month, $get_transaction_today_item, $get_transaction_month_item, $get_total_asset, $get_total_asset_item, $get_last_activity, $get_next_activity, $transfer_stock, $lost_faktur, $top_product_3_month, $get_note, $check_auth);
 		$this->load->view('Pages/dashboard', $data);
 	}
 
