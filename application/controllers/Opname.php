@@ -18,11 +18,16 @@ class Opname extends CI_Controller {
 
 	private function check_auth($modul){
 		if(isset($_SESSION['user_name']) == null){
-			redirect('Dashboard', 'refresh');
+			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
@@ -31,9 +36,11 @@ class Opname extends CI_Controller {
 	public function index(){
 		$modul = 'Opname';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$check_auth['check_auth'] = $check_auth;
-			$this->load->view('Pages/Opname/opname', $check_auth);
+			$page_title['page_title'] = 'Opname';
+			$data['data'] = array_merge($check_auth, $page_title);
+			$this->load->view('Pages/Opname/opname', $data);
 		}else{
 			$msg = "No Access";
 			echo json_encode(['code'=>0, 'result'=>$msg]);die();
@@ -44,7 +51,7 @@ class Opname extends CI_Controller {
 	{
 		$modul = 'Opname';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -59,7 +66,7 @@ class Opname extends CI_Controller {
 			$no = $_POST['start'];
 			foreach ($list as $field) {
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Opname/detailopname?id='.$field['opname_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['opname_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
@@ -95,9 +102,11 @@ class Opname extends CI_Controller {
 	{
 		$modul = 'Opname';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
-			$this->load->view('Pages/Opname/addopname', $warehouse_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($check_auth, $warehouse_list);
+			$this->load->view('Pages/Opname/addopname', $data);
 		}else{
 			$msg = "No Access";
 			echo json_encode(['code'=>0, 'result'=>$msg]);die();
@@ -137,7 +146,7 @@ class Opname extends CI_Controller {
 	{
 		$modul = 'Opname';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -187,7 +196,7 @@ class Opname extends CI_Controller {
 
 		$modul = 'Opname';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse 				= $this->input->post('warehouse');
 			$product_id 			= $this->input->post('product_id');
 			$system_stock 			= $this->input->post('system_stock');
@@ -228,7 +237,7 @@ class Opname extends CI_Controller {
 	{
 		$modul = 'Opname';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id  = $this->input->post('id');
 			$user_id 	 = $_SESSION['user_id'];
 			$this->opname_model->delete_temp_opname($product_id, $user_id);
@@ -264,7 +273,7 @@ class Opname extends CI_Controller {
 
 		$modul = 'Opname';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse   	= $this->input->post('warehouse');
 			$opname_date   	= $this->input->post('opname_date');
 			$total_opname   = $this->input->post('total_opname');

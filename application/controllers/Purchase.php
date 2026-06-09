@@ -17,11 +17,16 @@ class Purchase extends CI_Controller {
 
 	private function check_auth($modul){
 		if(isset($_SESSION['user_name']) == null){
-			redirect('Dashboard', 'refresh');
+			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
@@ -30,11 +35,12 @@ class Purchase extends CI_Controller {
 	public function index(){
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Purchase/purchase', $data);
 		}else{
 			$msg = "No Access";
@@ -52,7 +58,7 @@ class Purchase extends CI_Controller {
 	public function purchase_list(){
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -89,14 +95,14 @@ class Purchase extends CI_Controller {
 					$hd_purchase_remaining_debt = '<span class="badge badge-success">Lunas</span>';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Purchase/detailpurchase?id='.$field['hd_purchase_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_purchase_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'Purchase/detailpurchase?id='.$field['hd_purchase_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					if($field['hd_purchase_status'] != 'Cancel'){
 						$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" data-bs-toggle="modal" data-bs-target="#exampleModaledit" data-id="'.$field['hd_purchase_id'].'" data-name="'.$field['hd_purchase_invoice'].'"><i class="fas fa-edit sizing-fa"></i></button> ';
 					}else{
@@ -106,7 +112,7 @@ class Purchase extends CI_Controller {
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_purchase_status'] != 'Cancel'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_purchase_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -151,12 +157,13 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
-			$data['data'] = array_merge($supplier_list, $ekspedisi_list, $payment_list, $warehouse_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($supplier_list, $ekspedisi_list, $payment_list, $warehouse_list, $check_auth);
 			$this->load->view('Pages/Purchase/purchaseadd', $data);
 			//echo json_encode($output);
 		}else{
@@ -169,7 +176,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -220,7 +227,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id  = $this->input->post('id');
 			$user_id 	 = $_SESSION['user_id'];
 			$this->purchase_model->delete_temp_purchase($product_id, $user_id);
@@ -256,7 +263,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$po_id 		= $this->input->post('po_id');
 			$user_id 	= $_SESSION['user_id'];
 			$get_detail_po = $this->purchase_model->detail_po_purchase($po_id);
@@ -315,7 +322,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id 				= $this->input->post('product_id');
 			$temp_price_val 			= $this->input->post('temp_price_val');
 			$temp_qty 					= $this->input->post('temp_qty');
@@ -359,7 +366,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 
 			$po_inv 									= $this->input->post('po_inv');
 			$po_id 										= $this->input->post('po_id');
@@ -563,7 +570,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$purchase_id = $this->input->get('id');
 			$header_purchase['header_purchase'] = $this->purchase_model->header_purchase($purchase_id);
 			$detail_purchase['detail_purchase'] = $this->purchase_model->detail_purchase($purchase_id); 
@@ -581,11 +588,12 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Submission';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Purchase/submission', $data);
 		}else{
 			$msg = "No Access";
@@ -667,7 +675,7 @@ class Purchase extends CI_Controller {
 		
 		$modul = 'Submission';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -701,14 +709,14 @@ class Purchase extends CI_Controller {
 					$supplier_last = '-';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Purchase/detailsubmission?id='.$field['submission_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['submission_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'Purchase/detailsubmission?id='.$field['submission_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					if($field['submission_status'] == 'Pending'){
 						$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" data-bs-toggle="modal" data-bs-target="#exampleModaledit" data-id="'.$field['submission_id'].'" data-name="'.$field['submission_invoice'].'"><i class="fas fa-edit sizing-fa"></i></button> ';
 					}else{
@@ -718,7 +726,7 @@ class Purchase extends CI_Controller {
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['submission_status'] == 'Pending'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['submission_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -764,7 +772,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Submission';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$id = $this->input->get('id');
 			$submission_by_id['submission_by_id'] = $this->purchase_model->submission_by_id($id)->result_array(); 
 			$this->load->view('Pages/Purchase/detailsubmission', $submission_by_id);
@@ -778,7 +786,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Submission';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$submission_id  = $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$get_submission_code = $this->purchase_model->get_submission_code($submission_id);
@@ -803,7 +811,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Submission';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$submission_date 				= $this->input->post('submission_date');
 			$submission_warehouse_name 		= $this->input->post('submission_warehouse_name');
 			$submission_warehouse 			= $this->input->post('submission_warehouse');
@@ -864,7 +872,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Submission';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$submission_id 					= $this->input->post('submission_id');
 			$submission_inv 				= $this->input->post('submission_inv');
 			$submission_date 				= $this->input->post('submission_date');
@@ -929,9 +937,11 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$this->load->view('Pages/Purchase/purchaseorder', $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($supplier_list, $check_auth);
+			$this->load->view('Pages/Purchase/purchaseorder', $data);
 		}else{
 			$msg = "No Access";
 			echo json_encode(['code'=>0, 'result'=>$msg]);die();
@@ -943,7 +953,7 @@ class Purchase extends CI_Controller {
 		
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -990,14 +1000,14 @@ class Purchase extends CI_Controller {
 					$hd_po_status_input = '<span class="badge badge-danger">Batal</span>';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Purchase/detailpo?id='.$field['hd_po_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_po_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'Purchase/detailpo?id='.$field['hd_po_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					if($field['hd_po_status'] == 'Pending'){
 						$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" onclick="edit('.$field['hd_po_id'].')"><i class="fas fa-edit sizing-fa"></i></button> ';
 					}else{
@@ -1007,7 +1017,7 @@ class Purchase extends CI_Controller {
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled" onclick="edit('.$field['hd_po_id'].')"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_po_status'] == 'Pending'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_po_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -1017,7 +1027,7 @@ class Purchase extends CI_Controller {
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$note = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" onclick="note('.$field['hd_po_id'].')" data-toggle="tooltip" title="Print Memo"><i class="fas fa-sticky-note sizing-fa"></i></button> ';
 				}else{
 					$note = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled" onclick="edit('.$field['hd_po_id'].')"><i class="fas fa-sticky-note sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"> ';
@@ -1062,7 +1072,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$po_id = $this->input->get('id');
 			$header_po['header_po'] = $this->purchase_model->header_po($po_id);
 			$detail_po['detail_po'] = $this->purchase_model->detail_po($po_id);
@@ -1086,11 +1096,12 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$po_id = $this->input->get('id');
 			$header_po = $this->purchase_model->header_po($po_id);
 			$detail_po = $this->purchase_model->detail_po($po_id);
 			$user_id   					= $_SESSION['user_id'];
+			$check_auth['check_auth'] = $check_auth;
 			$this->purchase_model->clear_temp_po($user_id);
 			foreach($detail_po as $row){
 
@@ -1131,7 +1142,8 @@ class Purchase extends CI_Controller {
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
-			$data['data'] = array_merge($supplier_list, $ekspedisi_list, $payment_list, $warehouse_list, $header_po_view, $detail_po_view);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($supplier_list, $ekspedisi_list, $payment_list, $warehouse_list, $header_po_view, $detail_po_view, $check_auth);
 			$this->load->view('Pages/Purchase/purchaseorderedit', $data);
 			//echo json_encode($output);
 		}else{
@@ -1144,7 +1156,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$po_id = $this->input->get('id');
 			$header_po['header_po'] = $this->purchase_model->header_po($po_id);
 			$detail_po['detail_po'] = $this->purchase_model->detail_po($po_id); 
@@ -1161,12 +1173,13 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
-			$data['data'] = array_merge($supplier_list, $ekspedisi_list, $payment_list, $warehouse_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($supplier_list, $ekspedisi_list, $payment_list, $warehouse_list, $check_auth);
 			$this->load->view('Pages/Purchase/purchaseorderadd', $data);
 			//echo json_encode($output);
 		}else{
@@ -1215,7 +1228,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$submission_id 				= $this->input->post('submission_id');
 			$submission_code 			= $this->input->post('submission_code');
 			$po_supplier 			    = $this->input->post('po_supplier');
@@ -1264,7 +1277,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -1382,7 +1395,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$po_supplier 								= $this->input->post('po_supplier');
 			$po_date 									= $this->input->post('po_date');
 			$po_supplier								= $this->input->post('po_supplier');
@@ -1554,7 +1567,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$purchase_order_id  						= $this->input->post('purchase_order_id');
 			$purchase_order_invoice						= $this->input->post('purchase_order_invoice');
 			$po_supplier 								= $this->input->post('po_supplier');
@@ -1756,7 +1769,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'PO';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$po_id  		= $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$get_po_code 	= $this->purchase_model->get_po_code($po_id);
@@ -1805,7 +1818,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$id  	      = $this->input->get('print_type');
 			$hd_purchase_id  = $this->input->get('purchase_id');
 			$header_po['header_po'] = $this->purchase_model->header_po($hd_purchase_id);
@@ -1828,7 +1841,7 @@ class Purchase extends CI_Controller {
 		
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			 = $this->input->post('search');
 			$length 			 = $this->input->post('length');
 			$start 			  	 = $this->input->post('start');
@@ -1855,14 +1868,14 @@ class Purchase extends CI_Controller {
 					$hd_input_stock_status = '<span class="badge badge-danger">Batal</span>';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Purchase/detailinputstock?id='.$field['hd_input_stock_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_input_stock_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'Purchase/detailinputstock?id='.$field['hd_input_stock_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_input_stock_status'] == 'Pending'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_input_stock_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -1907,10 +1920,12 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$this->load->view('Pages/Purchase/warehouseinput', array_merge($warehouse_list, $supplier_list));
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $supplier_list, $check_auth);
+			$this->load->view('Pages/Purchase/warehouseinput', $data);
 		}else{
 			$msg = "No Access";
 			echo json_encode(['code'=>0, 'result'=>$msg]);die();
@@ -1921,11 +1936,12 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
-			$data['data'] = array_merge($supplier_list, $warehouse_list, $ekspedisi_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($supplier_list, $warehouse_list, $ekspedisi_list, $check_auth);
 			$this->load->view('Pages/Purchase/warehouseinputadd', $data);
 		}else{
 			$msg = "No Access";
@@ -1957,7 +1973,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -2010,7 +2026,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$po_id 		= $this->input->post('po_id');
 			$user_id 	= $_SESSION['user_id'];
 			$get_detail_po = $this->purchase_model->detail_po($po_id);
@@ -2076,7 +2092,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id 				= $this->input->post('product_id');
 			$temp_qty_recive 			= $this->input->post('temp_qty_recive');
 			$input_stock_detail_remark  = $this->input->post('input_stock_detail_remark');
@@ -2113,7 +2129,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$po_inv_id  		 = $this->input->post('po_inv_id');
 			$warehouseinput_date = $this->input->post('warehouseinput_date');
 			$warehouse 			 = $this->input->post('warehouse');
@@ -2213,7 +2229,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$input_stock_id = $this->input->get('id');
 			$header_input_stock['header_input_stock'] = $this->purchase_model->header_input_stock($input_stock_id);
 			$detail_input_stock['detail_input_stock'] = $this->purchase_model->detail_input_stock($input_stock_id); 
@@ -2230,7 +2246,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'WarehouseInput';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$input_stock_id = $this->input->post('id');
 			$user_id 		= $_SESSION['user_id'];
 			$get_input_warehouse_code 	= $this->purchase_model->get_input_warehouse_code($input_stock_id);
@@ -2263,6 +2279,7 @@ class Purchase extends CI_Controller {
 				}
 			}
 			$this->purchase_model->delete_warehouse_input($input_stock_id);
+			$this->purchase_model->update_po_input($input_stock_id);
 			$data_insert_act = array(
 				'activity_table_desc'	       => 'Batalkan Input Stock Ref: '.$hd_input_stock_inv,
 				'activity_table_ref'	       => $hd_input_stock_inv,
@@ -2285,11 +2302,12 @@ class Purchase extends CI_Controller {
 		
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Purchase/returpurchase', $data);
 		}else{
 			$msg = "No Access";
@@ -2302,11 +2320,12 @@ class Purchase extends CI_Controller {
 		
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Purchase/addreturpurchase', $data);
 		}else{
 			$msg = "No Access";
@@ -2319,7 +2338,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -2350,7 +2369,7 @@ class Purchase extends CI_Controller {
 					$payment_type = 'GARANSI';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Purchase/detailreturpurchase?id='.$field['hd_retur_purchase_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_retur_purchase_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
@@ -2358,7 +2377,7 @@ class Purchase extends CI_Controller {
 				}
 
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_retur_purchase_status'] == 'Pending'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_retur_purchase_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -2368,7 +2387,7 @@ class Purchase extends CI_Controller {
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					if($field['hd_retur_purchase_status'] == 'Pending'){
 						$payment = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="'.$field['hd_retur_purchase_id'].'" data-inv="'.$field['hd_retur_purchase_inv'].'" data-total="'.$field['hd_retur_purchase_total'].'" data-bs-toggle="modal" data-bs-target="#exampleModaledit"><i class="fas fa-money-bill-wave sizing-fa"></i></button>';
 					}else{
@@ -2464,7 +2483,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$purchase_id 				= $this->input->post('purchase_id');
 			$purchase_inv 				= $this->input->post('purchase_inv');
 			$product_id 				= $this->input->post('product_id');
@@ -2523,7 +2542,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -2604,7 +2623,7 @@ class Purchase extends CI_Controller {
 
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 
 			$retur_purchase_supplier 	= $this->input->post('retur_purchase_supplier');
 			$retur_purchase_date 		= $this->input->post('retur_purchase_date');
@@ -2711,7 +2730,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$user_id 					= $_SESSION['user_id'];
 			$retur_purchase_id 			= $this->input->post('retur_purchase_id');
 			$payment_type 			    = $this->input->post('payment_type');
@@ -2758,7 +2777,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$retur_purchase_id = $this->input->get('id');
 			$header_retur_purchase['header_retur_purchase'] = $this->purchase_model->header_retur_purchase($retur_purchase_id);
 			$detail_retur_purchase['detail_retur_purchase'] = $this->purchase_model->detail_retur_purchase($retur_purchase_id); 
@@ -2775,7 +2794,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'ReturPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$retur_purchase_id = $this->input->post('id');
 			$detail_retur_purchase = $this->purchase_model->detail_retur_purchase_delete($retur_purchase_id);
 			$user_id 	= $_SESSION['user_id'];
@@ -2832,7 +2851,7 @@ class Purchase extends CI_Controller {
 	public function purchaserevisi(){
 		$modul = 'RevisiPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
@@ -2848,7 +2867,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'RevisiPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
@@ -2887,7 +2906,7 @@ class Purchase extends CI_Controller {
 	{
 		$modul = 'RevisiPurchase';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$purchase_id 			= $this->input->post('purchase_id');
 			$user_id 				= $_SESSION['user_id'];
 			$get_hd_purcahse 		= $this->purchase_model->header_purchase($purchase_id);

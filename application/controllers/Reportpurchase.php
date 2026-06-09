@@ -22,11 +22,16 @@ class Reportpurchase extends CI_Controller {
 
 	private function check_auth($modul){
 		if(isset($_SESSION['user_name']) == null){
-			redirect('Dashboard', 'refresh');
+			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
@@ -39,10 +44,11 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Report/Purchase/reportsubmission', $data);
 		}else{
 			$msg = "No Access";
@@ -70,7 +76,7 @@ class Reportpurchase extends CI_Controller {
 	public function reportsubmission_excell(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$start_date       = $this->input->get('start_date');
 			$end_date 	      = $this->input->get('end_date');
 			$warehouse_report = $this->input->get('warehouse_report');
@@ -138,10 +144,11 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Report/Purchase/reportpo', $data);
 		}else{
 			$msg = "No Access";
@@ -174,7 +181,7 @@ class Reportpurchase extends CI_Controller {
 
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$start_date       = $this->input->get('start_date');
 			$end_date 	      = $this->input->get('end_date');
 			$warehouse_report = $this->input->get('warehouse_report');
@@ -310,10 +317,11 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$po_list['po_list'] = $this->reportpurchase_model->po_list()->result_array();
-			$data['data'] = array_merge($warehouse_list, $po_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $po_list, $check_auth);
 			$this->load->view('Pages/Report/Purchase/reportinputwarehouse', $data);
 		}else{
 			$msg = "No Access";
@@ -343,7 +351,7 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$start_date       = $this->input->get('start_date');
 			$end_date 	      = $this->input->get('end_date');
 			$warehouse_report = $this->input->get('warehouse_report');
@@ -418,10 +426,11 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Report/Purchase/reportpurchases', $data);
 		}else{
 			$msg = "No Access";
@@ -450,7 +459,7 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$start_date       = $this->input->get('start_date');
 			$end_date 	      = $this->input->get('end_date');
 			$warehouse_report = $this->input->get('warehouse_report');
@@ -567,10 +576,11 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Report/Purchase/reportreturpurchase', $data);
 		}else{
 			$msg = "No Access";
@@ -598,7 +608,7 @@ class Reportpurchase extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$start_date       = $this->input->get('start_date');
 			$end_date 	      = $this->input->get('end_date');
 			$warehouse_report = $this->input->get('warehouse_report');

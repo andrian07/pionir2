@@ -22,11 +22,16 @@ class Reportmaster extends CI_Controller {
 
 	private function check_auth($modul){
 		if(isset($_SESSION['user_name']) == null){
-			redirect('Dashboard', 'refresh');
+			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
@@ -40,7 +45,7 @@ class Reportmaster extends CI_Controller {
 	public function reportbrand(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
 			$sheet->setCellValue('A1', "List Brand"); 
@@ -85,7 +90,7 @@ class Reportmaster extends CI_Controller {
 	public function reportcustomer(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
 			$sheet->setCellValue('A1', "List Customer"); 
@@ -168,7 +173,7 @@ class Reportmaster extends CI_Controller {
 	public function reportekspedisi(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
 			$sheet->setCellValue('A1', "List Ekspedisi"); 
@@ -218,7 +223,7 @@ class Reportmaster extends CI_Controller {
 	public function reportwarehouse(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
 			$sheet->setCellValue('A1', "List Gudang"); 
@@ -266,7 +271,7 @@ class Reportmaster extends CI_Controller {
 	public function reportcategory(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
 			$sheet->setCellValue('A1', "List Kategori"); 
@@ -314,11 +319,12 @@ class Reportmaster extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$brand_list['brand_list'] = $this->masterdata_model->brand_list();
 			$category_list['category_list'] = $this->masterdata_model->category_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($brand_list, $category_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($brand_list, $category_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Report/Masterdata/reportproduct', $data);
 		}else{
 			$msg = "No Access";
@@ -347,7 +353,7 @@ class Reportmaster extends CI_Controller {
 	{
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$brand_report 	 = $this->input->get('brand_report');
 			$category_report = $this->input->get('category_report');
 			$Supplier_report = $this->input->get('Supplier_report');
@@ -497,7 +503,7 @@ class Reportmaster extends CI_Controller {
 	public function reportsalesman(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
 			$sheet->setCellValue('A1', "List Kategori"); 
@@ -545,7 +551,7 @@ class Reportmaster extends CI_Controller {
 	public function reportsupplier(){
 		$modul = 'Report';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
 			$sheet->setCellValue('A1', "List Supplier"); 

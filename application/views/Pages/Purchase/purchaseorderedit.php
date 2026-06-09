@@ -10,7 +10,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
 
     </div>
     <div class="row">
-      <h3 class="fw-bold mb-3">Tambah PO </h3>
+      <h3 class="fw-bold mb-3">Edit PO </h3>
       <div class="col-md-12">
         <div class="card">
           <div class="card-body">

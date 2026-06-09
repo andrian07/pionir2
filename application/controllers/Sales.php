@@ -27,11 +27,16 @@ class Sales extends CI_Controller {
 
 	private function check_auth($modul){
 		if(isset($_SESSION['user_name']) == null){
-			redirect('Sales', 'refresh');
+			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
@@ -85,14 +90,15 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$user_list['user_list'] = $this->masterdata_model->user_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
 			$this->load->view('Pages/Sales/salesorder', $data);
 		}else{
 			$msg = "No Access";
@@ -104,7 +110,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -139,14 +145,14 @@ class Sales extends CI_Controller {
 					$hd_sales_remaining_debt = '<span class="badge badge-success">Lunas</span>';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Sales/detailsalesorder?id='.$field['hd_sales_order_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_sales_order_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'Sales/detailsalesorder?id='.$field['hd_sales_order_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				$disable = ($check_auth[0]->edit != 'Y' || in_array($field['hd_sales_order_status'], ['Cancel', 'Success']));
+				$disable = ($check_auth['check_access'][0]->edit != 'Y' || in_array($field['hd_sales_order_status'], ['Cancel', 'Success']));
 
 				$print = '<button type="button" class="btn btn-icon btn-warning delete btn-sm mb-2-btn" data-id="'.$field['hd_sales_order_id'].'" data-bs-toggle="modal" data-bs-target="#print"><i class="fas fa-print sizing-fa"></i></button> ';
 
@@ -164,7 +170,7 @@ class Sales extends CI_Controller {
 							</a>';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_sales_order_status'] != 'Success'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_sales_order_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -209,7 +215,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$hd_sales_order_id  = $this->input->get('id');
 			$header_sales_order['header_sales_order'] = $this->sales_model->header_sales_order($hd_sales_order_id);
 			$detail_sales_order['detail_sales_order'] = $this->sales_model->detail_sales_order($hd_sales_order_id); 
@@ -225,7 +231,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$sales_order_id  	= $this->input->post('id');
 			$header_sales_order = $this->sales_model->header_sales_order($sales_order_id);
 			$inv 				= $header_sales_order[0]->hd_sales_order_inv;
@@ -250,14 +256,15 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$user_list['user_list'] = $this->masterdata_model->user_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
 			$this->load->view('Pages/Sales/addsalesorder', $data);
 		}else{
 			$msg = "No Access";
@@ -269,7 +276,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 
 			$so_id 		= $this->input->get('id');
 			$header_so  = $this->sales_model->header_so($so_id);
@@ -307,8 +314,9 @@ class Sales extends CI_Controller {
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$user_list['user_list'] = $this->masterdata_model->user_list();
+			$check_auth['check_auth'] = $check_auth;
 
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $header_so_data);
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $header_so_data, $check_auth);
 			$this->load->view('Pages/Sales/editsalesorder', $data);
 		}else{
 			$msg = "No Access";
@@ -320,7 +328,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$hd_sales_order_id  = $this->input->post('sales_order_id');
 			$header_sales_order = $this->sales_model->header_sales_order($hd_sales_order_id);
 			$detail_sales_order = $this->sales_model->detail_sales_order($hd_sales_order_id); 
@@ -335,7 +343,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$sales_type									= $this->input->post('sales_type');
 			$sales_order_customer 						= $this->input->post('sales_order_customer');
 			$sales_order_payment						= $this->input->post('sales_order_payment');
@@ -505,7 +513,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$sales_order_id								= $this->input->post('sales_order_id');
 			$sales_order_invoice 						= $this->input->post('sales_order_invoice');
 			$sales_type									= $this->input->post('sales_type');
@@ -666,7 +674,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -716,7 +724,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse_id 				= $this->input->post('warehouse_id');
 			$product_id 				= $this->input->post('product_id');
 			$temp_rate 					= $this->input->post('temp_rate');
@@ -803,7 +811,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'SalesOrder';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id  = $this->input->post('id');
 			$user_id 	 = $_SESSION['user_id'];
 			$this->sales_model->delete_temp_so($product_id, $user_id);
@@ -824,14 +832,15 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$user_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
 			$this->load->view('Pages/Sales/sales', $data);
 		}else{
 			$msg = "No Access";
@@ -843,7 +852,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 				= $this->input->post('search');
 			$length 				= $this->input->post('length');
 			$start 			  		= $this->input->post('start');
@@ -877,7 +886,7 @@ class Sales extends CI_Controller {
 					$hd_sales_remaining_debt = '<span class="badge badge-success">Lunas</span>';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Sales/detailsales?id='.$field['hd_sales_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_sales_order_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
@@ -885,7 +894,7 @@ class Sales extends CI_Controller {
 				}
 
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_sales_status'] != 'Cancel'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_sales_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -932,7 +941,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$sales_id  			= $this->input->post('id');
 			$header_sales 		= $this->sales_model->header_sales($sales_id);
 			$detail_sales 		= $this->sales_model->detail_sales($sales_id);
@@ -972,7 +981,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$hd_sales_id  = $this->input->get('id');
 			$header_sales['header_sales'] = $this->sales_model->header_sales($hd_sales_id);
 			$detail_sales['detail_sales'] = $this->sales_model->detail_sales($hd_sales_id); 
@@ -988,14 +997,15 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$user_list['user_list'] = $this->masterdata_model->user_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
 			$this->load->view('Pages/Sales/addsales', $data);
 		}else{
 			$msg = "No Access";
@@ -1007,7 +1017,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$id  	      = $this->input->get('print_type');
 			$hd_sales_id  = $this->input->get('sales_id');
 			$header_sales['header_sales'] = $this->sales_model->header_sales($hd_sales_id);
@@ -1034,7 +1044,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$id  	      = $this->input->get('print_type');
 			$hd_sales_order_id  = $this->input->get('sales_order_id');
 			$header_sales_so['header_sales_so'] = $this->sales_model->header_sales_order($hd_sales_order_id);
@@ -1055,7 +1065,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -1105,7 +1115,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse_id 				= $this->input->post('warehouse_id');
 			$product_id 				= $this->input->post('product_id');
 			$temp_rate 					= $this->input->post('temp_rate');
@@ -1235,7 +1245,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$sales_customer             			  = $this->input->post('sales_customer');
 			$sales_order_id  						  = $this->input->post('sales_order_id');
 			$sales_payment            				  = $this->input->post('sales_payment');
@@ -1451,7 +1461,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id  = $this->input->post('id');
 			$user_id 	 = $_SESSION['user_id'];
 			$this->sales_model->delete_temp_sales($product_id, $user_id);
@@ -1472,11 +1482,12 @@ class Sales extends CI_Controller {
 		
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Sales/retursales', $data);
 		}else{
 			$msg = "No Access";
@@ -1489,7 +1500,7 @@ class Sales extends CI_Controller {
 
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -1520,7 +1531,7 @@ class Sales extends CI_Controller {
 					$payment_sts = '<span class="badge badge-primary multi-badge">Garansi</span>';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Sales/detailretursales?id='.$field['hd_retur_sales_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_retur_sales_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
@@ -1528,7 +1539,7 @@ class Sales extends CI_Controller {
 				}
 
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_retur_sales_status'] == 'Pending'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_retur_sales_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -1538,7 +1549,7 @@ class Sales extends CI_Controller {
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					if($field['hd_retur_sales_status'] == 'Pending'){
 						$payment = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn edit" data-id="'.$field['hd_retur_sales_id'].'" data-inv="'.$field['hd_retur_sales_inv'].'" data-total="'.$field['hd_retur_sales_total'].'" data-bs-toggle="modal" data-bs-target="#exampleModaledit"><i class="fas fa-money-bill-wave sizing-fa"></i></button>';
 					}else{
@@ -1584,11 +1595,12 @@ class Sales extends CI_Controller {
 		
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $check_auth);
 			$this->load->view('Pages/Sales/addretursales', $data);
 		}else{
 			$msg = "No Access";
@@ -1647,7 +1659,7 @@ class Sales extends CI_Controller {
 
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$sales_id 					= $this->input->post('sales_id');
 			$sales_inv 					= $this->input->post('sales_inv');
 			$product_id 				= $this->input->post('product_id');
@@ -1711,7 +1723,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -1781,7 +1793,7 @@ class Sales extends CI_Controller {
 
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 
 			$retur_sales_customer 	    = $this->input->post('retur_sales_customer');
 			$retur_sales_date 			= $this->input->post('retur_sales_date');
@@ -1885,7 +1897,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->edit == 'Y'){
+		if($check_auth['check_access'][0]->edit == 'Y'){
 			$user_id 					= $_SESSION['user_id'];
 			$retur_sales_id 			= $this->input->post('retur_sales_id');
 			$payment_type 			    = $this->input->post('payment_type');
@@ -1942,7 +1954,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$retur_sales_id = $this->input->get('id');
 			$header_retur_sales['header_retur_sales'] = $this->sales_model->header_retur_sales($retur_sales_id);
 			$detail_retur_sales['detail_retur_sales'] = $this->sales_model->detail_retur_sales($retur_sales_id); 
@@ -1959,7 +1971,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'ReturSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$retur_sales_id = $this->input->post('id');
 			$detail_retur_sales = $this->sales_model->detail_retur_sales_delete($retur_sales_id);
 			$user_id 	= $_SESSION['user_id'];
@@ -2017,14 +2029,15 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'RevisiSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$user_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
 			$this->load->view('Pages/Sales/revisisales', $data);
 		}else{
 			$msg = "No Access";
@@ -2037,14 +2050,15 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'RevisiSales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
 			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
 			$user_list['user_list'] = $this->masterdata_model->user_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
 			$this->load->view('Pages/Sales/addrevisisales', $data);
 		}else{
 			$msg = "No Access";
@@ -2102,7 +2116,7 @@ class Sales extends CI_Controller {
 	{
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$sales_customer             			  = $this->input->post('sales_customer');
 			$sales_id  						  		  = $this->input->post('sales_inv_id');
 			$sales_payment            				  = $this->input->post('sales_payment');
@@ -2311,11 +2325,12 @@ class Sales extends CI_Controller {
 		
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list, $check_auth);
 			$this->load->view('Pages/Sales/retursales', $data);
 		}else{
 			$msg = "No Access";

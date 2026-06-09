@@ -169,7 +169,7 @@
             </li>
             <?php } ?>
 
-            <?php if($data['check_auth']['check_auth_nav'][15]->nav_bar == 'Y'){ ?>
+            <?php if($data['check_auth']['check_auth_nav'][14]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a href="<?php echo base_url(); ?>Search">
                 <i class="fas fa-search"></i>
@@ -178,7 +178,7 @@
             </li>
             <?php } ?>
             
-            <?php if($data['check_auth']['check_auth_nav'][15]->nav_bar == 'Y'){ ?>
+            <?php if($data['check_auth']['check_auth_nav'][10]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][11]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][12]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][13]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][17]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a data-bs-toggle="collapse" href="#purchase">
                 <i class="fas fa-shopping-cart"></i>
@@ -187,26 +187,34 @@
               </a>
               <div class="collapse" id="purchase">
                 <ul class="nav nav-collapse">
+                  <?php if($data['check_auth']['check_auth_nav'][10]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Purchase/submission">
                       <span class="sub-item">Pengajuan</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][11]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Purchase/po">
                       <span class="sub-item">PO</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][12]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Purchase/warehouseinput">
                       <span class="sub-item">Penginputan Gudang</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][13]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Purchase">
                       <span class="sub-item">Pembelian</span>
                     </a>
                   </li>
+                  <?php } ?>
                   <?php /* 
                   <li>
                     <a href="<?php echo base_url(); ?>Purchase/purchaserevisi">
@@ -214,15 +222,19 @@
                     </a>
                   </li>
                   */ ?>
+                  <?php if($data['check_auth']['check_auth_nav'][17]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Purchase/returpurchase">
                       <span class="sub-item">Retur Pembelian</span>
                     </a>
                   </li>
+                  <?php } ?>
                 </ul>
               </div>
             </li>
+            <?php } ?>
 
+            <?php if($data['check_auth']['check_auth_nav'][15]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][16]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][22]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][17]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a data-bs-toggle="collapse" href="#sales">
                 <i class="fas fa-shopping-cart"></i>
@@ -231,35 +243,47 @@
               </a>
               <div class="collapse" id="sales">
                 <ul class="nav nav-collapse">
+                  <?php if($data['check_auth']['check_auth_nav'][15]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Sales/salesorder">
                       <span class="sub-item">Sales Order</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][16]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Sales/salespage">
                       <span class="sub-item">Penjualan</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][15]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Sales/salesdropship">
                       <span class="sub-item">Penjualan Dropship</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][22]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Sales/revisisalespage">
                       <span class="sub-item">Revisi Penjualan</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][17]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Sales/retursales">
                       <span class="sub-item">Retur Penjualan</span>
                     </a>
                   </li>
+                  <?php } ?>
                 </ul>
               </div>
             </li>
+            <?php } ?>
 
+            <?php if($data['check_auth']['check_auth_nav'][19]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][20]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a data-bs-toggle="collapse" href="#payment">
                 <i class="fas fa-money-bill"></i>
@@ -268,41 +292,53 @@
               </a>
               <div class="collapse" id="payment">
                 <ul class="nav nav-collapse">
+                  <?php if($data['check_auth']['check_auth_nav'][19]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Payment/debt">
                       <span class="sub-item">Pelunasan Hutang</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][20]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>Payment/receivable">
                       <span class="sub-item">Pelunasan Piutang</span>
                     </a>
                   </li>
+                  <?php } ?>
                 </ul>
               </div>
             </li>
+            <?php } ?>
 
+            <?php if($data['check_auth']['check_auth_nav'][24]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a href="<?php echo base_url(); ?>Opname">
                 <i class="fas fa-box"></i>
                 <p>Stock Opname</p>
               </a>
             </li>
+            <?php } ?>
 
+             <?php if($data['check_auth']['check_auth_nav'][21]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a href="<?php echo base_url(); ?>Transferstock">
                 <i class="fas fa-exchange-alt"></i>
                 <p>Transfer Stock</p>
               </a>
             </li>
+            <?php } ?>
 
+             <?php if($data['check_auth']['check_auth_nav'][25]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a href="<?php echo base_url(); ?>Report">
                 <i class="fas fa-file-pdf"></i>
                 <p>Laporan</p>
               </a>
             </li>
+            <?php } ?>
 
+            <?php if($data['check_auth']['check_auth_nav'][26]->nav_bar == 'Y' || $data['check_auth']['check_auth_nav'][27]->nav_bar == 'Y'){ ?>
             <li class="nav-item">
               <a data-bs-toggle="collapse" href="#user">
                 <i class="fas fa-user"></i>
@@ -311,19 +347,24 @@
               </a>
               <div class="collapse" id="user">
                 <ul class="nav nav-collapse">
+                  <?php if($data['check_auth']['check_auth_nav'][26]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>User/role">
                       <span class="sub-item">Grup Pengguna</span>
                     </a>
                   </li>
+                  <?php } ?>
+                  <?php if($data['check_auth']['check_auth_nav'][27]->nav_bar == 'Y'){ ?>
                   <li>
                     <a href="<?php echo base_url(); ?>User/account">
                       <span class="sub-item">Akun Pengguna</span>
                     </a>
                   </li>
+                  <?php } ?>
                 </ul>
               </div>
             </li>
+            <?php } ?>
           </ul>
         </div>
       </div>

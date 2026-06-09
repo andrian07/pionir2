@@ -19,10 +19,10 @@ require DOC_ROOT_PATH . $this->config->item('header');
               </div>
               <div class="ms-md-auto py-2 py-md-0">
                 <button class="btn btn-info" id="btnreload"><span class="btn-label"><i class="fas fa-sync"></i></span> Reload</button>
-                <?php if($check_auth[0]->add == 'N'){ ?>
-                  <a href="<?php echo base_url(); ?>Transferstock/addtransferstock"><button class="btn btn-primary" disabled><span class="btn-label"><i class="fa fa-plus"></i></span>Tambah</button></a>
-                <?php }else{ ?>
+                  <?php if($data['check_auth']['check_access'][0]->add == 'Y'){ ?>
                   <a href="<?php echo base_url(); ?>Transferstock/addtransferstock"><button class="btn btn-primary"><span class="btn-label"><i class="fa fa-plus"></i></span>Tambah</button></a>
+                <?php }else{ ?>
+                  <button class="btn btn-primary" disabled><span class="btn-label"><i class="fa fa-plus"></i></span>Tambah</button>
                 <?php } ?>
               </div>
             </div>

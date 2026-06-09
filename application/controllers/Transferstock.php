@@ -21,8 +21,13 @@ class Transferstock extends CI_Controller {
 			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
@@ -30,9 +35,11 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$check_auth['check_auth'] = $check_auth;
-			$this->load->view('Pages/Transferstock/transferstock', $check_auth);
+			$title['title'] = 'Transfer Stock';
+			$data['data'] = array_merge($check_auth, $title);
+			$this->load->view('Pages/Transferstock/transferstock', $data);
 		}else{
 			print_r('Tidak Ada Akses');die();
 		}
@@ -42,7 +49,7 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
@@ -57,14 +64,14 @@ class Transferstock extends CI_Controller {
 			$data = array();
 			$no = $_POST['start'];
 			foreach ($list as $field) {
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'Transferstock/detailtransfer?id='.$field['hd_transfer_stock_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_transfer_stock_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'Transferstock/detailtransfer?id='.$field['hd_transfer_stock_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				if($check_auth[0]->edit == 'Y'){
+				if($check_auth['check_access'][0]->edit == 'Y'){
 					if($field['hd_transfer_stock_status'] != 'Cancel'){
 						$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" data-bs-toggle="modal" data-bs-target="#exampleModaledit" data-id="'.$field['hd_transfer_stock_id'].'" data-name="'.$field['hd_transfer_stock_code'].'"><i class="fas fa-edit sizing-fa"></i></button> ';
 					}else{
@@ -75,7 +82,7 @@ class Transferstock extends CI_Controller {
 				}
 
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['hd_transfer_stock_status'] != 'Cancel'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_transfer_stock_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -130,7 +137,7 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$id  	      = $this->input->get('print_type');
 			$hd_transfer_id  = $this->input->get('transfer_id');
 			$header_transfer['header_transfer'] = $this->transferstock_model->header_transfer_stock($hd_transfer_id);
@@ -148,7 +155,7 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$check_auth['check_auth'] = $check_auth;
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$data['data'] = array_merge($check_auth, $warehouse_list);
@@ -162,7 +169,7 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$hd_transfer_id  = $this->input->get('id');
 			$header_transfer['header_transfer'] = $this->transferstock_model->header_transfer_stock($hd_transfer_id);
 			$detail_transfer['detail_transfer'] = $this->transferstock_model->detail_transfer_stock($hd_transfer_id)->result_array(); 
@@ -212,7 +219,7 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -264,7 +271,7 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$product_id 				= $this->input->post('product_id');
 			$transfer_from 				= $this->input->post('transfer_from');
 			$transfer_to 				= $this->input->post('transfer_to');
@@ -352,7 +359,7 @@ class Transferstock extends CI_Controller {
 
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$footer_total  			= $this->input->post('footer_total');
 			$transfer_stock_remark  = $this->input->post('transfer_stock_remark');
 			$transfer_stock_date    = $this->input->post('transfer_stock_date');
@@ -485,7 +492,7 @@ class Transferstock extends CI_Controller {
 	{
 		$modul = 'TransferStock';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->delete == 'Y'){
+		if($check_auth['check_access'][0]->delete == 'Y'){
 			$hd_transfer_id  	= $this->input->post('id');
 			$user_id 		 	= $_SESSION['user_id'];
 			$header_transfer 	= $this->transferstock_model->header_transfer_stock($hd_transfer_id);

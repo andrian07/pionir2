@@ -39,7 +39,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                     <label>Metode Pembayaran</label>
                     <select class="form-control input-full js-example-basic-single" id="payment_method_id" name="payment_method_id">
                       <option value="">-- Pilih Metode Bayar --</option>
-                      <?php foreach ($payment_list as $row) { ?>
+                      <?php foreach ($data['payment_list'] as $row) { ?>
                         <option value="<?php echo $row->payment_id; ?>"><?php echo $row->payment_name; ?></option>  
                       <?php } ?>
                     </select>

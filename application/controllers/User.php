@@ -23,20 +23,26 @@
 			}
 		}
 
+		
 		private function check_auth($modul){
 			if(isset($_SESSION['user_name']) == null){
 				redirect('Masterdata', 'refresh');
 			}else{
 				$user_role_id = $_SESSION['user_role_id'];
+				$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 				$check_access = $this->global_model->check_access($user_role_id, $modul);
-				return($check_access);
+				$array = array(
+					'check_auth_nav' => $check_auth_nav,
+					'check_access' => $check_access
+				);
+				return($array);
 			}
 		}
 
 		public function role(){
 			$modul = 'Role';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->view == 'Y'){
+			if($check_auth['check_access'][0]->view == 'Y'){
 				$check_auth['check_auth'] = $check_auth;
 				$group_role['group_role'] = $this->masterdata_model->group_role();
 				$data['data'] = array_merge($check_auth, $group_role);
@@ -50,7 +56,7 @@
 		{
 			$modul = 'Role';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->view == 'Y'){
+			if($check_auth['check_access'][0]->view == 'Y'){
 				$id = $this->input->post('id');
 				$get_setting_permission = $this->masterdata_model->get_setting_permission($id);
 				echo json_encode($get_setting_permission);
@@ -62,7 +68,7 @@
 		public function save_role(){
 			$modul = 'Role';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->add == 'Y'){
+			if($check_auth['check_access'][0]->add == 'Y'){
 				$role_name = $this->input->post('role_name');
 				$user_id   = $_SESSION['user_id'];
 				if($role_name == null){
@@ -107,7 +113,7 @@
 
 			$modul = 'Role';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->edit == 'Y'){
+			if($check_auth['check_access'][0]->edit == 'Y'){
 				$role_id   	       = $this->input->post('role_id');
 				$role_name   	   = $this->input->post('role_name_edit');
 				$user_id   		   = $_SESSION['user_id'];
@@ -144,7 +150,7 @@
 		{
 			$modul = 'Role';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->delete == 'Y'){
+			if($check_auth['check_access'][0]->delete == 'Y'){
 				$role_id  	= $this->input->post('id');
 				$role_name  = $this->input->post('role_name');
 				$user_id   	= $_SESSION['user_id'];
@@ -167,7 +173,7 @@
 		{
 			$modul = 'Role';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->edit == 'Y'){
+			if($check_auth['check_access'][0]->edit == 'Y'){
 				$role_permission 			= $this->input->post('role_permission');
 				$value_permission_view      = $this->input->post('value_permission_view');
 				$value_permission_add      	= $this->input->post('value_permission_add');
@@ -233,7 +239,7 @@
 		{
 			$modul = 'Accountuser';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->view == 'Y'){
+			if($check_auth['check_access'][0]->view == 'Y'){
 				$role_list['role_list'] = $this->masterdata_model->role_list()->result_array();
 				$check_auth['check_auth'] = $check_auth;
 				$data['data'] = array_merge($check_auth, $role_list);
@@ -248,7 +254,7 @@
 		{
 			$modul = 'Accountuser';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->view == 'Y'){
+			if($check_auth['check_access'][0]->view == 'Y'){
 				$search 			= $this->input->post('search');
 				$length 			= $this->input->post('length');
 				$start 			  	= $this->input->post('start');
@@ -263,12 +269,12 @@
 				$no = $_POST['start'];
 				foreach ($list as $field) {
 
-					if($check_auth[0]->edit == 'Y'){
+					if($check_auth['check_access'][0]->edit == 'Y'){
 						$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" data-bs-toggle="modal" data-bs-target="#exampleModaledit" data-id="'.$field['user_id'].'" data-name="'.$field['user_name'].'" data-role="'.$field['user_role'].'"><i class="fas fa-edit sizing-fa"></i></button> ';
 					}else{
 						$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-cog sizing-fa"></i></button> ';
 					}
-					if($check_auth[0]->delete == 'Y'){
+					if($check_auth['check_access'][0]->delete == 'Y'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger btn-sm mb-2-btn delete" onclick="delete_account('.$field['user_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
 						$delete = '<button type="button" class="btn btn-icon btn-danger btn-sm mb-2-btn delete" disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
@@ -299,7 +305,7 @@
 		{
 			$modul = 'Accountuser';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->add == 'Y'){
+			if($check_auth['check_access'][0]->add == 'Y'){
 				$user_name  		= $this->input->post('user_name');
 				$user_role 			= $this->input->post('user_role');
 				$user_id_inp	   	= $this->input->post('user_id_inp');
@@ -327,7 +333,7 @@
 		{
 			$modul = 'Accountuser';
 			$check_auth = $this->check_auth($modul);
-			if($check_auth[0]->add == 'Y'){
+			if($check_auth['check_access'][0]->add == 'Y'){
 				$id  		= $this->input->post('id');
 				$user_id 	= $_SESSION['user_id'];
 				$this->masterdata_model->delete_account($id);

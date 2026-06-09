@@ -685,7 +685,7 @@ class sales_model extends CI_Model {
 
     public function detail_retur_sales($retur_sales_id)
     {
-        $query = $this->db->query("select * from dt_retur_sales a,  hd_sales b, ms_product c, ms_unit d, hd_retur_sales e where  a.hd_retur_sales_id = e.hd_retur_sales_id and a.dt_retur_sales_product_id = c.product_id and c.product_unit = d.unit_id where a.hd_retur_sales_id = '".$retur_sales_id."'");
+        $query = $this->db->query("select * from dt_retur_sales a,  hd_sales b, ms_product c, ms_unit d, hd_retur_sales e where a.dt_retur_sales_b_id = b.hd_sales_id and a.hd_retur_sales_id = e.hd_retur_sales_id and a.dt_retur_sales_product_id = c.product_id and c.product_unit = d.unit_id and a.hd_retur_sales_id = '".$retur_sales_id."'");
         $result = $query->result();
         return $result;
     }

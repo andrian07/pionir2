@@ -21,7 +21,11 @@ require DOC_ROOT_PATH . $this->config->item('header');
               </div>
               <div class="ms-md-auto py-2 py-md-0">
                 <button class="btn btn-info" id="reload"><span class="btn-label"><i class="fas fa-sync"></i></span> Reload</button>
-                <a href="<?php echo base_url(); ?>Purchase/addwarehouseinput"><button class="btn btn-primary"><span class="btn-label"><i class="fa fa-plus"></i></span>Tambah</button></a>
+                <?php if($data['check_auth']['check_access'][0]->add == 'Y'){ ?>
+                  <a href="<?php echo base_url(); ?>Purchase/addwarehouseinput"><button class="btn btn-primary"><span class="btn-label"><i class="fa fa-plus"></i></span>Tambah</button></a>
+                <?php }else{ ?>
+                  <button class="btn btn-primary" disabled><span class="btn-label"><i class="fa fa-plus"></i></span>Tambah</button>
+                <?php } ?>
                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleModaledit"><i class="fas fa-search" ></i> Filter</button>
                 <div class="modal fade editmodal" id="exampleModaledit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -52,7 +56,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="warehouse_filter" name="warehouse_filter">
                               <option value="">-- Pilih Gudang --</option>
-                              <?php foreach ($warehouse_list as $row) { ?>
+                              <?php foreach ($data['warehouse_list'] as $row) { ?>
                                 <option value="<?php echo $row->warehouse_id; ?>"><?php echo $row->warehouse_name; ?></option>  
                               <?php } ?>
                             </select>
@@ -64,7 +68,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="supplier_filter" name="supplier_filter">
                               <option value="">-- Pilih Supplier --</option>
-                              <?php foreach ($supplier_list as $row) { ?>
+                              <?php foreach ($data['supplier_list'] as $row) { ?>
                                 <option value="<?php echo $row->supplier_id; ?>"><?php echo $row->supplier_name; ?></option>  
                               <?php } ?>
                             </select>

@@ -15,13 +15,19 @@ class Payment extends CI_Controller {
 		$this->load->helper(array('url', 'html'));
 	}
 
+
 	private function check_auth($modul){
 		if(isset($_SESSION['user_name']) == null){
-			redirect('Dashboard', 'refresh');
+			redirect('Masterdata', 'refresh');
 		}else{
 			$user_role_id = $_SESSION['user_role_id'];
+			$check_auth_nav = $this->global_model->check_auth_nav($user_role_id);
 			$check_access = $this->global_model->check_access($user_role_id, $modul);
-			return($check_access);
+			$array = array(
+				'check_auth_nav' => $check_auth_nav,
+				'check_access' => $check_access
+			);
+			return($array);
 		}
 	}
 
@@ -38,7 +44,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
 			$check_auth['check_auth'] = $check_auth;
 			$data['data'] = array_merge($check_auth, $supplier_list);
@@ -53,7 +59,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -73,7 +79,7 @@ class Payment extends CI_Controller {
 			$no = $_POST['start'];
 			foreach ($list as $field) {
 
-				if($check_auth[0]->add == 'Y'){
+				if($check_auth['check_access'][0]->add == 'Y'){
 					$add = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" onclick="payment('.$field['supplier_id'].')"><i class="fas fa-money-bill-wave sizing-fa"></i></button> ';
 				}else{
 					$add = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-money-bill-wave sizing-fa"></i></button> ';
@@ -108,7 +114,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -130,14 +136,14 @@ class Payment extends CI_Controller {
 					$status = '<span class="badge badge-danger">Cancel</span>';
 				}
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'payment/detaildebt?id='.$field['payment_debt_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['payment_debt_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'payment/detaildebt?id='.$field['payment_debt_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['status'] != 'Cancel'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['payment_debt_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -180,7 +186,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$payment_debt_id  = $this->input->get('id');
 
 			$header_debt_payment['header_debt_payment'] = $this->payment_model->header_debt_payment($payment_debt_id);
@@ -197,7 +203,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$supplier_id	   = $this->input->get('id');
 			$user_id 		   = $_SESSION['user_id'];
 			$get_purchase_debt = $this->payment_model->get_purchase_debt($supplier_id)->result_array();
@@ -230,8 +236,12 @@ class Payment extends CI_Controller {
 
 	public function debtpayview()
 	{
+		$modul = 'DebtPayment';
+		$check_auth = $this->check_auth($modul);
+		$check_auth['check_auth'] = $check_auth;
 		$payment_list['payment_list'] = $this->masterdata_model->payment_list();
-		$this->load->view('Pages/Payment/debtpay', $payment_list);
+		$data['data'] = array_merge($check_auth, $payment_list);
+		$this->load->view('Pages/Payment/debtpay', $data);
 	}
 
 	public function get_header_debt_pay()
@@ -253,7 +263,7 @@ class Payment extends CI_Controller {
 	public function temp_debt_list(){
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -269,13 +279,13 @@ class Payment extends CI_Controller {
 			$no = $_POST['start'];
 			foreach ($list as $field) {
 
-				if($check_auth[0]->add == 'Y'){
+				if($check_auth['check_access'][0]->add == 'Y'){
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" onclick="edit('.$field['hd_purchase_id'].')"><i class="fas fa-edit sizing-fa"></i></button> ';
 				}else{
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"> ';
 				}
 
-				if($check_auth[0]->add == 'Y'){
+				if($check_auth['check_access'][0]->add == 'Y'){
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_purchase_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 				}else{
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
@@ -322,7 +332,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$purchase_id 				= $this->input->post('purchase_id');
 			$purchase_invoice_date 		= $this->input->post('purchase_invoice_date');
 			$debt_desc 					= $this->input->post('debt_desc');
@@ -351,7 +361,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'DebtPayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$supplier_id 				= $this->input->post('supplier_id');
 			$repayment_date 			= $this->input->post('repayment_date');
 			$payment_method_id 			= $this->input->post('payment_method_id');
@@ -439,7 +449,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
 			$check_auth['check_auth'] = $check_auth;
 			$data['data'] = array_merge($check_auth, $customer_list);
@@ -454,7 +464,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -475,7 +485,7 @@ class Payment extends CI_Controller {
 			$no = $_POST['start'];
 			foreach ($list as $field) {
 
-				if($check_auth[0]->add == 'Y'){
+				if($check_auth['check_access'][0]->add == 'Y'){
 					$add = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" onclick="payment('.$field['customer_id'].')"><i class="fas fa-money-bill-wave sizing-fa"></i></button> ';
 				}else{
 					$add = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-money-bill-wave sizing-fa"></i></button> ';
@@ -510,7 +520,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -533,14 +543,14 @@ class Payment extends CI_Controller {
 				}
 
 
-				if($check_auth[0]->view == 'Y'){
+				if($check_auth['check_access'][0]->view == 'Y'){
 					$url = base_url();
 					$detail = '<a href="'.base_url().'payment/detailreceivable?id='.$field['payment_receivable_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['payment_receivable_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}else{
 					$detail = '<a href="'.base_url().'payment/detailreceivable?id='.$field['payment_receivable_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
 				}
 
-				if($check_auth[0]->delete == 'Y'){
+				if($check_auth['check_access'][0]->delete == 'Y'){
 					if($field['status'] != 'Cancel'){
 						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['payment_receivable_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 					}else{
@@ -583,7 +593,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$customer_id	   = $this->input->get('id');
 			$user_id 		   = $_SESSION['user_id'];
 			$get_sales_receivable = $this->payment_model->get_sales_receivable($customer_id)->result_array();
@@ -615,15 +625,19 @@ class Payment extends CI_Controller {
 
 	public function receivablepayview()
 	{
+		$modul = 'ReceivablePayment';
+		$check_auth = $this->check_auth($modul);
+		$check_auth['check_auth'] = $check_auth;
 		$payment_list['payment_list'] = $this->masterdata_model->payment_list();
-		$this->load->view('Pages/Payment/receivablepay', $payment_list);
+		$data['data'] = array_merge($check_auth, $payment_list);
+		$this->load->view('Pages/Payment/receivablepay', $data);
 	}
 
 	public function temp_receivable_list()
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
@@ -639,13 +653,13 @@ class Payment extends CI_Controller {
 			$no = $_POST['start'];
 			foreach ($list as $field) {
 
-				if($check_auth[0]->add == 'Y'){
+				if($check_auth['check_access'][0]->add == 'Y'){
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" onclick="edit('.$field['hd_sales_id'].')"><i class="fas fa-edit sizing-fa"></i></button> ';
 				}else{
 					$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-edit sizing-fa"></i></button> <button type="button" class="btn btn-icon btn-info btn-sm mb-2-btn" disabled="disabled"> ';
 				}
 
-				if($check_auth[0]->add == 'Y'){
+				if($check_auth['check_access'][0]->add == 'Y'){
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_sales_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
 				}else{
 					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
@@ -708,7 +722,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$sales_id 						= $this->input->post('sales_id');
 			$sales_invoice_date 			= $this->input->post('sales_invoice_date');
 			$receivable_desc 				= $this->input->post('receivable_desc');
@@ -737,7 +751,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->add == 'Y'){
+		if($check_auth['check_access'][0]->add == 'Y'){
 			$customer_id 			= $this->input->post('customer_id');
 			$repayment_date 		= $this->input->post('repayment_date');
 			$payment_method_id 		= $this->input->post('payment_method_id');
@@ -818,7 +832,7 @@ class Payment extends CI_Controller {
 	{
 		$modul = 'ReceivablePayment';
 		$check_auth = $this->check_auth($modul);
-		if($check_auth[0]->view == 'Y'){
+		if($check_auth['check_access'][0]->view == 'Y'){
 			$payment_receivable_id  = $this->input->get('id');
 
 			$header_receivable_payment['header_receivable_payment'] = $this->payment_model->header_receivable_payment($payment_receivable_id);
