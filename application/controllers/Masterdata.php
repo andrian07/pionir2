@@ -1516,7 +1516,8 @@ class Masterdata extends CI_Controller {
 			$id = $this->input->get('id');
 			$settingproduct['settingproduct'] = $this->masterdata_model->settingproduct($id);
 			$product_stock['product_stock'] = $this->masterdata_model->product_stock($id);
-			$data['data'] = array_merge($settingproduct, $product_stock);
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($settingproduct, $product_stock, $check_auth);
 			$this->load->view('Pages/Masterdata/product_setting', $data);
 		}else{
 			$msg = "No Access";

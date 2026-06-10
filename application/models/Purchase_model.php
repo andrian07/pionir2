@@ -688,9 +688,16 @@ class purchase_model extends CI_Model {
 
     public function get_input_warehouse_code($input_stock_id)
     {
-        $query = $this->db->query("select hd_input_stock_inv from hd_input_stock  where hd_po_id  = '".$input_stock_id."'");
+        $query = $this->db->query("select hd_input_stock_inv, hd_po_id from hd_input_stock  where hd_po_id  = '".$input_stock_id."'");
         $result = $query->result();
         return $result;
+    }
+
+    public function update_po_input($hd_po_id)
+    {
+        $this->db->set('hd_po_status', 'Pending');
+        $this->db->where('hd_po_id ', $hd_po_id);
+        $this->db->update('hd_po');
     }
     // end warehouse input 
 

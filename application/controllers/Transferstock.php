@@ -314,7 +314,7 @@ class Transferstock extends CI_Controller {
 				'temp_transfer_stock_qty'			 => $temp_qty,
 				'temp_transfer_stock_warehouse_from' => $transfer_from,
 				'temp_transfer_stock_warehouse_to'	 => $transfer_to,
-				'temp_transfer_stock_from_qty'	 	 => $last_stock_from,
+				'temp_transfer_stock_from_qty'	 	 => $last_stock_from - $temp_qty,
 				'temp_transfer_stock_to_qty'	 	 => $last_stock_to,
 				'temp_transfer_stock_note'			 => $temp_note,
 				'user_id'							 => $user_id,

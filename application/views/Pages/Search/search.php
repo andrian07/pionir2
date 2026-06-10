@@ -188,6 +188,15 @@ require DOC_ROOT_PATH . $this->config->item('header');
               <input class="form-check-input" type="checkbox" id="summary_field_sku" checked>
               <label class="form-check-label" for="summary_field_sku">SKU</label>
             </div>
+             <div class="form-check">
+              <label class="form-check-label" for="summary_field_price">Harga:</label>
+              <select id="summary_field_price" class="form-control form-control-sm" style="width: auto; display: inline-block; margin-left: 10px;">
+                <option value="1" selected>Harga Umum</option>
+                <option value="2">Harga Toko</option>
+                <option value="3">Harga Sales</option>
+                <option value="4">Harga Khusus</option>
+              </select>
+            </div>
             <div class="form-check">
               <input class="form-check-input" type="checkbox" id="summary_field_kategori">
               <label class="form-check-label" for="summary_field_kategori">Kategori</label>
@@ -504,6 +513,7 @@ function show_summary() {
 function getSummaryFields() {
   return {
     sku: $('#summary_field_sku').is(':checked'),
+    price: $('#summary_field_price').val(),
     kategori: $('#summary_field_kategori').is(':checked'),
     status: $('#summary_field_status').is(':checked'),
     stock_total: $('#summary_field_stock_total').is(':checked'),
@@ -532,10 +542,21 @@ function renderSummaryText() {
     let itemsToProcess = Array.isArray(result.item) ? result.item : (result.item ? [result.item] : []);
     itemsToProcess.forEach(item => {
       let stocks = Array.isArray(result.stocks) ? result.stocks : [];
-      let price = parseInt(item.product_sell_price_1) || 0;
+      if(fields.price) {
+        switch(fields.price) {
+          case '1': price = parseInt(item.product_sell_price_1) || 0; break;
+          case '2': price = parseInt(item.product_sell_price_2) || 0; break;
+          case '3': price = parseInt(item.product_sell_price_3) || 0; break;
+          case '4': price = parseInt(item.product_sell_price_4) || 0; break;
+          default: price = parseInt(item.product_sell_price_1) || 0;
+        }
+      } else {
+        price = 0;
+      }
 
       summary += item_count + '. ' + item.product_name + '\n';
       if(fields.sku) summary += 'SKU: ' + (item.product_code || '-') + '\n';
+      if(fields.price) summary += 'Harga: ' + formatter.format(price) + '\n';
       if(fields.kategori) summary += 'Kategori: ' + (item.category_name || '-') + '\n';
       if(fields.status) summary += 'Status: ' + (item.product_status || '-') + '\n';
       if(fields.supplier) summary += 'Supplier: ' + (item.product_supplier_tag || '-') + '\n';

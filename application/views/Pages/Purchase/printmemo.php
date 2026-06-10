@@ -185,7 +185,7 @@ td,th{
 <table>
     <tr>
         <td align="center">
-            <b style="font-size:15px;">MEMO PENGAMBILAN BARANG</b>
+            <b style="font-size:15px;">MEMO BONGKAR BARANG</b>
         </td>
     </tr>
 </table>

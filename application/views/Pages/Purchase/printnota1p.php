@@ -80,7 +80,7 @@
     <table style="width: 100%;">
         <tr>
             <th width="70%">Item</th>
-            <th width="10%">Qty</th>
+            <th width="10%">PCS</th>
             <th width="20%">Harga</th>
         </tr>
      <?php foreach($data['detail_po'] as $detail){ ?>

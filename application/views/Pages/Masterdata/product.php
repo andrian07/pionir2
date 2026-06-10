@@ -251,7 +251,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           </div>
 
                           <div class="form-group form-inline">
-                            <label for="inlineinput" class="col-md-3 col-form-label">Berat</label>
+                            <label for="inlineinput" class="col-md-3 col-form-label">Berat (Gram)</label>
                             <div class="col-md-12 p-0">
                               <input type="number" class="form-control input-full" id="product_weight" name="product_weight" placeholder="Berat">
                             </div>
@@ -448,7 +448,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           </div>
 
                           <div class="form-group form-inline">
-                            <label for="inlineinput" class="col-md-3 col-form-label">Berat</label>
+                            <label for="inlineinput" class="col-md-3 col-form-label">Berat (Gram)</label>
                             <div class="col-md-12 p-0">
                               <input type="number" class="form-control input-full" id="product_weight_edit" name="product_weight_edit" placeholder="Berat">
                             </div>

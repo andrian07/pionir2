@@ -2251,6 +2251,7 @@ class Purchase extends CI_Controller {
 			$user_id 		= $_SESSION['user_id'];
 			$get_input_warehouse_code 	= $this->purchase_model->get_input_warehouse_code($input_stock_id);
 			$hd_input_stock_inv 	= $get_input_warehouse_code[0]->hd_input_stock_inv;
+			$hd_po_id 				= $get_input_warehouse_code[0]->hd_po_id;
 			$get_dt_input_stock     = $this->purchase_model->detail_input_stock($input_stock_id);
 
 			$date 					= date("d/m/Y");
@@ -2279,7 +2280,7 @@ class Purchase extends CI_Controller {
 				}
 			}
 			$this->purchase_model->delete_warehouse_input($input_stock_id);
-			$this->purchase_model->update_po_input($input_stock_id);
+			$this->purchase_model->update_po_input($hd_po_id);
 			$data_insert_act = array(
 				'activity_table_desc'	       => 'Batalkan Input Stock Ref: '.$hd_input_stock_inv,
 				'activity_table_ref'	       => $hd_input_stock_inv,
@@ -2570,7 +2571,7 @@ class Purchase extends CI_Controller {
 				$row[] 	= $field['temp_retur_purchase_qty'];
 				$row[] 	= 'Rp. '.number_format($field['temp_retur_purchase_ongkir']);
 				$row[] 	= 'Rp. '.number_format($field['temp_retur_purchase_total']);
-				$row[] 	= $field['temp_retur_purchase_supplier'];
+				$row[] 	= $field['temp_retur_purchase_note'];
 				$row[] 	= $edit.$delete;
 				$data[] = $row;
 			}
