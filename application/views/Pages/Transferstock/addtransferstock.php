@@ -92,7 +92,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
 								<div class="col-sm-2">
 									<div class="form-group">
 										<label>Stok Gudang Dari</label>
-										<input id="temp_stock_from" name="temp_stock_from" type="text" class="form-control text-right" value="0" required="">
+										<input id="temp_stock_from" name="temp_stock_from" type="text" class="form-control text-right" value="0" required="" readonly>
 									</div>
 								</div>
 

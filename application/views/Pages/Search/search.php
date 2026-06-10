@@ -12,6 +12,45 @@ require DOC_ROOT_PATH . $this->config->item('header');
       width: 35%;
     }
   }
+  .summary-option-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.summary-option{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  cursor:pointer;
+  transition:all .2s ease;
+  margin:0;
+  width:100%;
+}
+
+.summary-option:hover{
+  background:#eff6ff;
+  border-color:#93c5fd;
+  transform:translateY(-1px);
+}
+
+.summary-option input{
+  width:18px;
+  height:18px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.summary-option span{
+  font-weight:600;
+  color:#334155;
+  display:block;
+  width:100%;
+}
 </style>
 </div>
 
@@ -181,67 +220,211 @@ require DOC_ROOT_PATH . $this->config->item('header');
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_sku" checked>
-              <label class="form-check-label" for="summary_field_sku">SKU</label>
+      <div class="modal-body" style="background: #f8fafc;">
+        <div class="row">
+
+          <!-- LEFT SIDE -->
+          <div class="col-md-4 mb-3">
+
+            <div class="card border-0 shadow-sm h-100"
+                style="border-radius: 18px;">
+
+              <div class="card-body">
+
+                <div class="mb-4">
+                  <small class="text-muted">
+                    Pilih informasi yang ingin ditampilkan!
+                  </small>
+                </div>
+
+                <!-- HARGA -->
+                <div class="mb-4">
+
+                  <label class="font-weight-bold mb-2 d-block">
+                    Jenis Harga
+                  </label>
+
+                  <select id="summary_field_price"
+                          class="form-control form-control-md"
+                          style="
+                            border-radius: 12px;
+                            height: 45px;
+                            border: 1px solid #dbe2ea;
+                          ">
+
+                    <option value="1" selected>Harga Umum</option>
+                    <option value="2">Harga Toko</option>
+                    <option value="3">Harga Sales</option>
+                    <option value="4">Harga Khusus</option>
+
+                  </select>
+
+                </div>
+
+                <!-- CHECKBOX -->
+                <div class="summary-option-list">
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_sku"
+                          checked>
+
+                    <span>SKU</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_kategori">
+
+                    <span>Kategori</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_status">
+
+                    <span>Status</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_stock_total">
+
+                    <span>Stock Total</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_stock_per_warehouse">
+
+                    <span>Stok Per Gudang</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_lokasi_stock">
+
+                    <span>Lokasi Stock</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_supplier">
+
+                    <span>Supplier</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_berat">
+
+                    <span>Berat</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_deskripsi">
+
+                    <span>Deskripsi</span>
+                  </label>
+
+                  <label class="summary-option">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_satuan">
+
+                    <span>Satuan</span>
+                  </label>
+
+                  <!-- HIDDEN -->
+                  <div class="form-check" style="display:none;">
+                    <input class="form-check-input"
+                          type="checkbox"
+                          id="summary_field_foto">
+
+                    <label class="form-check-label"
+                          for="summary_field_foto">
+                      Foto
+                    </label>
+                  </div>
+
+                </div>
+
+              </div>
             </div>
-             <div class="form-check">
-              <label class="form-check-label" for="summary_field_price">Harga:</label>
-              <select id="summary_field_price" class="form-control form-control-sm" style="width: auto; display: inline-block; margin-left: 10px;">
-                <option value="1" selected>Harga Umum</option>
-                <option value="2">Harga Toko</option>
-                <option value="3">Harga Sales</option>
-                <option value="4">Harga Khusus</option>
-              </select>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_kategori">
-              <label class="form-check-label" for="summary_field_kategori">Kategori</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_status" >
-              <label class="form-check-label" for="summary_field_status">Status</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_stock_total">
-              <label class="form-check-label" for="summary_field_stock_total">Stock Total</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_stock_per_warehouse">
-              <label class="form-check-label" for="summary_field_stock_per_warehouse">Stok Per Gudang</label>
-            </div>
+
           </div>
-          <div class="col-md-6">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_lokasi_stock">
-              <label class="form-check-label" for="summary_field_lokasi_stock">Lokasi Stock</label>
+
+          <!-- RIGHT SIDE -->
+          <div class="col-md-8">
+
+            <div class="card border-0 shadow-sm h-100"
+                style="border-radius: 18px;">
+
+              <div class="card-header bg-white border-0 pt-4">
+
+                <div class="d-flex align-items-center">
+
+                  <div style="
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 12px;
+                    background: #dcfce7;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    margin-right: 12px;
+                  ">
+                    <i class="fas fa-file-alt text-success"></i>
+                  </div>
+
+                  <div>
+                    <h5 class="mb-0 fw-bold">
+                      Preview Text
+                    </h5>
+
+                    <small class="text-muted">
+                      Hasil rangkuman produk otomatis
+                    </small>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="card-body">
+
+                <textarea id="summary_textarea"
+                          class="form-control"
+                          rows="18"
+                          readonly
+                          style="
+                            border-radius: 14px;
+                            background: #0f172a;
+                            border: none;
+                            padding: 20px;
+                            font-size: 13px;
+                            line-height: 1.7;
+                            font-family: monospace;
+                            resize: none;
+                          "></textarea>
+
+              </div>
+
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_supplier">
-              <label class="form-check-label" for="summary_field_supplier">Supplier</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_berat">
-              <label class="form-check-label" for="summary_field_berat">Berat</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_deskripsi">
-              <label class="form-check-label" for="summary_field_deskripsi">Deskripsi</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="summary_field_satuan">
-              <label class="form-check-label" for="summary_field_satuan">Satuan</label>
-            </div>
-            <div class="form-check" style="display: none;"> 
-              <input class="form-check-input" type="checkbox" id="summary_field_foto">
-              <label class="form-check-label" for="summary_field_foto">Foto</label>
-            </div>
+
           </div>
+
         </div>
-        <textarea id="summary_textarea" class="form-control" rows="10" readonly></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" onclick="copyText()">Copy Text</button>
@@ -513,7 +696,7 @@ function show_summary() {
 function getSummaryFields() {
   return {
     sku: $('#summary_field_sku').is(':checked'),
-    price: $('#summary_field_price').val(),
+    price: $('#summary_field_price option:selected').val(),
     kategori: $('#summary_field_kategori').is(':checked'),
     status: $('#summary_field_status').is(':checked'),
     stock_total: $('#summary_field_stock_total').is(':checked'),
@@ -526,6 +709,12 @@ function getSummaryFields() {
     foto: $('#summary_field_foto').is(':checked')
   };
 }
+
+$('#rangkumanModal .form-check-input, #summary_field_price').on('change', function() {
+  if(summaryCache.length > 0) {
+    renderSummaryText();
+  }
+});
 
 function renderSummaryText() {
   if(!summaryCache || summaryCache.length === 0) {
@@ -590,8 +779,6 @@ function renderSummaryText() {
         let imageUrl = item.product_image ? '<?php echo base_url(); ?>assets/products/' + item.product_image : '-';
         summary += 'Foto: ' + imageUrl + '\n';
       }
-      summary += 'Harga: ' + formatter.format(price) + '\n\n';
-      total_price += price;
       item_count++;
     });
   });

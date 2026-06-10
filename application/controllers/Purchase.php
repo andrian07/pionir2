@@ -525,6 +525,8 @@ class Purchase extends CI_Controller {
 				}
 				if($edit_footer_discount_percentage3_submit > 0){
 					$nominal_discount_satuan = $nominal_discount_satuan - $discount_product_satuan_3;
+				}else{
+					$nominal_discount_satuan = 0;
 				}
 
 				$get_ekspedisi_name = $this->masterdata_model->get_ekspedisi_name($purchase_ekspedisi);
