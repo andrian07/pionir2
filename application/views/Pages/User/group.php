@@ -81,6 +81,124 @@ require DOC_ROOT_PATH . $this->config->item('header');
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
+                        <table class="table mt-3">
+                          <thead>
+                            <tr>
+                              <th scope="col">Katalog Produk</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="listcatalog row gx-3 gy-3">
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="access_price_umum"
+                                            checked>
+                                      <span>Harga Umum</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="access_price_toko">
+                                      <span>Harga Toko</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="access_price_sales">
+                                      <span>Harga Sales</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="access_price_sales">
+                                      <span>Stock Total</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="summary_field_stock_per_warehouse">
+                                      <span>Stok Per Gudang</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="summary_field_lokasi_stock">
+                                      <span>Lokasi Stock</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="summary_field_supplier">
+                                      <span>Supplier</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="summary_field_berat">
+                                      <span>Berat</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="summary_field_deskripsi">
+                                      <span>Deskripsi</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 col-md-4">
+                                    <label class="summary-option">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="summary_field_satuan">
+                                      <span>Satuan</span>
+                                    </label>
+                                  </div>
+
+                                  <div class="col-12" style="display:none;">
+                                    <div class="form-check">
+                                      <input class="form-check-input"
+                                            type="checkbox"
+                                            id="summary_field_foto">
+                                      <label class="form-check-label"
+                                            for="summary_field_foto">
+                                        Foto
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+
                         <table class="table mt-3" style="text-align:cen">
                           <thead>
                             <tr>
@@ -137,6 +255,38 @@ require DOC_ROOT_PATH . $this->config->item('header');
 </div>
 </div>
 
+<style>
+  .listcatalog {
+    margin: 0;
+  }
+
+  .summary-option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.65rem;
+    background-color: #f7f9fb;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .summary-option:hover {
+    background-color: #eef4fb;
+    border-color: #c6d5e9;
+  }
+
+  .summary-option input {
+    margin: 0;
+    transform: scale(1.05);
+  }
+
+  .summary-option span {
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+</style>
 
 <?php 
 require DOC_ROOT_PATH . $this->config->item('footer');
@@ -297,6 +447,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
           text_temp += '</div></td>'+
           '<td><a href="#" class="'+data[i].module_name+'" id="'+data[i].module_name+'cancel" onclick="hide(this)" style="display:none;">Tutup</a></td>'+
           '</tr>';
+          
         }
         document.getElementById("temp").innerHTML = text_temp;
       }

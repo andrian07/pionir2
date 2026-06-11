@@ -303,6 +303,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <div class="form-group form-inline">
                             <div class="proof">
                               <div class="imgArea_edit" data-title="">
+                                
+                                <input type="text" name="reset_image" id="reset_image" value="">
                                 <input type="file" name="screenshoot_edit" id="screenshoot_edit" hidden accept="image/*" />
                                 <i class="fa-solid fa-cloud-arrow-up"></i>
                                 <h4>upload screenshoot</h4>
@@ -310,6 +312,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                 <div id="active-image"></div>
                               </div>
                               <button class="selectImage_edit" type="button">Select Image</button>
+                              
+                              <button class="removeImage_edit" type="button" style="margin-top: 10px;padding: 10px 15px;border-radius: 10px;width: 100%;">Hapus Image</button>
                             </div>
                           </div>
 
@@ -529,7 +533,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 
   new bootstrap.Modal(document.getElementById('myModal'), {backdrop: 'static', keyboard: false})  
   new bootstrap.Modal(document.getElementById('exampleModaledit'), {backdrop: 'static', keyboard: false})  
-  
+    
   $(document ).ready(function() {
     table_product_list();
     if (window.performance) {
@@ -545,6 +549,10 @@ require DOC_ROOT_PATH . $this->config->item('footer');
         }
       });
     }
+  });
+
+  $('#exampleModaledit').on('hidden.bs.modal', function () {
+      location.reload();
   });
 
   function table_product_list(){
@@ -817,6 +825,20 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       reader.readAsDataURL(image);
     }
   })
+
+  const removeImageButton_edit = document.querySelector('.removeImage_edit');
+  if (removeImageButton_edit) {
+    removeImageButton_edit.addEventListener('click', function () {
+      const allImgs = document.querySelectorAll('.imgArea_edit img');
+      allImgs.forEach((img) => img.remove());
+      const defaultImg = document.createElement("img");
+      defaultImg.src = '<?php echo base_url(); ?>assets/products/default.png';
+      imgArea_edit.appendChild(defaultImg);
+      imgArea_edit.classList.add('active');
+      imgArea_edit.dataset.title = 'default.png';
+              $("#reset_image").val(1);
+    });
+  }
 
 // End Edit Image //
 

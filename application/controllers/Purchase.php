@@ -506,28 +506,45 @@ class Purchase extends CI_Controller {
 					$discount_product_satuan_1 = 0;
 				}
 				if($edit_footer_discount_percentage2_submit > 0){
-					$discount_product_satuan_2 = $row['temp_purchase_price'] * $edit_footer_discount_percentage2_submit / 100;
+				    $discount_product_satuan_1_cal = $row['temp_purchase_price'] * $edit_footer_discount_percentage1_submit / 100;
+				    $discount_product_satuan_2 = $row['temp_purchase_price'] - $discount_product_satuan_1_cal;
+				    $discount_product_satuan_2_cal = $discount_product_satuan_2 * $edit_footer_discount_percentage2_submit / 100;
+				    $discount_product_satuan_2 = $row['temp_purchase_price'] - $discount_product_satuan_2_cal - $discount_product_satuan_1_cal;
+				    
 				}else{
 					$discount_product_satuan_2 = 0;
 				}
 				if($edit_footer_discount_percentage3_submit > 0){
-					$discount_product_satuan_3 = $row['temp_purchase_price'] * $edit_footer_discount_percentage3_submit / 100;
+					$discount_product_satuan_1_cal = $row['temp_purchase_price'] * $edit_footer_discount_percentage1_submit / 100;
+				    $discount_product_satuan_2 = $row['temp_purchase_price'] - $discount_product_satuan_1_cal;
+				    $discount_product_satuan_2_cal = $discount_product_satuan_2 * $edit_footer_discount_percentage2_submit / 100;
+				    $discount_product_satuan_3 = $row['temp_purchase_price'] - $discount_product_satuan_2_cal - $discount_product_satuan_1_cal;
+				    $discount_product_satuan_3_cal = $discount_product_satuan_3 * $edit_footer_discount_percentage3_submit / 100;
+				    $discount_product_satuan_3 = $row['temp_purchase_price'] - $discount_product_satuan_3_cal - $discount_product_satuan_2_cal - $discount_product_satuan_1_cal;
 				}else{
 					$discount_product_satuan_3 = 0;
 				}
 
-				$nominal_discount_satuan =  $row['temp_purchase_price'];
 				if($edit_footer_discount_percentage1_submit > 0){
-					$nominal_discount_satuan = $row['temp_purchase_price'] - $discount_product_satuan_1;
-				}
-				if($edit_footer_discount_percentage2_submit > 0){
-					$nominal_discount_satuan = $nominal_discount_satuan - $discount_product_satuan_2;
-				}
-				if($edit_footer_discount_percentage3_submit > 0){
-					$nominal_discount_satuan = $nominal_discount_satuan - $discount_product_satuan_3;
+					$nominal_discount_satuan = $discount_product_satuan_1;
 				}else{
 					$nominal_discount_satuan = 0;
 				}
+
+				if($edit_footer_discount_percentage2_submit > 0){
+					$nominal_discount_satuan = $discount_product_satuan_2;
+				}else{
+					$nominal_discount_satuan = 0;
+				}
+
+				if($edit_footer_discount_percentage3_submit > 0){
+					$nominal_discount_satuan = $discount_product_satuan_3;
+				}else{
+					$nominal_discount_satuan = 0;
+				}
+				
+
+					
 
 				$get_ekspedisi_name = $this->masterdata_model->get_ekspedisi_name($purchase_ekspedisi);
 				$ekspedisi_name = $get_ekspedisi_name[0]->ekspedisi_name;

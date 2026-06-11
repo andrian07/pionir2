@@ -1359,11 +1359,28 @@ class Masterdata extends CI_Controller {
 			$product_note				= $this->input->post('product_note_edit');
 			$user_id 					= $_SESSION['user_id'];
 			$product_supplier_id_tag 	= implode(",",$product_supplier);
+			$reset_image 				= $this->input->post('reset_image');
 
-
+			
 			if($_FILES['screenshoot_edit']['name'] == null){
 				$get_product_by_id   = $this->masterdata_model->get_product_by_id($product_id);
 				$new_image_name 	 = $get_product_by_id[0]->product_image;
+				if($reset_image == 1){
+					$new_image_name = 'default.png';
+					$config['upload_path'] = './assets/products/';
+					$config['allowed_types'] = 'gif|jpg|png|jpeg|PNG';
+					$config['file_name'] = $new_image_name;
+					$this->load->library('upload', $config);
+					if (!$this->upload->do_upload('screenshoot_edit')) 
+					{
+						$error = array('error' => $this->upload->display_errors());
+					} 
+					else
+					{
+						$data = array('image_metadata' => $this->upload->data());
+						$data_edit = array('product_image' => $new_image_name);
+					}
+				}
 			}else{
 				$new_image_name = $product_code.$this->generateRandomString().'.png';
 				$config['upload_path'] = './assets/products/';
