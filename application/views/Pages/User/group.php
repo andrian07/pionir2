@@ -93,6 +93,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                 <div class="listcatalog row gx-3 gy-3">
                                   <div class="col-6 col-md-4">
                                     <label class="summary-option">
+                                      <input type="hidden" id="role_id_acc" value="" />
                                       <input class="form-check-input"
                                             type="checkbox"
                                             id="access_price_umum"
@@ -123,8 +124,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                     <label class="summary-option">
                                       <input class="form-check-input"
                                             type="checkbox"
-                                            id="access_price_sales">
-                                      <span>Stock Total</span>
+                                            id="access_price_khusus">
+                                      <span>Harga Khusus</span>
                                     </label>
                                   </div>
 
@@ -132,8 +133,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                     <label class="summary-option">
                                       <input class="form-check-input"
                                             type="checkbox"
-                                            id="summary_field_stock_per_warehouse">
-                                      <span>Stok Per Gudang</span>
+                                            id="access_purchase_price">
+                                      <span>Harga Beli</span>
                                     </label>
                                   </div>
 
@@ -141,8 +142,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                     <label class="summary-option">
                                       <input class="form-check-input"
                                             type="checkbox"
-                                            id="summary_field_lokasi_stock">
-                                      <span>Lokasi Stock</span>
+                                            id="access_stock">
+                                      <span>Stok</span>
                                     </label>
                                   </div>
 
@@ -150,7 +151,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                     <label class="summary-option">
                                       <input class="form-check-input"
                                             type="checkbox"
-                                            id="summary_field_supplier">
+                                            id="access_supplier">
                                       <span>Supplier</span>
                                     </label>
                                   </div>
@@ -159,8 +160,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                     <label class="summary-option">
                                       <input class="form-check-input"
                                             type="checkbox"
-                                            id="summary_field_berat">
-                                      <span>Berat</span>
+                                            id="access_item_supplier">
+                                      <span>Item Supplier</span>
                                     </label>
                                   </div>
 
@@ -168,31 +169,11 @@ require DOC_ROOT_PATH . $this->config->item('header');
                                     <label class="summary-option">
                                       <input class="form-check-input"
                                             type="checkbox"
-                                            id="summary_field_deskripsi">
-                                      <span>Deskripsi</span>
+                                            id="access_status">
+                                      <span>Status</span>
                                     </label>
                                   </div>
 
-                                  <div class="col-6 col-md-4">
-                                    <label class="summary-option">
-                                      <input class="form-check-input"
-                                            type="checkbox"
-                                            id="summary_field_satuan">
-                                      <span>Satuan</span>
-                                    </label>
-                                  </div>
-
-                                  <div class="col-12" style="display:none;">
-                                    <div class="form-check">
-                                      <input class="form-check-input"
-                                            type="checkbox"
-                                            id="summary_field_foto">
-                                      <label class="form-check-label"
-                                            for="summary_field_foto">
-                                        Foto
-                                      </label>
-                                    </div>
-                                  </div>
                                 </div>
                               </td>
                             </tr>
@@ -212,7 +193,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i> Batal</button>
-                        <button type="button" id="btnedit" class="btn btn-primary"><i class="fas fa-save"></i> Edit</button>
+                        <button type="button" id="btneditacc" class="btn btn-primary"><i class="fas fa-save"></i> Edit</button>
                       </div>
                     </div>
                   </div>
@@ -376,6 +357,38 @@ require DOC_ROOT_PATH . $this->config->item('footer');
     });
   });
 
+  $('#btneditacc').click(function(e){
+    e.preventDefault();
+    let role_id               =  $('#role_id_acc').val();
+    let access_price_umum     =  $('#access_price_umum').val();
+    let access_price_toko     =  $('#access_price_toko').val();
+    let access_price_sales    =  $('#access_price_sales').val();
+    let access_price_khusus   =  $('#access_price_khusus').val();
+    let access_purchase_price =  $('#access_purchase_price').val();
+    let access_stock          =  $('#access_stock').val();
+    let access_supplier       =  $('#access_supplier').val();
+    let access_item_supplier  =  $('#access_item_supplier').val();
+    let access_status         =  $('#access_status').val();
+    $.ajax({
+      type: "POST",
+      url: "<?php echo base_url(); ?>User/edit_acc_product",
+      dataType: "json",
+      data: {role_id:role_id, access_price_umum:access_price_umum, access_price_toko:access_price_toko, access_price_sales:access_price_sales, access_price_khusus:access_price_khusus, access_purchase_price:access_purchase_price, access_stock:access_stock, access_supplier:access_supplier, access_item_supplier:access_item_supplier, access_status:access_status},
+      success : function(data){
+        if (data.code == "200"){
+          window.location.href = "<?php echo base_url(); ?>User/role";
+          Swal.fire('Saved!', '', 'success');
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: data.result,
+          })
+        }
+      }
+    });
+  });
+
   $('#btnreload').click(function(e){
     e.preventDefault();
     location.reload();
@@ -407,49 +420,105 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       data: {id:id},
       success : function(data){
         let text_temp = "";
-        for (let i = 0; i < data.length; i++) {
-          if(data[i].view == 'Y'){var view = 'Lihat, ';}else{var view = 'No Access';}
-          if(data[i].add == 'Y'){var add = 'Tambah, ';}else{var add = '';}
-          if(data[i].edit == 'Y'){var edit = 'Edit, ';}else{var edit = '';}
-          if(data[i].delete == 'Y'){var deletes = 'Hapus';}else{var deletes = '';}
+        for (let i = 0; i < data.data.get_setting_permission.length; i++) {
+          if(data.data.get_setting_permission[i].view == 'Y'){var view = 'Lihat, ';}else{var view = 'No Access';}
+          if(data.data.get_setting_permission[i].add == 'Y'){var add = 'Tambah, ';}else{var add = '';}
+          if(data.data.get_setting_permission[i].edit == 'Y'){var edit = 'Edit, ';}else{var edit = '';}
+          if(data.data.get_setting_permission[i].delete == 'Y'){var deletes = 'Hapus';}else{var deletes = '';}
           text_temp += 
-          '<tr><td>'+data[i].module_title+'</td><td class="'+data[i].module_name+'" onclick="tdclick(this)"><a href="#" id="'+data[i].module_name+'title" class"'+data[i].module_name+'-title">'+view+''+add+''+edit+''+deletes+'</a><div id="'+data[i].module_name+'" class="hide-permission">';
-          if(data[i].view == 'Y'){
+          '<tr><td>'+data.data.get_setting_permission[i].module_title+'</td><td class="'+data.data.get_setting_permission[i].module_name+'" onclick="tdclick(this)"><a href="#" id="'+data.data.get_setting_permission[i].module_name+'title" class"'+data.data.get_setting_permission[i].module_name+'-title">'+view+''+add+''+edit+''+deletes+'</a><div id="'+data.data.get_setting_permission[i].module_name+'" class="hide-permission">';
+          if(data.data.get_setting_permission[i].view == 'Y'){
             text_temp += 
-            '<input class="form-check-input" type="checkbox" name="flexCheckDefaulta'+data[i].module_name+'" id="flexCheckDefaulta'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Lihat</label> <br />';
+            '<input class="form-check-input" type="checkbox" name="flexCheckDefaulta'+data.data.get_setting_permission[i].module_name+'" id="flexCheckDefaulta'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Lihat</label> <br />';
           }else{
             text_temp += 
-            '<input class="form-check-input" type="checkbox" name="flexCheckDefaulta'+data[i].module_name+'" id="flexCheckDefaulta'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')"><label class="form-check-label" for="flexCheckDefault">Lihat</label> <br />';
+            '<input class="form-check-input" type="checkbox" name="flexCheckDefaulta'+data.data.get_setting_permission[i].module_name+'" id="flexCheckDefaulta'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')"><label class="form-check-label" for="flexCheckDefault">Lihat</label> <br />';
           }
 
-          if(data[i].add == 'Y'){
+          if(data.data.get_setting_permission[i].add == 'Y'){
             text_temp += 
-            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultb'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Tambah</label> <br />';
+            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultb'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Tambah</label> <br />';
           }else{
             text_temp += 
-            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultb'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')"><label class="form-check-label" for="flexCheckDefault">Tambah</label> <br />';
+            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultb'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')"><label class="form-check-label" for="flexCheckDefault">Tambah</label> <br />';
           }
 
-          if(data[i].edit == 'Y'){
+          if(data.data.get_setting_permission[i].edit == 'Y'){
             text_temp += 
-            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultc'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Edit</label> <br />';
+            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultc'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Edit</label> <br />';
           }else{
             text_temp += 
-            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultc'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')""><label class="form-check-label" for="flexCheckDefault">Edit</label> <br />';
+            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultc'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')""><label class="form-check-label" for="flexCheckDefault">Edit</label> <br />';
           }
-          if(data[i].delete == 'Y'){
+          if(data.data.get_setting_permission[i].delete == 'Y'){
             text_temp += 
-            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultd'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Hapus</label> <br />';
+            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultd'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')" checked><label class="form-check-label" for="flexCheckDefault">Hapus</label> <br />';
           }else{
             text_temp += 
-            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultd'+data[i].module_name+'" onclick="editcheck(\''+data[i].role_permision+'-'+data[i].module_name+'\')"><label class="form-check-label" for="flexCheckDefault">Hapus</label> <br />';
+            '<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultd'+data.data.get_setting_permission[i].module_name+'" onclick="editcheck(\''+data.data.get_setting_permission[i].role_permision+'-'+data.data.get_setting_permission[i].module_name+'\')"><label class="form-check-label" for="flexCheckDefault">Hapus</label> <br />';
           }
           text_temp += '</div></td>'+
-          '<td><a href="#" class="'+data[i].module_name+'" id="'+data[i].module_name+'cancel" onclick="hide(this)" style="display:none;">Tutup</a></td>'+
+          '<td><a href="#" class="'+data.data.get_setting_permission[i].module_name+'" id="'+data.data.get_setting_permission[i].module_name+'cancel" onclick="hide(this)" style="display:none;">Tutup</a></td>'+
           '</tr>';
           
         }
         document.getElementById("temp").innerHTML = text_temp;
+
+        let product_access = data.data.get_settting_product;
+        if(product_access[0].access_umum_price == 'Y'){
+          $('#access_price_umum').prop('checked', true);
+        }else{
+          $('#access_price_umum').prop('checked', false);
+        }
+
+        if(product_access[0].access_store_price == 'Y'){
+          $('#access_price_toko').prop('checked', true);
+        }else{
+          $('#access_price_toko').prop('checked', false);
+        }
+
+        if(product_access[0].access_sales_price == 'Y'){
+          $('#access_price_sales').prop('checked', true);
+        }else{
+          $('#access_price_sales').prop('checked', false);
+        }
+
+        if(product_access[0].access_special_price == 'Y'){
+          $('#access_price_khusus').prop('checked', true);
+        }else{
+          $('#access_price_khusus').prop('checked', false);
+        }
+
+        if(product_access[0].access_purchase_price == 'Y'){
+          $('#access_purchase_price').prop('checked', true);
+        }else{
+          $('#access_purchase_price').prop('checked', false);
+        }
+
+        if(product_access[0].access_stock == 'Y'){
+          $('#access_stock').prop('checked', true);
+        }else{
+          $('#access_stock').prop('checked', false);
+        }
+
+        if(product_access[0].access_supplier == 'Y'){
+          $('#access_supplier').prop('checked', true);
+        }else{
+          $('#access_supplier').prop('checked', false);
+        }
+
+        if(product_access[0].access_item_supplier == 'Y'){
+          $('#access_item_supplier').prop('checked', true);
+        }else{
+          $('#access_item_supplier').prop('checked', false);
+        }
+
+        if(product_access[0].access_status == 'Y'){
+          $('#access_status').prop('checked', true);
+        }else{
+          $('#access_status').prop('checked', false);
+        }
+        $('#role_id_acc').val(id);
       }
     });
   })

@@ -58,8 +58,10 @@
 			$check_auth = $this->check_auth($modul);
 			if($check_auth['check_access'][0]->view == 'Y'){
 				$id = $this->input->post('id');
-				$get_setting_permission = $this->masterdata_model->get_setting_permission($id);
-				echo json_encode($get_setting_permission);
+				$get_setting_permission['get_setting_permission'] = $this->masterdata_model->get_setting_permission($id);
+				$get_settting_product['get_settting_product'] = $this->masterdata_model->get_settting_product($id)->result_array();
+				$data['data'] = array_merge($get_setting_permission, $get_settting_product);
+				echo json_encode($data);
 			}else{
 				print_r('Tidak Ada Akses');die();
 			}
@@ -94,6 +96,11 @@
 
 					$this->masterdata_model->save_permision($data_insert_permision);
 				}
+				
+				$data_product_role = array(
+					'role_id'	       => $role_id
+				);
+				$this->masterdata_model->save_product_role($data_product_role);
 
 				$data_insert_act = array(
 					'activity_table_desc'	       => 'Tambah Group Baru '. $role_name,
@@ -145,6 +152,56 @@
 			
 		}
 
+		public function edit_acc_product()
+		{
+			$modul = 'Role';
+			$check_auth = $this->check_auth($modul);
+			if($check_auth['check_access'][0]->edit == 'Y'){
+				$role_id   	       			= $this->input->post('role_id');
+				$access_price_umum 			= $this->input->post('access_price_umum');
+				$access_price_toko   	   	= $this->input->post('access_price_toko');
+				$access_price_sales   	   	= $this->input->post('access_price_sales');
+				$access_price_khusus   	   	= $this->input->post('access_price_khusus');
+				$access_purchase_price   	= $this->input->post('access_purchase_price');
+				$access_stock   	   		= $this->input->post('access_stock');
+				$access_supplier   	   		= $this->input->post('access_supplier');
+				$access_item_supplier   	= $this->input->post('access_item_supplier');
+				$access_status   	   		= $this->input->post('access_status');
+				$user_id   		   			= $_SESSION['user_id'];
+
+				if($role_id == null){
+					$msg = "Terjadi Kesalahan Silahkan Refresh Kembali";
+					echo json_encode(['code'=>0, 'result'=>$msg]);die();
+				}
+
+				$update = array(
+					'access_umum_price'	  	=> $access_price_umum,
+					'access_store_price'	=> $access_price_toko,
+					'access_sales_price'	=> $access_price_sales,
+					'access_special_price'	=> $access_price_khusus,
+					'access_purchase_price'	=> $access_purchase_price,
+					'access_stock'	       	=> $access_stock,
+					'access_item_supplier'	=> $access_supplier,
+					'access_supplier'	    => $access_item_supplier,
+					'access_status'	       	=> $access_status
+
+				);
+				$this->masterdata_model->update_acc_product($update, $role_id);
+
+				$data_insert_act = array(
+					'activity_table_desc'	       => 'Update Aksess Produk',
+					'activity_table_user'	       => $user_id,
+				);
+				$this->global_model->save($data_insert_act);
+
+				$msg = "Succes Update";
+				echo json_encode(['code'=>200, 'result'=>$msg]);
+				die();
+				echo json_encode($get_setting_permission);
+			}else{
+				print_r('Tidak Ada Akses');die();
+			}
+		}
 
 		public function delete_role()
 		{

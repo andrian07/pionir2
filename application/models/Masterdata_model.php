@@ -13,6 +13,25 @@ class masterdata_model extends CI_Model {
         return $query;
     }
 
+    public function save_product_role($data_product_role)
+    {
+        $this->db->insert('ms_role_permision_product', $data_product_role);
+    }
+
+    public function get_settting_product($id)
+    {
+        $this->db->select('*');
+        $this->db->from('ms_role_permision_product');
+        $this->db->where('role_id', $id);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function update_acc_product($update, $role_id)
+    {
+        
+    }
+
     public function account_list($search, $length, $start)
     {
         $this->db->select('*');
