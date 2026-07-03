@@ -34,7 +34,7 @@ class global_model extends CI_Model {
         $this->db->from('ms_product');
         $this->db->join('ms_unit', 'ms_product.product_unit = ms_unit.unit_id');
         $this->db->where('ms_product.is_active', 'y');
-        $this->db->where('ms_product.product_status', 'Aktif');
+        $this->db->where('ms_product.product_status !=', 'Tidak Aktif');
         if($keyword != null){
             $this->db->where('(ms_product.product_name like "%'.$keyword.'%" OR ms_product.product_code like "%'.$keyword.'%" OR ms_product.product_supplier_name like "%'.$keyword.'%" OR ms_product.product_key like "%'.$keyword.'%" OR ms_product.product_desc like "%'.$keyword.'%") ');
         }
@@ -60,7 +60,7 @@ class global_model extends CI_Model {
         $this->db->join('dt_po', 'ms_product.product_id = dt_po.dt_product_id', 'left');
         $this->db->join('hd_po', 'dt_po.hd_po_id = hd_po.hd_po_id', 'left');
         $this->db->where('ms_product.is_active', 'y');
-        $this->db->where('ms_product.product_status', 'Aktif');
+         $this->db->where('ms_product.product_status !=', 'Tidak Aktif');
         if($keyword != null){
           $this->db->where('(ms_product.product_name like "%'.$keyword.'%" OR ms_product.product_code like "%'.$keyword.'%" OR ms_product.product_supplier_name like "%'.$keyword.'%" OR ms_product.product_key like "%'.$keyword.'%" OR ms_product.product_desc like "%'.$keyword.'%")');
         }
@@ -76,7 +76,7 @@ class global_model extends CI_Model {
         $this->db->join('ms_unit', 'ms_product.product_unit = ms_unit.unit_id');
         $this->db->join('ms_product_stock', 'ms_product.product_id = ms_product_stock.product_id');
         $this->db->where('ms_product.is_active', 'y');
-        $this->db->where('ms_product.product_status', 'Aktif');
+         $this->db->where('ms_product.product_status !=', 'Tidak Aktif');
 
         if($keyword != null){
             $this->db->where('(ms_product.product_name like "%'.$keyword.'%" OR ms_product.product_code like "%'.$keyword.'%" OR ms_product.product_supplier_name like "%'.$keyword.'%" OR ms_product.product_key like "%'.$keyword.'%" OR ms_product.product_desc like "%'.$keyword.'%") AND ms_product_stock.warehouse_id = '.$warehouse.'');
@@ -113,6 +113,16 @@ class global_model extends CI_Model {
         return $query;
     }
 
+    public function check_role_product($user_id)
+    {
+        $this->db->select('*');
+        $this->db->from('ms_user');
+        $this->db->join('ms_role_permision_product', 'ms_user.user_role = ms_role_permision_product.role_id');
+        $this->db->where('user_id', $user_id);
+        $query = $this->db->get();
+        return $query;
+    }
+
     public function search_sales_inv($keyword, $customer_id)
     {
         $this->db->select('*');
@@ -144,7 +154,7 @@ class global_model extends CI_Model {
 
     public function search_product_by_supplier($keyword)
     {
-        $query = $this->db->query("select * from ms_product a, ms_product_supplier b, ms_unit c  where a.product_id = b.product_id and a.product_unit = b.unit_id and(product_name like '%".$keyword."%' or product_code like '%".$keyword."%') and  a.is_active = 'Y' and a.product_status = 'Aktif' group by a.product_id" );
+        $query = $this->db->query("select * from ms_product a, ms_product_supplier b, ms_unit c  where a.product_id = b.product_id and a.product_unit = b.unit_id and(product_name like '%".$keyword."%' or product_code like '%".$keyword."%') and  a.is_active = 'Y' and a.product_status != 'Tidak Aktif' group by a.product_id" );
         $result = $query->result();
         return $result;
     }

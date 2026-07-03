@@ -29,7 +29,9 @@ class masterdata_model extends CI_Model {
 
     public function update_acc_product($update, $role_id)
     {
-        
+        $this->db->set($update);
+        $this->db->where('role_id', $role_id);
+        $this->db->update('ms_role_permision_product');
     }
 
     public function account_list($search, $length, $start)

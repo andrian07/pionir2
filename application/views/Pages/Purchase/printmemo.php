@@ -252,7 +252,7 @@ td,th{
 <?php if($p == $pages-1){ ?>
 
 <div class="footer-wrapper">
-
+    <?php /*
     <table>
         <tr>
             <td width="50%"></td>
@@ -281,6 +281,7 @@ td,th{
             </td>
         </tr>
     </table>
+    */?>
 
 </div>
 

@@ -1127,11 +1127,13 @@ class Masterdata extends CI_Controller {
 			$brand_filter = $this->input->post('filter_brand');
 			$product_status_filter = $this->input->post('filter_product_status');
 			$in_transit_filter = $this->input->post('filter_in_transit');
+			$user_id = $_SESSION['user_id'];
 
 			if($search != null){
 				$search = $search['value'];
 			}
 			$user_id = $_SESSION['user_id'];
+			$check_role_product = $this->global_model->check_role_product($user_id)->result_array();
 			$list = $this->masterdata_model->product_list($search, $length, $start, $supplier_filter, $category_filter, $brand_filter,$product_status_filter, $in_transit_filter)->result_array();
 			$count_list = $this->masterdata_model->product_list_count($search, $supplier_filter, $category_filter, $brand_filter,$product_status_filter, $in_transit_filter)->result_array();
 			$total_row = $count_list[0]['total_row'];
@@ -1179,7 +1181,12 @@ class Masterdata extends CI_Controller {
 				}else{
 					$product_status = '<span class="badge badge-warning">Discontinue</span>';
 				}
-
+				
+				if($check_role_product[0]['access_supplier'] == 'Y'){
+					$product_tag = $field['product_supplier_tag'];
+				}else{
+					$product_tag = '-';
+				}
 
 				$url_image = base_url().'assets/products/'.$field['product_image'];
 				$no++;
@@ -1189,7 +1196,7 @@ class Masterdata extends CI_Controller {
 				$row[] = $field['brand_name'];
 				$row[] = $field['category_name'];
 				$row[] = $product_sell_price_1;
-				$row[] = $field['product_supplier_tag'];
+				$row[] = $product_tag;
 				$row[] = $product_status;
 				$row[] = $intransit;
 				$row[] = $product_package;

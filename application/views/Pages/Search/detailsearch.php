@@ -117,8 +117,14 @@
                 </tr>
                 
                 <tr>
-                  <th scope="col" class="productinfo-text-right">Catatan Penting:</th>
-                  <td colspan="4"><?php echo nl2br($row->product_purchase_record); ?></td>
+                   <th scope="col" class="productinfo-text-right">Catatan Penting:</th>
+                <?php
+                $note = str_replace(['<br />', '<br>', '<br/>'], "\n", $row->product_note);
+                ?>
+                
+                <td colspan="4" style="white-space: pre-line;">
+                    <?= $note; ?>
+                </td>
                 </tr>
                 <tr>
                   <th scope="col" class="productinfo-text-right">Min Order:</th>

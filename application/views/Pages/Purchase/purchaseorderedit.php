@@ -505,6 +505,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
   $(document).ready(function() {
     temppo_table();
     get_header_edit();
+    let header_edit = get_header_edit();
   });
 
   function temppo_table(){
@@ -819,18 +820,20 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       success : function(data){
         if (data.code == "200"){
           var row = data.data[0];
+
           
-          console.log(row.hd_po_top);
           let po_top = row.hd_po_top;
-            if(po_top == 'JT 7'){
+            if(po_top == 'JT7'){
               $('#po_top').val('7');
-            }else if(po_top == 'JT 14'){
-              $('#po_top').val('14');
-            }else if(po_top == 'JT 30'){
+            }else if(po_top == 'JT15'){
+              $('#po_top').val('15');
+            }else if(po_top == 'JT30'){
               $('#po_top').val('30');
-            }else if(po_top == 'JT 60'){
+            }else if(po_top == 'JT45'){
+              $('#po_top').val('45');
+            }else if(po_top == 'JT60'){
               $('#po_top').val('60');
-            }else if(po_top == 'JT 90'){  
+            }else if(po_top == 'JT90'){  
               $('#po_top').val('90');
             }else{
               $('#po_top').val('0');
@@ -842,6 +845,23 @@ require DOC_ROOT_PATH . $this->config->item('footer');
               $('#ppn_cheked').prop('checked', false);
             }
           $('#po_top').trigger('change');
+          
+          setTimeout(function(){
+                
+                edit_footer_discount_percentage1.set(row.hd_po_disc_percentage1);
+                edit_footer_discount1.set(row.hd_po_disc_1);
+                 edit_footer_discount_percentage2.set(row.hd_po_disc_percentage2);
+                edit_footer_discount2.set(row.hd_po_disc_2);
+                 edit_footer_discount_percentage3.set(row.hd_po_disc_percentage3);
+                edit_footer_discount3.set(row.hd_po_disc_3);
+                footer_total_discount.set(row.hd_po_total_discount);
+                footer_dpp.set(row.hd_po_dpp);
+                footer_total_ppn.set(row.hd_po_ppn);
+                footer_total_ongkir.set(row.hd_po_ongkir);
+                footer_total_invoice.set(row.hd_po_grand_total);
+            
+            }, 200);
+
           $("#purchase_order_invoice").val(row.hd_po_invoice);
           $("#purchase_order_id").val(row.hd_po_id);
           $("#po_supplier").val(row.supplier_id);
@@ -852,6 +872,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
           $('#po_payment_method').trigger('change');
           $("#po_warehouse").val(row.hd_po_warehouse); 
           $('#po_warehouse').trigger('change');
+         
         }
       }
     });  

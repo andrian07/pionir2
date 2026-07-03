@@ -168,7 +168,8 @@
 				$access_item_supplier   	= $this->input->post('access_item_supplier');
 				$access_status   	   		= $this->input->post('access_status');
 				$user_id   		   			= $_SESSION['user_id'];
-
+				
+			
 				if($role_id == null){
 					$msg = "Terjadi Kesalahan Silahkan Refresh Kembali";
 					echo json_encode(['code'=>0, 'result'=>$msg]);die();
@@ -181,8 +182,8 @@
 					'access_special_price'	=> $access_price_khusus,
 					'access_purchase_price'	=> $access_purchase_price,
 					'access_stock'	       	=> $access_stock,
-					'access_item_supplier'	=> $access_supplier,
-					'access_supplier'	    => $access_item_supplier,
+					'access_item_supplier'	=> $access_item_supplier,
+					'access_supplier'	    => $access_supplier,
 					'access_status'	       	=> $access_status
 
 				);

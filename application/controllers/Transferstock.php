@@ -413,7 +413,7 @@ class Transferstock extends CI_Controller {
 					'dt_transfer_stock_qty' 			 => $row['temp_transfer_stock_qty'],
 					'dt_transfer_stock_warehouse_from'	 => $row['temp_transfer_stock_warehouse_from'],
 					'dt_transfer_stock_warehouse_to'	 => $row['temp_transfer_stock_warehouse_to'],
-					'dt_transfer_stock_from_qty'		 => $last_stock_from[0]['stock'],
+					'dt_transfer_stock_from_qty'		 => $row['temp_transfer_stock_from_qty'],
 					'dt_transfer_stock_to_qty'			 => $last_stock_to[0]['stock'] + $row['temp_transfer_stock_qty'],
 					'dt_transfer_stock_note'			 => $row['temp_transfer_stock_note']
 				);

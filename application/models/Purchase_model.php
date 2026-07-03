@@ -688,7 +688,7 @@ class purchase_model extends CI_Model {
 
     public function get_input_warehouse_code($input_stock_id)
     {
-        $query = $this->db->query("select hd_input_stock_inv, hd_po_id from hd_input_stock  where hd_po_id  = '".$input_stock_id."'");
+        $query = $this->db->query("select hd_input_stock_inv, hd_po_id from hd_input_stock  where hd_input_stock_id  = '".$input_stock_id."'");
         $result = $query->result();
         return $result;
     }

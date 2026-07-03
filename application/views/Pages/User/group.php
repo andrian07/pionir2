@@ -359,35 +359,48 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 
   $('#btneditacc').click(function(e){
     e.preventDefault();
-    let role_id               =  $('#role_id_acc').val();
-    let access_price_umum     =  $('#access_price_umum').val();
-    let access_price_toko     =  $('#access_price_toko').val();
-    let access_price_sales    =  $('#access_price_sales').val();
-    let access_price_khusus   =  $('#access_price_khusus').val();
-    let access_purchase_price =  $('#access_purchase_price').val();
-    let access_stock          =  $('#access_stock').val();
-    let access_supplier       =  $('#access_supplier').val();
-    let access_item_supplier  =  $('#access_item_supplier').val();
-    let access_status         =  $('#access_status').val();
+
+    let role_id               = $('#role_id_acc').val();
+    let access_price_umum = $('#access_price_umum').is(':checked') ? 'Y' : 'N';
+    let access_price_toko = $('#access_price_toko').is(':checked') ? 'Y' : 'N';
+    let access_price_sales = $('#access_price_sales').is(':checked') ? 'Y' : 'N';
+    let access_price_khusus = $('#access_price_khusus').is(':checked') ? 'Y' : 'N';
+    let access_purchase_price = $('#access_purchase_price').is(':checked') ? 'Y' : 'N';
+    let access_stock = $('#access_stock').is(':checked') ? 'Y' : 'N';
+    let access_supplier = $('#access_supplier').is(':checked') ? 'Y' : 'N';
+    let access_item_supplier = $('#access_item_supplier').is(':checked') ? 'Y' : 'N';
+    let access_status = $('#access_status').is(':checked') ? 'Y' : 'N';
+
     $.ajax({
-      type: "POST",
-      url: "<?php echo base_url(); ?>User/edit_acc_product",
-      dataType: "json",
-      data: {role_id:role_id, access_price_umum:access_price_umum, access_price_toko:access_price_toko, access_price_sales:access_price_sales, access_price_khusus:access_price_khusus, access_purchase_price:access_purchase_price, access_stock:access_stock, access_supplier:access_supplier, access_item_supplier:access_item_supplier, access_status:access_status},
-      success : function(data){
-        if (data.code == "200"){
-          window.location.href = "<?php echo base_url(); ?>User/role";
-          Swal.fire('Saved!', '', 'success');
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: data.result,
-          })
+        type: "POST",
+        url: "<?php echo base_url(); ?>User/edit_acc_product",
+        dataType: "json",
+        data: {
+            role_id: role_id,
+            access_price_umum: access_price_umum,
+            access_price_toko: access_price_toko,
+            access_price_sales: access_price_sales,
+            access_price_khusus: access_price_khusus,
+            access_purchase_price: access_purchase_price,
+            access_stock: access_stock,
+            access_supplier: access_supplier,
+            access_item_supplier: access_item_supplier,
+            access_status: access_status
+        },
+        success: function(data){
+            if (data.code == "200"){
+                window.location.href = "<?php echo base_url(); ?>User/role";
+                Swal.fire('Saved!', '', 'success');
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.result,
+                });
+            }
         }
-      }
     });
-  });
+});
 
   $('#btnreload').click(function(e){
     e.preventDefault();

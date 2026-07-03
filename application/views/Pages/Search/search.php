@@ -2,211 +2,470 @@
 define('DOC_ROOT_PATH', $_SERVER['DOCUMENT_ROOT'].'/');
 require DOC_ROOT_PATH . $this->config->item('header');
 ?>
-<style type="text/css">
-  .image-td{
-    width: 15%;
+<style>
+  /* ===== SEARCH PAGE REDESIGN ===== */
+  .search-hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+    border-radius: 18px;
+    padding: 28px 32px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(30,58,95,0.18);
+        margin-top: 76px;
+  }
+  .search-hero h4 {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+  }
+  .search-hero small {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.82rem;
+  }
+  .search-input-wrap {
+    position: relative;
+    margin-top: 18px;
+  }
+  .search-input-wrap .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b8db5;
+    font-size: 1rem;
+    pointer-events: none;
+  }
+  .search-input-wrap input {
+    border-radius: 12px !important;
+    padding-left: 44px !important;
+    height: 50px;
+    font-size: 1rem;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    background: #fff;
+  }
+  .search-input-wrap input:focus {
+    box-shadow: 0 0 0 3px rgba(45,106,159,0.25);
+    outline: none;
   }
 
-  @media only screen and (max-width: 600px) {
-    .image-td{
-      width: 35%;
-    }
+  /* ===== FILTER SECTION ===== */
+  .filter-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e8edf3;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   }
-  .summary-option-list{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+  .filter-card .filter-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #8ca0b8;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .filter-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .filter-label i {
+    color: #6b8db5;
+    font-size: 0.75rem;
+  }
+  .filter-card .form-control,
+  .filter-card .select2-container--default .select2-selection--single {
+    border-radius: 10px !important;
+    border-color: #dce3ec;
+    font-size: 0.88rem;
+    height: 38px;
+    background: #f8fafc;
+  }
+  .filter-card .select2-container--default .select2-selection--single {
+    height: 38px;
+    line-height: 36px;
+    padding-top: 1px;
+  }
+  .filter-card .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 36px;
+    color: #4a5568;
+  }
+  .filter-card .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+  }
 
-.summary-option{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px 14px;
-  border-radius:12px;
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
-  cursor:pointer;
-  transition:all .2s ease;
-  margin:0;
-  width:100%;
-}
+  /* ===== TOOLBAR ===== */
+  .toolbar-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e8edf3;
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .toolbar-bar .toolbar-left,
+  .toolbar-bar .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .toolbar-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toolbar-select-wrap label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #6b7280;
+    white-space: nowrap;
+    margin: 0;
+  }
+  .toolbar-select-wrap select {
+    border-radius: 8px;
+    border-color: #dce3ec;
+    font-size: 0.85rem;
+    height: 34px;
+    background: #f8fafc;
+    padding: 0 10px;
+    color: #374151;
+  }
+  #pagination_info {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f1f5f9;
+    padding: 6px 14px;
+    border-radius: 8px;
+  }
+  .btn-select-mode {
+    border-radius: 8px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    padding: 6px 14px;
+  }
 
-.summary-option:hover{
-  background:#eff6ff;
-  border-color:#93c5fd;
-  transform:translateY(-1px);
-}
+  /* ===== PRODUCT TABLE ===== */
+  .product-table-wrap {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e8edf3;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .product-table-wrap table {
+    margin: 0;
+  }
+  .product-table-wrap table thead th {
+    background: #f1f5f9;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 16px;
+  }
+  .product-table-wrap table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .product-table-wrap table tbody tr:last-child {
+    border-bottom: none;
+  }
+  .product-table-wrap table tbody tr:hover {
+    background: #f0f7ff;
+  }
+  .product-table-wrap table tbody td {
+    padding: 12px 16px;
+    vertical-align: middle;
+  }
+  .product-img-cell {
+    width: 72px;
+  }
+  .product-img-cell img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .product-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+  .product-price-badge {
+    display: inline-block;
+    background: linear-gradient(90deg,#e0f2fe,#bae6fd);
+    color: #0369a1;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+  .product-stock {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 7px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+  .product-stock.low {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #c2410c;
+  }
 
-.summary-option input{
-  width:18px;
-  height:18px;
-  cursor:pointer;
-  flex-shrink:0;
-}
+  /* ===== PAGINATION ===== */
+  .pagination-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 12px 0 4px;
+  }
+  .pagination .page-link {
+    border-radius: 8px !important;
+    margin: 0 3px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+    border-color: #e2e8f0;
+    padding: 6px 12px;
+  }
+  .pagination .page-item.active .page-link {
+    background: #2d6a9f;
+    border-color: #2d6a9f;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(45,106,159,0.25);
+  }
+  .pagination .page-item.disabled .page-link {
+    color: #cbd5e1;
+    background: #f8fafc;
+  }
+  .pagination .page-link:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+  }
 
-.summary-option span{
-  font-weight:600;
-  color:#334155;
-  display:block;
-  width:100%;
-}
+  /* ===== SUMMARY OPTIONS ===== */
+  .summary-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .summary-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all .15s ease;
+    margin: 0;
+    width: 100%;
+  }
+  .summary-option:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    transform: translateY(-1px);
+  }
+  .summary-option input {
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: #2d6a9f;
+  }
+  .summary-option span {
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.87rem;
+  }
+
+  @media (max-width: 600px) {
+    .product-img-cell img { width: 48px; height: 48px; }
+    .search-hero { padding: 18px 16px; }
+    .filter-card { padding: 14px 12px; }
+  }
 </style>
 </div>
 
-<div class="container">
-  <div class="page-inner">
-    <div class="page-header">
-      <h3 class="fw-bold mb-3" style="padding-left: 20px;">Informasi Produk</h3>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <div class="row" style="margin-top:10px;">
-               <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">Unit:</label>
-                <select id="filter_unit" class="form-control input-full js-example-basic-single">
-                  <option value="">-- Semua Unit --</option>
-                  <?php foreach($data['unit_list'] as $u){ ?>
-                    <option value="<?= $u->unit_id ?>"><?= $u->unit_name ?></option>
-                  <?php } ?>
-                </select>
-              </div>
+<div class="container-fluid">
+  <div class="page-inner" style="padding: 20px 24px;">
 
-              <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">Kategori:</label>
-                <select id="filter_category" class="form-control input-full js-example-basic-single">
-                  <option value="">-- Semua Kategori --</option>
-                  <?php foreach($data['category_list'] as $c){ ?>
-                    <option value="<?= $c->category_id ?>"><?= $c->category_name ?></option>
-                  <?php } ?>
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                
-                <label style="font-weight: 700; margin-bottom: 5px;">Brand:</label>
-                <select id="filter_brand" class="form-control input-full js-example-basic-single">
-                  <option value="">-- Semua Brand --</option>
-                  <?php foreach($data['brand_list'] as $b){ ?>
-                    <option value="<?= $b->brand_id ?>"><?= $b->brand_name ?></option>
-                  <?php } ?>
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">Supplier:</label>
-                <select id="filter_supplier" class="form-control input-full js-example-basic-single">
-                  <option value="">-- Semua Supplier --</option>
-                  <?php foreach($data['supplier_list'] as $s){ ?>
-                    <option value="<?= $s->supplier_name ?>"><?= $s->supplier_name ?></option>
-                  <?php } ?>
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">Status:</label>
-                <select id="filter_status" class="form-control input-full js-example-basic-single">
-                  <option value="">-- Semua Status --</option>
-                    <option value="Aktif">Aktif</option>
-                    <option value="Discontinue">Discontinue</option>
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">Paket:</label>
-                <select id="filter_paket" class="form-control input-full js-example-basic-single">
-                  <option value="">-- Semua --</option>
-                    <option value="N">Bukan Paket</option>
-                    <option value="Y">Paket</option>
-                </select>
-              </div>
-
-               <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">PPN:</label>
-                <select id="filter_ppn" class="form-control input-full js-example-basic-single">
-                  <option value="">-- Semua --</option>
-                    <option value="NON PPN">Bukan PPN</option>
-                    <option value="PPN">PPN</option>
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                <button type="button" class="btn btn-sm btn-info" id="toggle_select_btn" onclick="toggle_select_mode()" style="margin-top: 25px;">Pilih</button>
-                <button type="button" class="btn btn-sm btn-primary" onclick="show_summary()" style="margin-top: 25px;">Rangkuman</button>
-              </div>
-
-
-            </div>
-          </div>
-
-          <div class="card-header">
-            <div class="row">
-              <div id="info" class="col-12"></div>
-
-              <div class="col-12">
-                <label style="font-weight: 700; margin-bottom: 5px; margin-left:5px;">Barcode / Nama Produk</label>
-              </div>
-              <div class="col-sm-10">
-                <!-- text input -->
-                <div class="form-group">
-                  <input id="key" name="key" type="text" class="form-control ui-autocomplete-input" placeholder="Barcode atau Nama Produk" value="" autocomplete="off">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          
-          <div class="card-body">
-            <div class="row mb-3">
-              <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">Items Per Page:</label>
-                <select id="items_per_page" class="form-control">
-                  <option value="20">20 item</option>
-                  <option value="30">30 item</option>
-                  <option value="50" selected>50 item</option>
-                  <option value="100">100 item</option>
-                  <option value="200">200 item</option>
-                  <option value="500">500 item</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label style="font-weight: 700; margin-bottom: 5px;">Urutkan:</label>
-                <select id="sort_order" class="form-control">
-                  <option value="name_asc">Nama A - Z</option>
-                  <option value="name_desc">Nama Z - A</option>
-                  <option value="price_asc">Harga Terendah</option>
-                  <option value="price_desc">Harga Tertinggi</option>
-                  <option value="stock_asc">Stock Terendah</option>
-                  <option value="stock_desc">Stock Tertinggi</option>
-                </select>
-              </div>
-              <div class="col-md-6 text-center">
-                <div id="pagination_info" style="padding-top: 32px; font-weight: 700;">Menampilkan 0 hasil</div>
-              </div>
-            </div>
-
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <tbody id="product_list">
-
-                </tbody>
-              </table>
-            </div>
-
-            <div class="row mt-3">
-              <div class="col-md-12">
-                <nav aria-label="Page navigation">
-                  <ul class="pagination justify-content-center" id="pagination_controls">
-                  </ul>
-                </nav>
-              </div>
-            </div>
-          </div>
+    <!-- HERO SEARCH BAR -->
+    <div class="search-hero">
+      <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+        <div>
+          <h4><i class="fas fa-boxes mr-2"></i>Informasi Produk</h4>
+          <small>Cari, filter, dan lihat detail produk secara real-time</small>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-warning btn-select-mode" id="toggle_select_btn" onclick="toggle_select_mode()">
+            <i class="fas fa-check-square mr-1"></i> Pilih
+          </button>
+          <button type="button" class="btn btn-sm btn-success btn-select-mode" onclick="show_summary()">
+            <i class="fas fa-file-alt mr-1"></i> Rangkuman
+          </button>
         </div>
       </div>
-    </div>  
+      <div id="info"></div>
+      <div class="search-input-wrap">
+        <i class="fas fa-search search-icon"></i>
+        <input id="key" name="key" type="text" class="form-control ui-autocomplete-input" placeholder="Ketik barcode atau nama produk..." value="" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- FILTER SECTION -->
+    <div class="filter-card">
+      <div class="filter-title">
+        <i class="fas fa-sliders-h"></i> Filter Produk
+      </div>
+      <div class="row">
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="filter-label"><i class="fas fa-store"></i> Unit</div>
+          <select id="filter_unit" class="form-control js-example-basic-single">
+            <option value="">-- Semua Unit --</option>
+            <?php foreach($data['unit_list'] as $u){ ?>
+              <option value="<?= $u->unit_id ?>"><?= $u->unit_name ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="filter-label"><i class="fas fa-tags"></i> Kategori</div>
+          <select id="filter_category" class="form-control js-example-basic-single">
+            <option value="">-- Semua Kategori --</option>
+            <?php foreach($data['category_list'] as $c){ ?>
+              <option value="<?= $c->category_id ?>"><?= $c->category_name ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="filter-label"><i class="fas fa-trademark"></i> Brand</div>
+          <select id="filter_brand" class="form-control js-example-basic-single">
+            <option value="">-- Semua Brand --</option>
+            <?php foreach($data['brand_list'] as $b){ ?>
+              <option value="<?= $b->brand_id ?>"><?= $b->brand_name ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+          <div class="filter-label"><i class="fas fa-truck"></i> Supplier</div>
+          <select id="filter_supplier" class="form-control js-example-basic-single">
+            <option value="">-- Semua Supplier --</option>
+            <?php foreach($data['supplier_list'] as $s){ ?>
+              <option value="<?= $s->supplier_name ?>"><?= $s->supplier_name ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-2">
+          <div class="filter-label"><i class="fas fa-toggle-on"></i> Status</div>
+          <select id="filter_status" class="form-control js-example-basic-single">
+            <option value="">-- Semua Status --</option>
+            <option value="Aktif">Aktif</option>
+            <option value="Discontinue">Discontinue</option>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-2">
+          <div class="filter-label"><i class="fas fa-box-open"></i> Paket</div>
+          <select id="filter_paket" class="form-control js-example-basic-single">
+            <option value="">-- Semua --</option>
+            <option value="N">Bukan Paket</option>
+            <option value="Y">Paket</option>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-2">
+          <div class="filter-label"><i class="fas fa-percent"></i> PPN</div>
+          <select id="filter_ppn" class="form-control js-example-basic-single">
+            <option value="">-- Semua --</option>
+            <option value="NON PPN">Bukan PPN</option>
+            <option value="PPN">PPN</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar-bar">
+      <div class="toolbar-left">
+        <div class="toolbar-select-wrap">
+          <label><i class="fas fa-list-ol mr-1"></i>Per Halaman:</label>
+          <select id="items_per_page" class="form-control" style="width:auto;">
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+          </select>
+        </div>
+        <div class="toolbar-select-wrap">
+          <label><i class="fas fa-sort-amount-down mr-1"></i>Urutkan:</label>
+          <select id="sort_order" class="form-control" style="width:auto;">
+            <option value="name_asc">Nama A - Z</option>
+            <option value="name_desc">Nama Z - A</option>
+            <option value="price_asc">Harga Terendah</option>
+            <option value="price_desc">Harga Tertinggi</option>
+            <option value="stock_asc">Stock Terendah</option>
+            <option value="stock_desc">Stock Tertinggi</option>
+          </select>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <div id="pagination_info">Menampilkan 0 hasil</div>
+      </div>
+    </div>
+
+    <!-- PRODUCT TABLE -->
+    <div class="product-table-wrap">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th id="col_check" style="display:none; width:40px;"></th>
+            <th style="width:80px;">Foto</th>
+            <th>Nama Produk</th>
+            <th style="width:130px;">Stok</th>
+          </tr>
+        </thead>
+        <tbody id="product_list"></tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-wrap">
+      <nav aria-label="Page navigation">
+        <ul class="pagination" id="pagination_controls"></ul>
+      </nav>
+    </div>
+
   </div>
 </div>
 
@@ -515,20 +774,23 @@ function product_list_table(key = '') {
         let stocks = response.data[i].total_stock ?? 0;
         let product_id = response.data[i].product_id;
         let checkedAttr = selected_items[product_id] ? 'checked' : '';
-        let checkbox_html = select_mode ? `<input type="checkbox" class="product-checkbox" data-id="${product_id}" data-name="${response.data[i].product_name}" data-price="${response.data[i].product_sell_price_1}" onchange="toggle_item_selection(this)" ${checkedAttr}>` : '';
+        let checkbox_html = select_mode
+          ? `<input type="checkbox" class="product-checkbox" data-id="${product_id}" data-name="${response.data[i].product_name}" data-price="${response.data[i].product_sell_price_1}" onchange="toggle_item_selection(this)" ${checkedAttr} style="width:18px;height:18px;accent-color:#2d6a9f;cursor:pointer;">`
+          : '';
         let row_click = select_mode ? '' : `onclick="popupOpen(${product_id})"`;
+        let stockClass = stocks <= 0 ? 'low' : '';
 
-        text+= `
+        text += `
         <tr ${row_click}>
-          ${checkbox_html ? `<td style="width: 5%; text-align: center;">${checkbox_html}</td>` : ''}
-          <td class="image-td">
-            <img src="<?php echo base_url(); ?>assets/products/${response.data[i].product_image}" width="100%">
+          ${select_mode ? `<td style="text-align:center;vertical-align:middle;">${checkbox_html}</td>` : ''}
+          <td class="product-img-cell">
+            <img src="<?php echo base_url(); ?>assets/products/${response.data[i].product_image}" alt="">
           </td>
           <td>
-            ${response.data[i].product_name}<br>
-            <span class="badge badge-primary">${formatter.format(response.data[i].product_sell_price_1)}</span>
+            <div class="product-name">${response.data[i].product_name}</div>
+            <span class="product-price-badge">${formatter.format(response.data[i].product_sell_price_1)}</span>
           </td>
-          <td>${stocks} ${response.data[i].unit_name}</td>
+          <td><span class="product-stock ${stockClass}">${stocks} ${response.data[i].unit_name}</span></td>
         </tr>`;
       }
 
@@ -619,15 +881,18 @@ function popupOpen(id) {
 function toggle_select_mode() {
   select_mode = !select_mode;
   let btn = document.getElementById('toggle_select_btn');
+  let colCheck = document.getElementById('col_check');
   
   if(select_mode) {
-    btn.classList.remove('btn-info');
-    btn.classList.add('btn-warning');
-    btn.textContent = 'Batal';
-  } else {
     btn.classList.remove('btn-warning');
-    btn.classList.add('btn-info');
-    btn.textContent = 'Pilih';
+    btn.classList.add('btn-danger');
+    btn.innerHTML = '<i class="fas fa-times mr-1"></i> Batal';
+    colCheck.style.display = '';
+  } else {
+    btn.classList.remove('btn-danger');
+    btn.classList.add('btn-warning');
+    btn.innerHTML = '<i class="fas fa-check-square mr-1"></i> Pilih';
+    colCheck.style.display = 'none';
     selected_items = {};
     document.getElementById('summary_textarea').value = '';
   }
@@ -756,7 +1021,7 @@ function renderSummaryText() {
         let totalStock = stocks.reduce((sum, row) => sum + (parseInt(row.stock) || 0), 0);
         summary += 'Stock Total: ' + totalStock + '\n';
       }
-      if(fields.stock_per_warehouse || fields.lokasi_stock) {
+      if(fields.stock_per_warehouse) {
         if(fields.stock_per_warehouse && fields.lokasi_stock) {
           summary += 'Stok Per Gudang:\n';
         } else if(fields.stock_per_warehouse) {
@@ -771,10 +1036,13 @@ function renderSummaryText() {
             let warehouseName = row.warehouse_name || row.warehouse_code || '-';
             let stockValue = row.stock || 0;
             let locationText = fields.lokasi_stock ? ' (' + warehouseName + ')' : '';
-            summary += '  - ' + (fields.stock_per_warehouse ? stockValue + ' ' + (item.unit_name || '') : '') + (fields.stock_per_warehouse ? locationText : warehouseName) + '\n';
+            summary += '  - ' + (fields.stock_per_warehouse ? stockValue + ' ' + (item.unit_name || '') : '') + ' ' +(warehouseName) + '\n';
           });
         }
       }
+      if(fields.lokasi_stock){
+             summary += 'Lokasi: ' + (item.product_location) + '\n';
+        }
       if(fields.foto) {
         let imageUrl = item.product_image ? '<?php echo base_url(); ?>assets/products/' + item.product_image : '-';
         summary += 'Foto: ' + imageUrl + '\n';

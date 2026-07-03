@@ -81,13 +81,13 @@
         <tr>
             <th width="70%">Item</th>
             <th width="10%">PCS</th>
-            <th width="20%">Harga</th>
+            <th width="20%">Satuan</th>
         </tr>
      <?php foreach($data['detail_po'] as $detail){ ?>
       <tr class="dash">
         <td width="70%" style="font-size:11px; padding: 2%;"><?php echo $detail->product_name; ?><br /><br /><br /><br /><br /></td>
         <td class="text-center" width="10%"><?php echo $detail->dt_po_qty; ?><br /><br /><br /><br /><br /></td>
-        <td class="text-center" width="20%"><?php echo number_format($detail->dt_po_price, 0, ',', '.'); ?><br /><br /><br /><br /><br /></td>
+        <td class="text-center" width="20%"><?php echo $detail->unit_name ?><br /><br /><br /><br /><br /></td>
       </tr>
     <?php } ?>
   </table>

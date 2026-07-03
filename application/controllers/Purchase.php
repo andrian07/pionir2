@@ -528,19 +528,19 @@ class Purchase extends CI_Controller {
 				if($edit_footer_discount_percentage1_submit > 0){
 					$nominal_discount_satuan = $discount_product_satuan_1;
 				}else{
-					$nominal_discount_satuan = 0;
+					$nominal_discount_satuan = $row['temp_purchase_price'];
 				}
 
 				if($edit_footer_discount_percentage2_submit > 0){
 					$nominal_discount_satuan = $discount_product_satuan_2;
 				}else{
-					$nominal_discount_satuan = 0;
+					$nominal_discount_satuan = $row['temp_purchase_price'];
 				}
 
 				if($edit_footer_discount_percentage3_submit > 0){
 					$nominal_discount_satuan = $discount_product_satuan_3;
 				}else{
-					$nominal_discount_satuan = 0;
+					$nominal_discount_satuan = $row['temp_purchase_price'];
 				}
 				
 

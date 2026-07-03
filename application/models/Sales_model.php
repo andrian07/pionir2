@@ -453,7 +453,7 @@ class sales_model extends CI_Model {
 
     public function last_sales_inv()
     {
-        $query = $this->db->query("select hd_sales_inv from hd_sales where hd_sales_type = 'SALES' order by hd_sales_order_id desc limit 1");
+        $query = $this->db->query("select hd_sales_inv from hd_sales where hd_sales_type = 'SALES' order by hd_sales_id desc limit 1");
         $result = $query->result();
         return $result;
     }
