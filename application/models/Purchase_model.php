@@ -821,13 +821,38 @@ class purchase_model extends CI_Model {
         $query = $this->db->get();
         return $query;
     }
+    
 
     public function detail_po_purchase($po_id)
     {
-        $query = $this->db->query("select * from dt_po a, hd_po b, ms_product c, ms_unit d, ms_user e, hd_input_stock f, dt_input_stock g where a.hd_po_id = b.hd_po_id and a.dt_product_id = c.product_id and c.product_unit = d.unit_id and b.hd_po_id = f.hd_po_id and f.hd_input_stock_id  = g.hd_is_id and b.created_by = e.user_id and a.hd_po_id  = '".$po_id."' and hd_input_stock_status = 'Pending' group by dt_po_id");
+        $query = $this->db->query("SELECT *
+        FROM dt_po a
+        INNER JOIN hd_po b
+            ON a.hd_po_id = b.hd_po_id
+        INNER JOIN ms_product c
+            ON a.dt_product_id = c.product_id
+        INNER JOIN ms_unit d
+            ON c.product_unit = d.unit_id
+        INNER JOIN ms_user e
+            ON b.created_by = e.user_id
+        INNER JOIN hd_input_stock f
+            ON b.hd_po_id = f.hd_po_id
+        INNER JOIN dt_input_stock g
+            ON f.hd_input_stock_id = g.hd_is_id
+            AND g.dt_is_product_id = a.dt_product_id
+        WHERE a.hd_po_id = '".$po_id."'
+        AND f.hd_input_stock_status = 'Pending';");
+                $result = $query->result();
+                return $result;
+    }
+    
+    /*
+    public function detail_po_purchase($po_id)
+    {
+        $query = $this->db->query("select * from dt_pos a, hd_po b, ms_product c, ms_unit d, ms_user e, hd_input_stock f, dt_input_stock g where a.hd_po_id = b.hd_po_id and a.dt_product_id = c.product_id and c.product_unit = d.unit_id and b.hd_po_id = f.hd_po_id and f.hd_input_stock_id  = g.hd_is_id and b.created_by = e.user_id and a.hd_po_id  = '".$po_id."' and hd_input_stock_status = 'Pending' group by dt_po_id");
         $result = $query->result();
         return $result;
-    }
+    }*/
 
 
     public function delete_temp_purchase($product_id, $user_id)

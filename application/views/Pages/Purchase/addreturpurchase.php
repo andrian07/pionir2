@@ -1,6 +1,7 @@
 <?php 
 define('DOC_ROOT_PATH', $_SERVER['DOCUMENT_ROOT'].'/');
 require DOC_ROOT_PATH . $this->config->item('header');
+?>
 <style>
   .po-page-wrap { padding: 20px 24px; }
   .po-section { background: #fff; border-radius: 16px; border: 1px solid #e8edf3; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px; overflow: hidden; }

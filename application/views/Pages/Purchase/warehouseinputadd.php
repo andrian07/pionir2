@@ -138,7 +138,6 @@ require DOC_ROOT_PATH . $this->config->item('header');
               <input id="product_id" type="hidden" name="product_id">
             </div>
           </div>
-          <hr class="section-divider">
           <div class="row mb-3">
             <div class="col-md-3 mb-2">
               <div class="field-label"><i class="fas fa-sort-numeric-up"></i> Qty Beli</div>
@@ -149,7 +148,6 @@ require DOC_ROOT_PATH . $this->config->item('header');
               <input id="temp_qty_recive" name="temp_qty_recive" type="text" class="form-control text-right" value="0" required="">
             </div>
           </div>
-          <hr class="section-divider">
           <div class="item-row-note">
             <div>
               <div class="field-label"><i class="fas fa-sticky-note"></i> Catatan Item</div>

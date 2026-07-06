@@ -4,24 +4,259 @@ require DOC_ROOT_PATH . $this->config->item('header');
 ?>
 </div>
 
-<div class="container">
-  <div class="page-inner">
-    <div class="page-header">
+<style>
+  .sales-page-wrap { padding: 20px 24px; }
+  .sales-section {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e8edf3;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .sales-section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border-bottom: 1px solid #f0f4f8;
+    background: #f8fafc;
+  }
+  .sales-section-header .section-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .sales-section-header h6 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #64748b;
+    margin: 0;
+  }
+  .sales-section-body { padding: 20px 22px; }
+  .sales-field-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .sales-field-label i { font-size: 0.72rem; color: #9ca3af; }
+  .sales-section-body .form-control,
+  .sales-section-body .select2-container--default .select2-selection--single {
+    border-radius: 9px !important;
+    border-color: #dce3ec;
+    font-size: 0.88rem;
+    background: #fafbfc;
+  }
+  .sales-section-body .form-control[readonly] {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .sales-page-header {
+    background: linear-gradient(120deg, #0f766e 0%, #0ea5e9 100%);
+    border-radius: 16px;
+    padding: 20px 26px;
+    margin-bottom: 20px;
+    margin-top: 76px;
+    box-shadow: 0 6px 24px rgba(15,118,110,0.22);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .sales-page-header .header-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .sales-page-header h5 { color:#fff; font-weight:700; margin:0; font-size:1.1rem; }
+  .sales-page-header small { color: rgba(255,255,255,0.78); font-size:0.8rem; }
+  .sales-btn-add {
+    width: 42px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(120deg, #0f766e, #0ea5e9);
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(14,165,233,0.24);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .sales-btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(15,118,110,0.3);
+  }
+  .sales-divider {
+    border: none;
+    border-top: 1px dashed #e5ebf2;
+    margin: 16px 0;
+  }
+  .sales-summary-card {
+    background: #fffaf7;
+    border-radius: 12px;
+    border: 1px solid #f6d7c8;
+    padding: 16px 20px;
+  }
+  .sales-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f7e1d4;
+    font-size: 0.88rem;
+  }
+  .sales-summary-row:last-child { border-bottom: none; }
+  .sales-summary-row .s-label { font-weight: 600; color: #6b7280; }
+  .sales-summary-row .s-input { width: 180px; }
+  .sales-summary-row.grand .s-label { color: #1f2937; font-size: 0.95rem; font-weight: 700; }
+  @media (max-width: 768px) { .sales-page-wrap { padding: 14px 12px; } }
+</style>
+
+<div class="container-fluid">
+  <div class="sales-page-wrap">
+    <div class="sales-page-header">
+      <div class="header-icon"><i class="fas fa-pen-square"></i></div>
+      <div>
+        <h5>Tambah Revisi Penjualan</h5>
+        <small>Silahkan isi data revisi penjualan dengan lengkap</small>
+      </div>
     </div>
-    <div class="row">
-      <h3 class="fw-bold mb-3">Tambah Revisi Penjualan </h3>
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="form-group row">
-              <label for="noinvoice" class="col-sm-1 col-form-label text-right">No Invoice :</label>
-              <div class="col-sm-3">
-                <input id="sales_invoice" name="sales_invoice" type="text" class="form-control" value="AUTO" readonly="">
-                <input id="sales_id" name="sales_id" type="hidden" class="form-control">
-              </div>
-              <label for="tanggal" class="col-sm-1 col-form-label text-right">T.O.P :</label>
-              <div class="col-sm-3">
-                <select class="form-control input-full js-example-basic-single" onchange="duedate_cal()" id="sales_top" name="sales_top">
+
+    <div class="row mb-4">
+      <div class="col-md-4 mb-3 mb-md-0 d-flex">
+        <div class="sales-section mb-0 flex-fill">
+          <div class="sales-section-header">
+            <div class="section-icon" style="background:#ccfbf1; color:#0f766e;"><i class="fas fa-file-alt"></i></div>
+            <h6>Informasi Dokumen</h6>
+          </div>
+          <div class="sales-section-body">
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-hashtag"></i> No Invoice</div>
+              <input id="sales_invoice" name="sales_invoice" type="text" class="form-control" value="AUTO" readonly="">
+              <input id="sales_id" name="sales_id" type="hidden" class="form-control">
+            </div>
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-file-import"></i> Sales Invoice</div>
+              <input id="sales_inv_sales" name="sales_inv_sales" type="text" class="form-control ui-autocomplete-input" placeholder="No Penjualan" value="" required="" autocomplete="off">
+              <input id="sales_inv_id" type="hidden" name="sales_inv_id">
+              <input id="hd_sales_type" name="hd_sales_type" type="hidden" value="REVISI">
+            </div>
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-calendar-day"></i> Tanggal</div>
+              <input id="sales_date" name="sales_date" type="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" readonly>
+            </div>
+            <div class="mb-0">
+              <div class="sales-field-label"><i class="fas fa-user"></i> User</div>
+              <input id="po_user_id" name="po_user_id" type="text" class="form-control" value="<?php echo $_SESSION['user_name']; ?>" readonly="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3 mb-md-0 d-flex" style="padding-left:10px; padding-right:10px;">
+        <div class="sales-section mb-0 flex-fill">
+          <div class="sales-section-header">
+            <div class="section-icon" style="background:#fce7f3; color:#be185d;"><i class="fas fa-users"></i></div>
+            <h6>Pelanggan &amp; Sales</h6>
+          </div>
+          <div class="sales-section-body">
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-building"></i> Customer</div>
+              <select class="form-control js-example-basic-single" id="sales_customer" name="sales_customer">
+                <option value="">-- Pilih Customer --</option>
+                <?php foreach ($data['customer_list'] as $row) { ?>
+                  <option value="<?php echo $row->customer_id; ?>"><?php echo $row->customer_name; ?></option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-user-tie"></i> Sales</div>
+              <select class="form-control js-example-basic-single" id="sales_salesman" name="sales_salesman">
+                <option value="">-- Pilih Sales --</option>
+                <?php foreach ($data['salesman_list'] as $row) { ?>
+                  <option value="<?php echo $row->salesman_id; ?>"><?php echo $row->salesman_name; ?></option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-percent"></i> Rate Customer</div>
+              <input id="sales_rate_customer" name="sales_rate_customer" type="text" class="form-control" readonly="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="sales-section mb-0 flex-fill">
+          <div class="sales-section-header">
+            <div class="section-icon" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-truck"></i></div>
+            <h6>Logistik &amp; Pembayaran</h6>
+          </div>
+          <div class="sales-section-body">
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-warehouse"></i> Gudang</div>
+              <select class="form-control js-example-basic-single" id="sales_warehouse" name="sales_warehouse">
+                <option value="">-- Pilih Gudang --</option>
+                <?php foreach ($data['warehouse_list'] as $row) { ?>
+                  <option value="<?php echo $row->warehouse_id; ?>"><?php echo $row->warehouse_name; ?></option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-shipping-fast"></i> Ekspedisi</div>
+              <select class="form-control js-example-basic-single" id="sales_ekspedisi" name="sales_ekspedisi">
+                <option value="">-- Pilih Ekspedisi --</option>
+                <?php foreach ($data['ekspedisi_list'] as $row) { ?>
+                  <option value="<?php echo $row->ekspedisi_id; ?>"><?php echo $row->ekspedisi_name; ?></option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <div class="sales-field-label"><i class="fas fa-credit-card"></i> Metode Bayar</div>
+              <select class="form-control js-example-basic-single" id="sales_payment" name="sales_payment">
+                <option value="">-- Pilih Metode Bayar --</option>
+                <?php foreach ($data['payment_list'] as $row) { ?>
+                  <option value="<?php echo $row->payment_id; ?>"><?php echo $row->payment_name; ?></option>
+                <?php } ?>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-8 mb-3 mb-md-0 d-flex">
+        <div class="sales-section mb-0 flex-fill">
+          <div class="sales-section-header">
+            <div class="section-icon" style="background:#ede9fe; color:#7c3aed;"><i class="fas fa-clock"></i></div>
+            <h6>Termin &amp; Informasi Tambahan</h6>
+          </div>
+          <div class="sales-section-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="sales-field-label"><i class="fas fa-calendar-times"></i> T.O.P</div>
+                <select class="form-control js-example-basic-single" onchange="duedate_cal()" id="sales_top" name="sales_top">
                   <option value="">-- Pilih T.O.P --</option>
                   <option value="0">CBD</option>
                   <option value="7">JT7</option>
@@ -32,372 +267,251 @@ require DOC_ROOT_PATH . $this->config->item('header');
                   <option value="90">JT90</option>
                 </select>
               </div>
-              <label for="tanggal" class="col-sm-1 col-form-label text-right">Tanggal :</label>
-              <div class="col-sm-3">
-                <input id="sales_date" name="sales_date" type="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" readonly>
-              </div>
-            </div>
-
-            <div class="form-group row">
-              <label for="noinvoice" class="col-sm-1 col-form-label text-right">Sales Invoice:</label>
-              <div class="col-sm-3">
-                <input id="sales_inv_sales" name="sales_inv_sales" type="text" class="form-control ui-autocomplete-input" placeholder="No Penjualan" value="" required="" autocomplete="off">
-                <input id="sales_inv_id" type="hidden" name="sales_inv_id">
-                <input id="hd_sales_type" name="hd_sales_type" type="hidden" value="REVISI">
-              </div>
-
-              <label for="tanggal" class="col-sm-1 col-form-label text-right">Jth Tempo :</label>
-              <div class="col-sm-3">
+              <div class="col-md-6 mb-3">
+                <div class="sales-field-label"><i class="fas fa-calendar-alt"></i> Jatuh Tempo</div>
                 <input id="sales_due_date" name="sales_due_date" type="date" class="form-control">
               </div>
-              <label for="tanggal" class="col-sm-1 col-form-label text-right">Gudang :</label>
-              <div class="col-sm-3">
-                <select class="form-control input-full js-example-basic-single" id="sales_warehouse" name="sales_warehouse">
-                  <option value="">-- Pilih Gudang --</option>
-                  <?php foreach ($data['warehouse_list'] as $row) { ?>
-                    <option value="<?php echo $row->warehouse_id; ?>"><?php echo $row->warehouse_name; ?></option>  
-                  <?php } ?>
-                </select>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="sales-field-label"><i class="fas fa-clipboard-list"></i> Disiapkan Oleh</div>
+                <input id="sales_prepare" name="sales_prepare" type="text" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="sales-field-label"><i class="fas fa-box-open"></i> Jumlah Colly</div>
+                <input id="sales_colly" name="sales_colly" type="text" class="form-control">
               </div>
             </div>
-
-            <div class="form-group row">
-             <label for="noinvoice" class="col-sm-1 col-form-label text-right">Customer:</label>
-             <div class="col-sm-3">
-               <select class="form-control input-full js-example-basic-single" id="sales_customer" name="sales_customer">
-                <option value="">-- Pilih Customer --</option>
-                <?php foreach ($data['customer_list'] as $row) { ?>
-                  <option value="<?php echo $row->customer_id; ?>"><?php echo $row->customer_name; ?></option>  
-                <?php } ?>
-              </select>
-            </div>
-            <label for="tanggal" class="col-sm-1 col-form-label text-right">Sales :</label>
-            <div class="col-sm-3">
-              <select class="form-control input-full js-example-basic-single" id="sales_salesman" name="sales_salesman">
-                <option value="">-- Pilih Sales --</option>
-                <?php foreach ($data['salesman_list'] as $row) { ?>
-                  <option value="<?php echo $row->salesman_id; ?>"><?php echo $row->salesman_name; ?></option>  
-                <?php } ?>
-              </select>
-            </div>
-
-            <label for="tanggal" class="col-sm-1 col-form-label text-right">Ekspedisi :</label>
-            <div class="col-sm-3">
-              <select class="form-control input-full js-example-basic-single" id="sales_ekspedisi" name="sales_ekspedisi">
-                <option value="">-- Pilih Ekspedisi --</option>
-                <?php foreach ($data['ekspedisi_list'] as $row) { ?>
-                  <option value="<?php echo $row->ekspedisi_id; ?>"><?php echo $row->ekspedisi_name; ?></option>  
-                <?php } ?>
+            <div class="mb-0">
+              <div class="sales-field-label"><i class="fas fa-truck-loading"></i> Dropship</div>
+              <select class="form-control js-example-basic-single" id="drop_ship" name="drop_ship">
+                <option value="N">Tidak</option>
+                <option value="Y">Ya</option>
               </select>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="form-group row">
-            <label for="noinvoice" class="col-sm-1 col-form-label text-right">Rate Customer:</label>
-            <div class="col-sm-3">
-              <input id="sales_rate_customer" name="sales_rate_customer" type="text" class="form-control" readonly="">
-            </div>
-
-            <label for="noinvoice" class="col-sm-1 col-form-label text-right">Disiapkan Oleh :</label>
-            <div class="col-sm-3">
-              <input id="sales_prepare" name="sales_prepare" type="text" class="form-control">
-            </div>
-
-            <label for="tanggal" class="col-sm-1 col-form-label text-right">User :</label>
-            <div class="col-sm-3">
-              <input id="po_user_id" name="po_user_id" type="text" class="form-control" value="<?php echo $_SESSION['user_name']; ?>" readonly="">
-            </div>
+      <div class="col-md-4 d-flex">
+        <div class="sales-section mb-0 flex-fill">
+          <div class="sales-section-header">
+            <div class="section-icon" style="background:#fee2e2; color:#dc2626;"><i class="fas fa-shipping-fast"></i></div>
+            <h6>Dropship</h6>
           </div>
-
-          <div class="form-group row">
-            <label for="tanggal" class="col-sm-1 col-form-label text-right">Metode Bayar :</label>
-            <div class="col-sm-3">
-              <select class="form-control input-full js-example-basic-single" id="sales_payment" name="sales_payment">
-                <option value="">-- Pilih Metode Bayar --</option>
-                <?php foreach ($data['payment_list'] as $row) { ?>
-                  <option value="<?php echo $row->payment_id; ?>"><?php echo $row->payment_name; ?></option>  
-                <?php } ?>
-              </select>
+          <div class="sales-section-body">
+            <div id="dropship-container" style="display:none;">
+              <div class="mb-3">
+                <div class="sales-field-label"><i class="fas fa-user"></i> Nama</div>
+                <input id="dropship_name" name="dropship_name" type="text" class="form-control" placeholder="Nama Dropship Pelanggan">
+              </div>
+              <div class="mb-3">
+                <div class="sales-field-label"><i class="fas fa-phone"></i> No Telp</div>
+                <input id="dropship_phone" name="dropship_phone" type="text" class="form-control" placeholder="Telp Dropship Pelanggan">
+              </div>
+              <div class="mb-0">
+                <div class="sales-field-label"><i class="fas fa-map-marker-alt"></i> Alamat</div>
+                <textarea id="dropship_address" name="dropship_address" class="form-control" placeholder="Alamat Dropship" maxlength="500" rows="4"></textarea>
+              </div>
             </div>
-
-
-            <label for="noinvoice" class="col-sm-1 col-form-label text-right">Jumlah Colly :</label>
-            <div class="col-sm-3">
-              <input id="sales_colly" name="sales_colly" type="text" class="form-control">
-            </div>
+            <div class="text-muted small">Pilih opsi dropship untuk menampilkan detail penerima.</div>
           </div>
-
-          <div class="form-group row">
-							<label for="noinvoice" class="col-sm-1 col-form-label text-right">Dropship :</label>
-							<div class="col-sm-3">
-								<select class="form-control input-full js-example-basic-single" id="drop_ship" name="drop_ship">
-									<option value="N">Tidak</option>
-									<option value="Y">Ya</option>
-								</select>
-							</div>
-						</div>
-
         </div>
       </div>
     </div>
 
-    	<div class="row" style="display:none;" id="dropship-container">
-				<div class="card">
-					<div class="card-body">
-						<div class="row">
-							<div class="col-md-6">
-								<label>Nama:</label>
-								<input id="dropship_name" name="dropship_name" type="text" class="form-control" placeholder="Nama Dropship Pelanggan">
-								<label style="margin-top:10px;">No Telp:</label>
-								<input id="dropship_phone" name="dropship_phone" type="text" class="form-control" placeholder="Telp Dropship Pelanggan">
-							</div>
-							<div class="col-md-6">
-                <label>Alamat:</label>
-								<textarea id="dropship_address" name="dropship_address" class="form-control" placeholder="Alamat Dropship" maxlength="500" rows="4"></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+    <div class="sales-section">
+      <div class="sales-section-header">
+        <div class="section-icon" style="background:#ede9fe; color:#7c3aed;"><i class="fas fa-boxes"></i></div>
+        <h6>Input Item</h6>
+      </div>
+      <div class="sales-section-body">
+        <form id="formaddtemp">
+          <div class="row mb-3">
+            <div class="col-md-4 mb-2">
+              <div class="sales-field-label"><i class="fas fa-box"></i> Produk</div>
+              <input id="product_name" name="product_name" type="text" class="form-control ui-autocomplete-input" placeholder="Ketikkan nama produk..." value="" required="" autocomplete="off" data-parsley-required data-parsley-required-message="*Masukan Nama Produk">
+              <input id="product_id" type="hidden" name="product_id">
+            </div>
+            <div class="col-md-2 mb-2">
+              <div class="sales-field-label"><i class="fas fa-tags"></i> Rate Produk</div>
+              <select class="form-control js-example-basic-single" id="temp_rate" name="temp_rate">
+                <option value="Umum">Umum</option>
+                <option value="Toko">Toko</option>
+                <option value="Sales">Sales</option>
+                <option value="Khusus">Khusus</option>
+              </select>
+            </div>
+            <div class="col-md-2 mb-2">
+              <div class="sales-field-label"><i class="fas fa-tag"></i> Harga Jual / Unit</div>
+              <input id="temp_price" name="temp_price" class="form-control text-right" value="0" required="">
+            </div>
+            <div class="col-md-2 mb-2">
+              <div class="sales-field-label"><i class="fas fa-boxes-stacked"></i> Current Stock</div>
+              <input id="curent_stock" name="curent_stock" class="form-control text-right" value="0" required="" readonly>
+            </div>
+            <div class="col-md-2 mb-2">
+              <div class="sales-field-label"><i class="fas fa-sort-numeric-up"></i> Qty</div>
+              <input id="temp_qty" name="temp_qty" type="text" class="form-control text-right" value="0" required="">
+            </div>
+          </div>
 
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-body">
-          <form id="formaddtemp">
-            <div class="row well well-sm input-temp">
+          <hr class="sales-divider">
 
-              <div class="col-sm-4">
-                <div class="form-group">
-                  <label>Produk</label>
-                  <input id="product_name" name="product_name" type="text" class="form-control ui-autocomplete-input" placeholder="ketikkan nama produk" value="" required="" autocomplete="off"  data-parsley-required data-parsley-required-message="*Masukan Nama Produk">
-                  <input id="product_id" type="hidden" name="product_id">
+          <div class="row mb-3">
+            <div class="col-md-2 mb-2">
+              <div class="sales-field-label"><i class="fas fa-percentage"></i> Discount</div>
+              <input id="temp_discount" name="temp_discount" type="text" class="form-control text-right" value="0">
+            </div>
+            <div class="col-md-4 mb-2">
+              <div class="sales-field-label"><i class="fas fa-sticky-note"></i> Keterangan</div>
+              <input id="desc_item" name="desc_item" type="text" class="form-control text-left" required="">
+            </div>
+            <div class="col-md-4 mb-2">
+              <div class="sales-field-label"><i class="fas fa-calculator"></i> Total</div>
+              <input id="temp_total" name="temp_total" type="text" class="form-control text-right" value="0" readonly="">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button id="btnadd_temp" type="submit" class="sales-btn-add btn-add-temp" title="Tambah Item">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <hr class="sales-divider" style="margin-top:20px;">
+
+        <div class="table-responsive">
+          <table id="temp-sales-list" class="display table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Produk</th>
+                <th>Rate</th>
+                <th>Qty</th>
+                <th>Harga Satuan</th>
+                <th>Discount</th>
+                <th>Ket</th>
+                <th>Total</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="sales-section">
+      <div class="sales-section-header">
+        <div class="section-icon" style="background:#fef3c7; color:#d97706;"><i class="fas fa-receipt"></i></div>
+        <h6>Catatan &amp; Total</h6>
+      </div>
+      <div class="sales-section-body">
+        <div class="row">
+          <div class="col-lg-6 mb-3">
+            <div class="sales-field-label"><i class="fas fa-sticky-note"></i> Catatan Penjualan</div>
+            <textarea id="sales_remark" name="sales_remark" class="form-control" placeholder="Catatan revisi penjualan..." maxlength="500" rows="8" style="border-radius:9px; resize:none;"></textarea>
+          </div>
+          <div class="col-lg-6">
+            <div class="sales-summary-card">
+              <div class="sales-summary-row">
+                <span class="s-label">Sub Total</span>
+                <input id="footer_sub_total" name="footer_sub_total" type="text" class="form-control text-right s-input" value="0" readonly="" style="border-radius:8px; font-size:0.88rem;">
+              </div>
+              <div class="sales-summary-row">
+                <span class="s-label">Discount</span>
+                <div class="s-input">
+                  <input id="footer_discount1" name="footer_discount1" type="hidden" value="Rp 0.00">
+                  <input id="footer_discount2" name="footer_discount2" type="hidden" value="Rp 0.00">
+                  <input id="footer_discount3" name="footer_discount3" type="hidden" value="Rp 0.00">
+                  <input id="footer_discount_percentage1" name="footer_discount_percentage1" type="hidden" value="0.00%">
+                  <input id="footer_discount_percentage2" name="footer_discount_percentage2" type="hidden" value="0.00%">
+                  <input id="footer_discount_percentage3" name="footer_discount_percentage3" type="hidden" value="0.00%">
+                  <input id="footer_total_discount" name="footer_total_discount" data-bs-toggle="modal" data-bs-target="#footerdiscount" type="text" class="form-control text-right" value="0" readonly="" style="border-radius:8px; font-size:0.88rem; cursor:pointer;">
                 </div>
               </div>
-
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Rate Produk</label>
-                  <select class="form-control input-full js-example-basic-single" id="temp_rate" name="temp_rate">
-                    <option value="Umum">Umum</option>
-                    <option value="Toko">Toko</option>
-                    <option value="Sales">Sales</option>
-                    <option value="Khusus">Khusus</option>
-                  </select>
+              <div class="sales-summary-row">
+                <span class="s-label">PPN 11%</span>
+                <div class="d-flex align-items-center gap-2">
+                  <input id="footer_total_ppn" name="footer_total_ppn" type="text" class="form-control text-right s-input" value="0" readonly="" style="border-radius:8px; font-size:0.88rem;">
+                  <input class="form-check-input" type="checkbox" id="ppnchecked" style="width: 30px; height: 30px;">
                 </div>
               </div>
+              <div class="sales-summary-row grand" style="margin-top:8px; padding-top:12px; border-top:2px solid #f6d7c8; border-bottom:none;">
+                <span class="s-label">Grand Total</span>
+                <input id="footer_total_invoice" name="footer_total_invoice" type="text" class="form-control text-right s-input" value="0" readonly="" style="border-radius:8px; font-size:0.95rem; font-weight:700; background:#ffedd5; border-color:#fdba74; color:#9a2c0f;">
+              </div>
+              <div class="sales-summary-row">
+                <span class="s-label">DP</span>
+                <input id="footer_dp" name="footer_dp" type="text" class="form-control text-right s-input" value="0" style="border-radius:8px; font-size:0.88rem;">
+              </div>
+              <div class="sales-summary-row">
+                <span class="s-label">Kredit</span>
+                <input id="footer_remaining_debt" name="footer_remaining_debt" type="text" class="form-control text-right s-input" value="0" readonly="" style="border-radius:8px; font-size:0.88rem;">
+              </div>
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button id="btncancel" class="btn btn-danger" style="border-radius:9px; font-weight:600; padding:8px 22px;"><i class="fas fa-times-circle mr-1"></i> Batal</button>
+                <button id="btnsave" class="btn btn-success button-header-custom-save" style="border-radius:9px; font-weight:600; padding:8px 22px;"><i class="fas fa-save mr-1"></i> Simpan Revisi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Harga Jual Per Unit</label>
-                  <input id="temp_price" name="temp_price" class="form-control text-right" value="0"  required="">
+    <div class="modal fade" id="footerdiscount" tabindex="-1" aria-labelledby="exampleModaleditLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="title-frmfooterdiscount">Diskon</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="frmfooterdiscount" class="form-horizontal">
+            <div class="modal-body">
+              <div class="form-group">
+                <div class="row">
+                  <label for="edit_footer_discount1_lbl" class="col-sm-12">Diskon 1</label>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" id="edit_footer_discount_percentage1" name="edit_footer_discount_percentage1" value="0">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" id="edit_footer_discount1" name="edit_footer_discount1" value="0" readonly>
+                  </div>
                 </div>
               </div>
-
-
-
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Curent Stock</label>
-                  <input id="curent_stock" name="curent_stock" class="form-control text-right" value="0"  required="" readonly>
+              <div class="form-group">
+                <div class="row">
+                  <label for="edit_footer_discount2_lbl" class="col-sm-12">Diskon 2</label>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" id="edit_footer_discount_percentage2" name="edit_footer_discount_percentage2" value="0">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" id="edit_footer_discount2" name="edit_footer_discount2" value="0" readonly>
+                  </div>
                 </div>
               </div>
-
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Qty</label>
-                  <input id="temp_qty" name="temp_qty" type="text" class="form-control text-right" value="0" required="">
+              <div class="form-group">
+                <div class="row">
+                  <label for="edit_footer_discount3_lbl" class="col-sm-12">Diskon 3</label>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" id="edit_footer_discount_percentage3" name="edit_footer_discount_percentage3" value="0">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" id="edit_footer_discount3" name="edit_footer_discount3" value="0" readonly>
+                  </div>
                 </div>
               </div>
-
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Discount</label>
-                  <input id="temp_discount" name="temp_discount" type="text" class="form-control text-right" value="0">
-                </div>
-              </div>
-
-              <div class="col-sm-4">
-                <div class="form-group">
-                  <label>Keterangan:</label>
-                  <input id="desc_item" name="desc_item" class="form-control text-left" required="">
-                </div>
-              </div>
-              <div class="col-sm-7">
-
-                <!-- text input -->
-
-                <div class="form-group">
-
-                  <label>Total</label>
-
-                  <input id="temp_total" name="temp_total" type="text" class="form-control text-right" value="0" readonly="">
-
-                </div>
-
-              </div>
-
-              <div class="col-sm-1" style="padding-right: 62px;">
-
-                <!-- text input -->
-
-                <label>&nbsp;</label>
-
-                <div class="form-group">
-
-                  <button id="btnadd_temp" class="btn btn-md btn-primary rounded-circle float-right btn-add-temp"><i class="fas fa-plus"></i></button>
-
-                </div>
-
-              </div>
-
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i> Batal</button>
+              <button type="button" id="btneditdisc" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
             </div>
           </form>
-
-          <div class="table-responsive">
-            <table id="temp-sales-list" class="display table table-striped table-hover" >
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>produk</th>
-                  <th>Rate</th>
-                  <th>Qty</th>
-                  <th>Harga Satuan</th>
-                  <th>Discount</th>
-                  <th>Ket</th>
-                  <th>Total</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="row form-space">
-            <div class="col-lg-6">
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <textarea id="sales_remark" name="sales_remark" class="form-control" placeholder="Catatan" maxlength="500" rows="8"></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-6 text-right">
-              <div class="form-group row">
-                <label for="footer_sub_total" class="col-sm-7 col-form-label text-right:">Sub Total:</label>
-                <div class="col-sm-5">
-                  <input id="footer_sub_total" name="footer_sub_total" type="text" class="form-control text-right" value="0" readonly="">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="footer_total_discount" class="col-sm-7 col-form-label text-right:">Discount :</label>
-                <div class="col-sm-5">
-                  <input id="footer_discount1" name="footer_discount1" type="hidden" class="form-control text-right" value="Rp 0.00" readonly="">
-                  <input id="footer_discount2" name="footer_discount2" type="hidden" class="form-control text-right" value="Rp 0.00" readonly="">
-                  <input id="footer_discount3" name="footer_discount3" type="hidden" class="form-control text-right" value="Rp 0.00" readonly="">
-                  <input id="footer_discount_percentage1" name="footer_discount_percentage1" type="hidden" class="form-control text-right" value="0.00%" readonly="">
-                  <input id="footer_discount_percentage2" name="footer_discount_percentage2" type="hidden" class="form-control text-right" value="0.00%" readonly="">
-                  <input id="footer_discount_percentage3" name="footer_discount_percentage3" type="hidden" class="form-control text-right" value="0.00%" readonly="">
-                  <input id="footer_total_discount" name="footer_total_discount" data-bs-toggle="modal" data-bs-target="#footerdiscount" type="text" class="form-control text-right" value="0" readonly="">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="footer_total_ppn" class="col-sm-7 col-form-label text-right:">PPN 11% :</label>
-                <div class="col-sm-4">
-                  <input id="footer_total_ppn" name="footer_total_ppn" type="text" class="form-control text-right" value="0" readonly="">
-                </div>
-                <div class="col-sm-1">
-                  <input class="form-check-input" type="checkbox" id="ppnchecked" style="width: 33px; height: 33px;">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="footer_total_invoice" class="col-sm-7 col-form-label text-right:">Grand Total :</label>
-                <div class="col-sm-5">
-                  <input id="footer_total_invoice" name="footer_total_invoice" type="text" class="form-control text-right" value="0" readonly="">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="footer_dp" class="col-sm-7 col-form-label text-right:">DP :</label>
-                <div class="col-sm-5">
-                  <input id="footer_dp" name="footer_dp" type="text" class="form-control text-right" value="0">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="footer_remaining_debt" class="col-sm-7 col-form-label text-right:">Kredit :</label>
-                <div class="col-sm-5">
-                  <input id="footer_remaining_debt" name="footer_remaining_debt" type="text" class="form-control text-right" value="0" readonly="">
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-sm-12">
-                  <button id="btncancel" class="btn btn-danger"><i class="fas fa-times-circle"></i> Batal</button>
-                  <button id="btnsave" class="btn btn-success button-header-custom-save"><i class="fas fa-save"></i> Simpan</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer Modal Discount -->
-          <div class="modal fade" id="footerdiscount" tabindex="-1" aria-labelledby="exampleModaleditLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title" id="title-frmfooterdiscount">Diskon</h4>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="frmfooterdiscount" class="form-horizontal">
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <div class="row">
-                        <label for="edit_footer_discount1_lbl" class="col-sm-12">Diskon 1</label>
-                        <div class="col-md-6">
-                          <input type="text" class="form-control" id="edit_footer_discount_percentage1" name="edit_footer_discount_percentage1" value="0">
-                        </div>
-                        <div class="col-md-6">
-                          <input type="text" class="form-control" id="edit_footer_discount1" name="edit_footer_discount1" value="0" readonly>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <div class="row">
-                        <label for="edit_footer_discount2_lbl" class="col-sm-12">Diskon 2</label>
-                        <div class="col-md-6">
-                          <input type="text" class="form-control" id="edit_footer_discount_percentage2" name="edit_footer_discount_percentage2" value="0">
-                        </div>
-                        <div class="col-md-6">
-                          <input type="text" class="form-control" id="edit_footer_discount2" name="edit_footer_discount2" value="0" readonly>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <div class="row">
-                        <label for="edit_footer_discount3_lbl" class="col-sm-12">Diskon 3</label>
-                        <div class="col-md-6">
-                          <input type="text" class="form-control" id="edit_footer_discount_percentage3" name="edit_footer_discount_percentage3" value="0">
-                        </div>
-                        <div class="col-md-6">
-                          <input type="text" class="form-control" id="edit_footer_discount3" name="edit_footer_discount3" value="0" readonly>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-times-circle"></i> Batal</button>
-                    <button type="button" id="btneditdisc"  class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
-                  </div>
-                </form>
-              </div>
-              <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-          </div>
-          <!-- Footer Modal Discount -->
-
         </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 
 <?php 
@@ -1069,7 +1183,7 @@ function check_tempt_data()
         footer_sub_total.set(sub_total);
         footer_total_invoice.set(sub_total);
         footer_remaining_debt.set(sub_total);
-        if($('#sales_order_top').val() == '0'){
+        if($('#sales_top').val() == '0'){
 						footer_dp.set(sub_total);
 						footer_remaining_debt.set(0);
 					}else{

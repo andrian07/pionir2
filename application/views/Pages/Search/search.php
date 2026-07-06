@@ -585,7 +585,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           type="checkbox"
                           id="summary_field_berat">
 
-                    <span>Berat</span>
+                    <span>Berat (gram)</span>
                   </label>
 
                   <label class="summary-option">
@@ -1014,7 +1014,7 @@ function renderSummaryText() {
       if(fields.kategori) summary += 'Kategori: ' + (item.category_name || '-') + '\n';
       if(fields.status) summary += 'Status: ' + (item.product_status || '-') + '\n';
       if(fields.supplier) summary += 'Supplier: ' + (item.product_supplier_tag || '-') + '\n';
-      if(fields.berat) summary += 'Berat: ' + (item.product_weight || '-') + '\n';
+      if(fields.berat) summary += 'Berat (gram): ' + (item.product_weight || '-') + '\n';
       if(fields.satuan) summary += 'Satuan: ' + (item.unit_name || '-') + '\n';
       if(fields.deskripsi) summary += 'Deskripsi: ' + (item.product_desc || '-') + '\n';
       if(fields.stock_total) {

@@ -35,8 +35,29 @@ class Reportmaster extends CI_Controller {
 		}
 	}
 
+	private function apply_excel_report_style($sheet, $title, $title_range, $header_range, $data_start_row = 4, $header_fill = '1F4E78'){
+		$last_col = $sheet->getHighestDataColumn();
+		$last_row = $sheet->getHighestDataRow();
 
-	
+		$sheet->setCellValue('A1', $title);
+		$sheet->mergeCells($title_range);
+		$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('0F4C81'));
+		$sheet->getStyle('A1')->getAlignment()->setHorizontal('center')->setVertical('center');
+		$sheet->getStyle($header_range)->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
+		$sheet->getStyle($header_range)->getAlignment()->setHorizontal('center')->setVertical('center');
+		$sheet->getStyle($header_range)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($header_fill);
+		$sheet->getStyle($header_range)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+		if($last_row > 1){
+			$style_range = 'A2:' . $last_col . $last_row;
+			$sheet->getStyle($style_range)->getAlignment()->setVertical('center')->setWrapText(true);
+			$sheet->getStyle($style_range)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+		}
+
+		$sheet->getRowDimension(1)->setRowHeight(26);
+		$sheet->freezePane('A' . $data_start_row);
+	}
+
 	public function index(){
 		echo 'Report Master';die();
 	}
@@ -65,6 +86,7 @@ class Reportmaster extends CI_Controller {
 				$sheet->setCellValue('C'.$i, $row['brand_desc']);
 				$i++;
 			}
+			$this->apply_excel_report_style($sheet, 'List Brand', 'A1:C1', 'A3:C3');
 			$sheet->getColumnDimension('A')->setWidth(25); 
 			$sheet->getColumnDimension('B')->setWidth(35); 
 			$sheet->getColumnDimension('C')->setWidth(55);
@@ -136,6 +158,7 @@ class Reportmaster extends CI_Controller {
 				$sheet->setCellValue('P'.$i, $row['customer_expedisi_tag']);
 				$i++;
 			}
+			$this->apply_excel_report_style($sheet, 'List Customer', 'A1:P1', 'A3:P3');
 			$sheet->getColumnDimension('A')->setWidth(35); 
 			$sheet->getColumnDimension('B')->setWidth(35); 
 			$sheet->getColumnDimension('C')->setWidth(25);
@@ -197,6 +220,7 @@ class Reportmaster extends CI_Controller {
 				$sheet->setCellValue('E'.$i, $row['ekspedisi_desc']);
 				$i++;
 			}
+			$this->apply_excel_report_style($sheet, 'List Ekspedisi', 'A1:E1', 'A3:E3');
 			$sheet->getColumnDimension('A')->setWidth(35); 
 			$sheet->getColumnDimension('B')->setWidth(35); 
 			$sheet->getColumnDimension('C')->setWidth(35);
@@ -245,6 +269,7 @@ class Reportmaster extends CI_Controller {
 				$sheet->setCellValue('D'.$i, $row['warehouse_address']);
 				$i++;
 			}
+			$this->apply_excel_report_style($sheet, 'List Gudang', 'A1:D1', 'A3:D3');
 			$sheet->getColumnDimension('A')->setWidth(35); 
 			$sheet->getColumnDimension('B')->setWidth(35); 
 			$sheet->getColumnDimension('C')->setWidth(35);
@@ -291,6 +316,7 @@ class Reportmaster extends CI_Controller {
 				$sheet->setCellValue('C'.$i, $row['category_desc']);
 				$i++;
 			}
+			$this->apply_excel_report_style($sheet, 'List Kategori', 'A1:C1', 'A3:C3');
 			$sheet->getColumnDimension('A')->setWidth(35); 
 			$sheet->getColumnDimension('B')->setWidth(35); 
 			$sheet->getColumnDimension('C')->setWidth(60); 
@@ -453,6 +479,7 @@ class Reportmaster extends CI_Controller {
 			$sheet->getStyle('V')->getNumberFormat()->setFormatCode('#,##0');
 			$sheet->getStyle('X')->getNumberFormat()->setFormatCode('#,##0');
 
+			$this->apply_excel_report_style($sheet, 'List Produk', 'A1:Y1', 'A3:Y4', 5);
 			$sheet->getColumnDimension('A')->setWidth(25); 
 			$sheet->getColumnDimension('B')->setWidth(45); 
 			$sheet->getColumnDimension('C')->setWidth(10);
@@ -525,6 +552,7 @@ class Reportmaster extends CI_Controller {
 				$sheet->setCellValue('D'.$i, $row['warehouse_name']);
 				$i++;
 			}
+			$this->apply_excel_report_style($sheet, 'List Salesman', 'A1:D1', 'A3:D3');
 			$sheet->getColumnDimension('A')->setWidth(35); 
 			$sheet->getColumnDimension('B')->setWidth(35); 
 			$sheet->getColumnDimension('C')->setWidth(60); 
@@ -573,6 +601,7 @@ class Reportmaster extends CI_Controller {
 				$sheet->setCellValue('D'.$i, $row['supplier_phone']);
 				$i++;
 			}
+			$this->apply_excel_report_style($sheet, 'List Supplier', 'A1:D1', 'A3:D3');
 			$sheet->getColumnDimension('A')->setWidth(35); 
 			$sheet->getColumnDimension('B')->setWidth(35); 
 			$sheet->getColumnDimension('C')->setWidth(70); 

@@ -2322,21 +2322,483 @@ class Sales extends CI_Controller {
 	// start dropship sales
 	public function salesdropship()
 	{
-		
 		$modul = 'Sales';
 		$check_auth = $this->check_auth($modul);
 		if($check_auth['check_access'][0]->view == 'Y'){
 			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
 			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
-			$supplier_list['supplier_list'] = $this->masterdata_model->supplier_list();
+			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
+			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
+			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
+			$user_list['user_list'] = $this->masterdata_model->user_list();
 			$check_auth['check_auth'] = $check_auth;
-			$data['data'] = array_merge($warehouse_list, $salesman_list, $supplier_list, $check_auth);
-			$this->load->view('Pages/Sales/retursales', $data);
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
+			$this->load->view('Pages/Sales/salesdropship', $data);
 		}else{
 			$msg = "No Access";
 			echo json_encode(['code'=>0, 'result'=>$msg]);die();
 		}
 	}
+
+
+	public function salesdropship_list()
+	{
+		$modul = 'Sales';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->view == 'Y'){
+			$search 				= $this->input->post('search');
+			$length 				= $this->input->post('length');
+			$start 			  		= $this->input->post('start');
+			$cat 			  		= $this->input->post('cat');
+			$start_date 			= $this->input->post('start_date');
+			$end_date 			  	= $this->input->post('end_date');
+			$customer_filter 		= $this->input->post('customer_filter');
+			$payment_status_filter	= $this->input->post('status_payment_filter');
+
+			if($search != null){
+				$search = $search['value'];
+			}
+			$list = $this->sales_model->salesdropship_list($search, $cat, $length, $start, $start_date, $end_date, $customer_filter, $payment_status_filter)->result_array();
+			$count_list = $this->sales_model->salesdropship_list_count($search, $cat, $start_date, $end_date, $customer_filter, $payment_status_filter)->result_array();
+			$total_row = $count_list[0]['total_row'];
+			$data = array();
+			$no = $_POST['start'];
+			foreach ($list as $field) {
+
+				if($field['hd_dropship_sales_status'] == 'Pending'){
+					$hd_sales_status = '<span class="badge badge-info">Pending</span>';
+				}else if($field['hd_dropship_sales_status'] == 'Success'){
+					$hd_sales_status = '<span class="badge badge-success">Success</span>';
+				}else{
+					$hd_sales_status = '<span class="badge badge-danger">Cancel</span>';
+				}
+
+				if($field['hd_dropship_sales_remaining_debt'] > 0){
+					$hd_sales_remaining_debt = '<span class="badge badge-danger">Belum Lunas</span>';
+				}else{
+					$hd_sales_remaining_debt = '<span class="badge badge-success">Lunas</span>';
+				}
+
+				if($check_auth['check_access'][0]->view == 'Y'){
+					$url = base_url();
+					$detail = '<a href="'.base_url().'Sales/detailsalesdropship?id='.$field['hd_dropship_sales_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" data-id="'.$field['hd_dropship_sales_id'].'"><i class="fas fa-eye sizing-fa"></i></button></a> ';
+				}else{
+					$detail = '<a href="'.base_url().'Sales/detailsalesdropship?id='.$field['hd_dropship_sales_id'].'" data-fancybox="" data-type="iframe"><button type="button" class="btn btn-icon btn-primary btn-sm mb-2-btn" disabled="disabled"><i class="fas fa-eye sizing-fa"></i></button></a> ';
+				}
+
+
+				if($check_auth['check_access'][0]->delete == 'Y'){
+					if($field['hd_dropship_sales_status'] != 'Cancel'){
+						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['hd_dropship_sales_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
+					}else{
+						$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
+					}
+				}else{
+					$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn"  disabled="disabled"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
+				}
+
+				$print = '<button type="button" class="btn btn-icon btn-warning delete btn-sm mb-2-btn" data-id="'.$field['hd_dropship_sales_id'].'" data-bs-toggle="modal" data-bs-target="#print"><i class="fas fa-print sizing-fa"></i></button> ';
+
+				$date = date_create($field['hd_dropship_sales_date']); 
+				$no++;
+				$row = array();
+				$row[] 	= $field['hd_dropship_sales_inv'];
+				$row[] 	= date_format($date,"d-M-Y");
+				$row[] 	= $field['customer_name'];
+				$row[] 	= $field['customer_rate'];
+				$row[] 	= $field['product_name'];
+				$row[] 	= $field['dt_dropship_sales_qty'];
+				$row[] 	= 'Rp. '.number_format($field['hd_dropship_sales_total']);
+				$row[] 	= $field['hd_dropship_sales_top'];
+				$row[] 	= 'Rp. '.number_format($field['hd_dropship_sales_remaining_debt']);
+				$row[] 	= $field['ekspedisi_name'];
+				$row[]  = $hd_sales_status;
+				$row[] 	= $detail.$delete.$print;
+				$data[] = $row;
+			}
+
+			$output = array(
+				"draw" => $_POST['draw'],
+				"recordsTotal" => $total_row,
+				"recordsFiltered" => $total_row,
+				"data" => $data,
+			);
+			echo json_encode($output);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+
+	public function addsalesdropship()
+	{
+		$modul = 'Sales';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->add == 'Y'){
+			$warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
+			$salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
+			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
+			$payment_list['payment_list'] = $this->masterdata_model->payment_list();
+			$ekspedisi_list['ekspedisi_list'] = $this->masterdata_model->ekspedisi_list();
+			$user_list['user_list'] = $this->masterdata_model->user_list();
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($warehouse_list, $salesman_list, $customer_list, $payment_list, $ekspedisi_list, $user_list, $check_auth);
+			$this->load->view('Pages/Sales/addsalesdropship', $data);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+
+	public function search_sales_dropship()
+	{
+		$keyword = $this->input->get('term');
+		$result = ['success' => FALSE, 'num_product' => 0, 'data' => [], 'message' => ''];
+		if (!($keyword == '' || $keyword == NULL)) {
+			$find = $this->sales_model->search_sales_dropship($keyword)->result_array();
+			$find_result = [];
+			foreach ($find as $row) {
+				$diplay_text = $row['hd_sales_inv'];
+				$find_result[] = [
+					'id'                  => $row['hd_sales_id'],
+					'value'               => $diplay_text
+				];
+			}
+			$result = ['success' => TRUE, 'num_product' => count($find_result), 'data' => $find_result, 'message' => ''];
+		}
+		echo json_encode($result);
+	}
+
+	public function get_header_sales_dropship()
+	{
+		$sales_id 				= $this->input->post('id');
+		$user_id 			= $_SESSION['user_id'];
+		$this->sales_model->clear_temp_sales_dropship($user_id);
+		$get_dt_sales = $this->sales_model->get_sales_dt($sales_id);
+		foreach($get_dt_sales as $row)
+		{
+			$data_insert = array(
+				'temp_dropship_product_id'			=> $row->dt_sales_product_id,
+				'temp_dropship_sales_id'			=> $row->hd_sales_id,
+				'temp_dropship_sales_rate'			=> $row->dt_sales_rate,
+				'temp_dropship_sales_price'			=> $row->dt_sales_price,
+				'temp_dropship_sales_qty'			=> $row->dt_sales_qty,
+				'temp_dropship_sales_discount'		=> $row->dt_sales_discount,
+				'temp_dropship_sales_total'			=> $row->dt_sales_total,
+				'temp_dropship_user_id'				=> $user_id
+			);
+			$this->sales_model->add_temp_sales_dropship($data_insert);
+		}
+		$get_hd_sales = $this->sales_model->get_hd_sales($sales_id);
+		echo json_encode(['code'=>200, 'data'=>$get_hd_sales]);
+	}
+
+	public function add_temp_sales_dropship()
+	{
+		$modul = 'SalesOrder';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->add == 'Y'){
+			$sales_id 					= $this->input->post('sales_id');
+			$product_id 				= $this->input->post('product_id');
+			$temp_rate 					= $this->input->post('temp_rate');
+			$temp_qty  					= $this->input->post('temp_qty');
+			$temp_price_val 			= $this->input->post('temp_price_val');
+			$temp_discount_val 			= $this->input->post('temp_discount_val');
+			$temp_total_val 			= $this->input->post('temp_total_val');
+			$temp_note 					= $this->input->post('temp_note');
+			$user_id 					= $_SESSION['user_id'];
+
+			$check_temp_sales_dropship_input = $this->sales_model->check_temp_sales_dropship_input($product_id, $user_id);
+			$data_insert = array(
+				'temp_dropship_product_id'			=> $product_id,
+				'temp_dropship_sales_id'			=> $sales_id,
+				'temp_dropship_sales_rate'			=> $temp_rate,
+				'temp_dropship_sales_price'			=> $temp_price_val,
+				'temp_dropship_sales_qty'			=> $temp_qty,
+				'temp_dropship_sales_discount'		=> $temp_discount_val,
+				'temp_dropship_sales_total'			=> $temp_total_val,
+				'temp_dropship_desc_item'			=> $temp_note,
+				'temp_dropship_user_id'				=> $user_id
+			);
+
+			if($check_temp_sales_dropship_input != null){
+				$this->sales_model->edit_temp_sales_dropship($product_id, $user_id, $data_insert);
+			}else{
+				$this->sales_model->add_temp_sales_dropship($data_insert);
+			}
+			$msg = 'Success Tambah';
+			echo json_encode(['code'=>200, 'result'=>$msg]);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+
+	public function refresh_header_sales_dropship()
+	{
+		$user_id 			  = $_SESSION['user_id'];
+		$get_temp_sales_dropship_id = $this->sales_model->get_temp_sales_dropship($user_id)->result_array();
+		if($get_temp_sales_dropship_id != null){
+			$dropship_id 		= $get_temp_sales_dropship_id[0]['temp_dropship_id']; 
+			$get_hd_dropship  = $this->sales_model->get_hd_dropship($dropship_id);
+		}else{
+			$get_hd_dropship = 0;
+		}
+		echo json_encode(['code'=>200, 'data'=>$get_hd_dropship]);
+	}
+
+	public function temp_sales_dropship_list()
+	{
+		$modul = 'SalesOrder';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->view == 'Y'){
+			$search 			= $this->input->post('search');
+			$length 			= $this->input->post('length');
+			$start 			  	= $this->input->post('start');
+			$user 				= $_SESSION['user_id'];
+
+			if($search != null){
+				$search = $search['value'];
+			}
+			$list = $this->sales_model->temp_sales_dropship_list($search, $length, $start, $user)->result_array();
+			$count_list = $this->sales_model->temp_sales_dropship_list_count($search, $user)->result_array();
+			$total_row = $count_list[0]['total_row'];
+			$data = array();
+			$no = $_POST['start'];
+			foreach ($list as $field) {
+
+				$edit = '<button type="button" class="btn btn-icon btn-warning btn-sm mb-2-btn" onclick="edit_temp('.$field['temp_dropship_product_id'].')"><i class="fas fa-edit sizing-fa"></i></button> ';
+				$delete = '<button type="button" class="btn btn-icon btn-danger delete btn-sm mb-2-btn" onclick="deletes('.$field['temp_dropship_product_id'].')"><i class="fas fa-trash-alt sizing-fa"></i></button> ';
+
+				$no++;
+				$row = array();
+				$row[] 	= $field['product_code'];
+				$row[] 	= $field['product_name'];
+				$row[] 	= $field['temp_dropship_sales_rate'];
+				$row[] 	= $field['temp_dropship_sales_qty'];
+				$row[] 	= 'Rp. '.number_format($field['temp_dropship_sales_price']);
+				$row[] 	= 'Rp. '.number_format($field['temp_dropship_sales_discount']);
+				$row[] 	= 'Rp. '.number_format($field['temp_dropship_sales_total']);
+				$row[] 	= $field['temp_dropship_desc_item'];
+				$row[] 	= $edit.$delete;
+				$data[] = $row;
+			}
+
+			$output = array(
+				"draw" => $_POST['draw'],
+				"recordsTotal" => $total_row,
+				"recordsFiltered" => $total_row,
+				"data" => $data,
+			);
+			echo json_encode($output);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+
+	public function check_temp_sales_dropship()
+	{
+		$user_id 		= $_SESSION['user_id'];
+		$check_temp_sales_dropship  = $this->sales_model->check_temp_sales_dropship($user_id)->result_array();
+		echo json_encode(['code'=>200, 'data'=>$check_temp_sales_dropship]);
+		die();
+	}
+
+	public function clear_temp_sales_dropship()
+	{
+		$user_id = $_SESSION['user_id'];
+		$this->sales_model->clear_temp_sales_dropship($user_id);
+		echo json_encode(['code'=>200, 'result'=>'Temp sales dropship berhasil dihapus']);
+	}
+
+	public function get_edit_temp_sales_dropship()
+	{
+		$product_id = $this->input->post('id');
+		$user_id = $_SESSION['user_id'];
+		$get_temp_sales_dropship = $this->sales_model->get_edit_temp_sales_dropship($product_id, $user_id)->result_array();
+		echo json_encode(['code'=>200, 'data'=>$get_temp_sales_dropship]);
+	}
+
+	public function delete_temp_sales_dropship()
+	{
+		$product_id = $this->input->post('id');
+		$user_id = $_SESSION['user_id'];
+		$this->sales_model->delete_temp_sales_dropship($product_id, $user_id);
+		echo json_encode(['code'=>200, 'result'=>'Berhasil Hapus']);
+	}
+
+	public function save_sales_dropship()
+	{
+		$modul = 'Sales';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->add == 'Y'){
+			$sales_customer             			  = $this->input->post('sales_customer');
+			$sales_id  						  	      = $this->input->post('sales_id');
+			$sales_payment            				  = $this->input->post('sales_payment');
+			$sales_top              				  = $this->input->post('sales_top');
+			$sales_top_id             				  = $this->input->post('sales_top_id');
+			$drop_ship						  		  = $this->input->post('drop_ship');
+			$dropship_name						  	  = $this->input->post('dropship_name');
+			$dropship_phone						      = $this->input->post('dropship_phone');
+			$dropship_address						  = $this->input->post('dropship_address');
+			$sales_salesman             			  = $this->input->post('sales_salesman');
+			$sales_prepare            				  = $this->input->post('sales_prepare');
+			$sales_prepare_id           			  = $this->input->post('sales_prepare_id');
+			$sales_colly              				  = $this->input->post('sales_colly');
+			$sales_warehouse            			  = $this->input->post('sales_warehouse');
+			$sales_ekspedisi            			  = $this->input->post('sales_ekspedisi');
+			$footer_sub_total_submit          		  = $this->input->post('footer_sub_total_submit');
+			$sales_due_date             			  = $this->input->post('sales_due_date');
+			$sales_date               				  = $this->input->post('sales_date');
+			$footer_total_discount_submit        	  = $this->input->post('footer_total_discount_submit');
+			$edit_footer_discount_percentage1_submit  = $this->input->post('edit_footer_discount_percentage1_submit');
+			$edit_footer_discount_percentage2_submit  = $this->input->post('edit_footer_discount_percentage2_submit');
+			$edit_footer_discount_percentage3_submit  = $this->input->post('edit_footer_discount_percentage3_submit');
+			$edit_footer_discount1_submit         	  = $this->input->post('edit_footer_discount1_submit');
+			$edit_footer_discount2_submit         	  = $this->input->post('edit_footer_discount2_submit');
+			$edit_footer_discount3_submit         	  = $this->input->post('edit_footer_discount3_submit');
+			$footer_total_ppn_val                     = $this->input->post('footer_total_ppn_val');
+			$footer_total_invoice_val           	  = $this->input->post('footer_total_invoice_val');
+			$footer_dp_val                  		  = $this->input->post('footer_dp_val');
+			$footer_remaining_debt_val          	  = $this->input->post('footer_remaining_debt_val');
+			$sales_remark             				  = $this->input->post('sales_remark');
+			$user_id                  			      = $_SESSION['user_id'];
+
+			if($sales_customer == null){
+				$msg = 'Silahkan Masukan Customer';
+				echo json_encode(['code'=>0, 'result'=>$msg]);die();
+			}
+
+			if($sales_top == null){
+				$msg = 'Silahkan Masukan TOP';
+				echo json_encode(['code'=>0, 'result'=>$msg]);die();
+			}
+
+			if($sales_salesman == null){
+				$msg = 'Silahkan Masukan Salesman';
+				echo json_encode(['code'=>0, 'result'=>$msg]);die();
+			}
+
+			if($sales_payment == null){
+				$msg = 'Silahkan Masukan Jenis Pembayaran';
+				echo json_encode(['code'=>0, 'result'=>$msg]);die();
+			}
+
+			if($sales_warehouse == null){
+				$msg = 'Silahkan Masukan Gudang';
+				echo json_encode(['code'=>0, 'result'=>$msg]);die();
+			}
+
+			if($sales_ekspedisi == null){
+				$msg = 'Silahkan Masukan Ekspedisi';
+				echo json_encode(['code'=>0, 'result'=>$msg]);die();
+			}
+
+			if($footer_total_invoice_val <= 0){
+				$msg = 'Silahkan Input Data Terlebih Dahulu';
+				echo json_encode(['code'=>0, 'result'=>$msg]);die();
+			}
+
+			if($sales_top_id == 0){
+				$footer_dp_val = $footer_total_invoice_val;
+				$footer_remaining_debt_val = 0;
+			}
+
+			$warehouse_id     = $sales_warehouse;
+			$get_warehouse_code = $this->masterdata_model->get_warehouse_code($warehouse_id);
+			$warehouse_code   = $get_warehouse_code[0]->warehouse_code;
+			$warehouse_name   = $get_warehouse_code[0]->warehouse_name;
+
+			$customer_id = $sales_customer;
+			$get_customer_code = $this->masterdata_model->get_customer_code($customer_id);
+			$customer_code = $get_customer_code[0]->customer_code;
+			$customer_name = $get_customer_code[0]->customer_name;
+
+
+			$maxCode  = $this->sales_model->last_sales_inv();
+			
+			$inv_code = 'SD/'.$customer_code.'/'.$warehouse_code.'/'.date("d/m/Y").'/';
+			if ($maxCode == NULL) {
+				$last_code = $inv_code.'000001';
+			} else {
+				$maxCode   = $maxCode[0]->hd_sales_inv;
+				$last_code = substr($maxCode, -6);
+				$last_code = $inv_code.substr('000000' . strval(floatval($last_code) + 1), -6);
+			}
+
+			$get_temp_sales = $this->sales_model->get_temp_sales_dropship($user_id)->result_array();
+			$data_insert = array(
+				'hd_dropship_sales_inv'            	=> $last_code,
+				'hd_sales_id'     					=> $sales_id,
+				'hd_dropship_sales_customer'     	=> $sales_customer,
+				'hd_dropship_sales_payment'      	=> $sales_payment,
+				'hd_dropship_sales_ekspedisi'      	=> $sales_ekspedisi,
+				'hd_dropship_sales_top'        		=> $sales_top,
+				'hd_dropship_sales_top_id'			=> $sales_top_id,
+				'hd_dropship_sales_due_date'		=> $sales_due_date,
+				'hd_dropship_sales_dropship'		=> 'Y',
+				'hd_dropship_sales_dropship_name'   => $dropship_name,
+				'hd_dropship_sales_dropship_phone'  => $dropship_phone,
+				'hd_dropship_sales_dropship_address'=> $dropship_address,
+				'hd_dropship_sales_salesman'     	=> $sales_salesman,
+				'hd_dropship_sales_prepare'      			=> $sales_prepare,
+				'hd_dropship_sales_prepare_id'      		=> $sales_prepare_id,
+				'hd_dropship_sales_colly'        			=> $sales_colly,
+				'hd_dropship_sales_date'       			=> $sales_date,
+				'hd_dropship_sales_warehouse'      		=> $sales_warehouse,
+				'hd_dropship_sales_sub_total'      		=> $footer_sub_total_submit,
+				'hd_dropship_sales_percentage1'    		=> $edit_footer_discount_percentage1_submit,
+				'hd_dropship_sales_percentage2'    		=> $edit_footer_discount_percentage2_submit,
+				'hd_dropship_sales_percentage3'    		=> $edit_footer_discount_percentage3_submit,
+				'hd_dropship_sales_disc1'        			=> $edit_footer_discount1_submit,
+				'hd_dropship_sales_disc2'        			=> $edit_footer_discount2_submit,
+				'hd_dropship_sales_disc3'        			=> $edit_footer_discount3_submit,
+				'hd_dropship_sales_total_discount'   		=> $footer_total_discount_submit,
+				'hd_dropship_sales_ppn'          			=> $footer_total_ppn_val,
+				'hd_dropship_sales_total'        			=> $footer_total_invoice_val,
+				'hd_dropship_sales_dp'         			=> $footer_dp_val,
+				'hd_dropship_sales_remaining_debt'   		=> $footer_remaining_debt_val,
+				'hd_dropship_sales_note'       			=> $sales_remark,
+				'created_by'            			=> $user_id
+			);  
+			$save_sales_dropship = $this->sales_model->save_sales_dropship($data_insert);
+
+			$get_temp_sales_dropship = $this->sales_model->get_temp_sales_dropship($user_id)->result_array();
+			foreach($get_temp_sales_dropship  as $row){
+				$data_insert_detail = array(
+					'hd_dropship_sales_id'   	      => $save_sales_dropship,
+					'dt_dropship_sales_product_id'    => $row['temp_dropship_product_id'],
+					'dt_dropship_sales_rate'          => $row['temp_dropship_sales_rate'],
+					'dt_dropship_sales_price'         => $row['temp_dropship_sales_price'],
+					'dt_dropship_sales_qty'           => $row['temp_dropship_sales_qty'],
+					'dt_dropship_sales_discount'      => $row['temp_dropship_sales_discount'],
+					'dt_dropship_sales_total'         => $row['temp_dropship_sales_total'],
+					'dt_dropship_sales_desc'          => $row['temp_dropship_desc_item']
+				);
+				$save_detail_sales = $this->sales_model->save_detail_sales_dropship($data_insert_detail);
+
+			}
+
+			$this->sales_model->update_sales_dropship_status($sales_id);
+			
+			$data_insert_act = array(
+				'activity_table_desc'        => 'Tambah Penjualan Dropship Cabang '.$warehouse_name.' '.$last_code.'',
+				'activity_table_user'        => $user_id,
+			);
+
+			$this->global_model->save($data_insert_act);
+
+			$this->sales_model->clear_temp_sales_dropship($user_id);
+
+			$msg = 'Success Tambah';
+			echo json_encode(['code'=>200, 'result'=>$msg]);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+	
 	// end dropship sales
 }	
 

@@ -505,6 +505,221 @@ class sales_model extends CI_Model {
     }
     // end sales
 
+    // start sales dropship
+
+     public function salesdropship_list($search, $cat, $length, $start, $start_date, $end_date, $customer_filter, $payment_status_filter)
+    {
+        $this->db->select('*');
+        $this->db->from('hd_sales_dropship');
+        $this->db->join('dt_sales_dropship', 'hd_sales_dropship.hd_dropship_sales_id = dt_sales_dropship.hd_dropship_sales_id');
+        $this->db->join('ms_customer', 'hd_sales_dropship.hd_dropship_sales_customer = ms_customer.customer_id');
+        $this->db->join('ms_product', 'dt_sales_dropship.dt_dropship_sales_product_id = ms_product.product_id');
+        $this->db->join('ms_unit', 'ms_unit.unit_id = ms_product.product_unit');
+        $this->db->join('ms_warehouse', 'hd_sales_dropship.hd_dropship_sales_warehouse = ms_warehouse.warehouse_id');
+        $this->db->join('ms_salesman', 'hd_sales_dropship.hd_dropship_sales_salesman = ms_salesman.salesman_id', 'left');
+        $this->db->join('ms_user', 'hd_sales_dropship.created_by = ms_user.user_id');
+        $this->db->join('ms_ekspedisi', 'hd_sales_dropship.hd_dropship_sales_ekspedisi = ms_ekspedisi.ekspedisi_id');
+        if($start_date != null){
+            $this->db->where('hd_sales_dropship_date between "'.$start_date.'" and "'.$end_date.'"');
+        }
+        if($customer_filter != null){
+            $this->db->where('hd_dropship_sales_customer', $customer_filter);
+        }
+        if($payment_status_filter != null){
+            if($payment_status_filter == 'Lunas'){
+                $this->db->where('hd_dropship_sales_remaining_debt < 1');
+            }else{
+                $this->db->where('hd_dropship_sales_remaining_debt > 0');
+            }
+        }
+        if($search != null){
+            $this->db->where('(ms_product.product_name like "%'.$search.'%" OR ms_product.product_code like "%'.$search.'%" OR ms_product.product_supplier_name like "%'.$search.'%" OR ms_product.product_key like "%'.$search.'%" OR ms_product.product_desc like "%'.$search.'%") ');
+        }
+        $this->db->order_by('hd_sales_dropship.created_at', 'desc');
+        $this->db->limit($length);
+        $this->db->offset($start);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function salesdropship_list_count($search, $cat, $start_date, $end_date, $customer_filter, $payment_status_filter)
+    {
+        $this->db->select('count(*) as total_row');
+        $this->db->from('hd_sales_dropship');
+        $this->db->join('dt_sales_dropship', 'hd_sales_dropship.hd_dropship_sales_id = dt_sales_dropship.hd_dropship_sales_id');
+        $this->db->join('ms_customer', 'hd_sales_dropship.hd_dropship_sales_customer = ms_customer.customer_id');
+        $this->db->join('ms_product', 'dt_sales_dropship.dt_dropship_sales_product_id = ms_product.product_id');
+        $this->db->join('ms_unit', 'ms_unit.unit_id = ms_product.product_unit');
+        $this->db->join('ms_warehouse', 'hd_sales_dropship.hd_dropship_sales_warehouse = ms_warehouse.warehouse_id');
+        $this->db->join('ms_salesman', 'hd_sales_dropship.hd_dropship_sales_salesman = ms_salesman.salesman_id', 'left');
+        $this->db->join('ms_user', 'hd_sales_dropship.created_by = ms_user.user_id');
+        $this->db->join('ms_ekspedisi', 'hd_sales_dropship.hd_dropship_sales_ekspedisi = ms_ekspedisi.ekspedisi_id');
+        if($start_date != null){
+            $this->db->where('hd_sales_dropship_date between "'.$start_date.'" and "'.$end_date.'"');
+        }
+        if($customer_filter != null){
+            $this->db->where('hd_dropship_sales_customer', $customer_filter);
+        }
+        if($payment_status_filter != null){
+            if($payment_status_filter == 'Lunas'){
+                $this->db->where('hd_dropship_sales_remaining_debt < 1');
+            }else{
+                $this->db->where('hd_dropship_sales_remaining_debt > 0');
+            }
+            
+        }
+        if($search != null){
+            $this->db->where('(ms_product.product_name like "%'.$search.'%" OR ms_product.product_code like "%'.$search.'%" OR ms_product.product_supplier_name like "%'.$search.'%" OR ms_product.product_key like "%'.$search.'%" OR ms_product.product_desc like "%'.$search.'%") ');
+        }
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function search_sales_dropship($keyword)
+    {
+        $this->db->select('*');
+        $this->db->from('hd_sales');
+        $this->db->where('hd_sales_dropship', 'Y');
+        $this->db->where('hd_sales_status', 'Success');
+        $this->db->where('hd_sales_dropship_status', 'Pending');
+        if($keyword != null){
+            $this->db->where('hd_sales.hd_sales_inv like "%'.$keyword.'%"');
+        }
+        $this->db->limit(50);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function clear_temp_sales_dropship($user_id)
+    {
+        $this->db->where('temp_dropship_user_id', $user_id);
+        $this->db->delete('temp_sales_dropship');
+    }
+
+    public function add_temp_sales_dropship($data_insert)
+    {
+        $this->db->insert('temp_sales_dropship', $data_insert);
+    }
+
+    public function edit_temp_sales_dropship($product_id, $user_id, $data_insert)
+    {
+        $this->db->set($data_insert);
+        $this->db->where('temp_dropship_product_id ', $product_id);
+        $this->db->where('temp_dropship_user_id ', $user_id);
+        $this->db->update('temp_sales_dropship');
+    }
+
+    public function temp_sales_dropship_list($search, $length, $start, $user_id)
+    {
+        $this->db->select('*');
+        $this->db->from('temp_sales_dropship');
+        $this->db->join('ms_product', 'temp_sales_dropship.temp_dropship_product_id = ms_product.product_id');
+        $this->db->join('ms_unit', 'ms_unit.unit_id = ms_product.product_unit');
+        $this->db->join('ms_user', 'temp_sales_dropship.temp_dropship_user_id = ms_user.user_id');
+        $this->db->where('temp_dropship_user_id', $user_id);
+        if($search != null){
+            $this->db->where('ms_product.product_name like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
+        }
+        $this->db->order_by('temp_sales_dropship.created_at', 'desc');
+        $this->db->limit($length);
+        $this->db->offset($start);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function temp_sales_dropship_list_count($search, $user_id)
+    {
+        $this->db->select('count(*) as total_row');
+        $this->db->from('temp_sales_dropship');
+        $this->db->join('ms_product', 'temp_sales_dropship.temp_dropship_product_id = ms_product.product_id');
+        $this->db->join('ms_unit', 'ms_unit.unit_id = ms_product.product_unit');
+        $this->db->join('ms_user', 'temp_sales_dropship.temp_dropship_user_id = ms_user.user_id');
+        $this->db->where('temp_dropship_user_id', $user_id);
+        if($search != null){
+            $this->db->where('ms_product.product_name like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
+        }
+        $this->db->order_by('temp_sales_dropship.created_at', 'desc');
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function get_temp_sales_dropship($user_id)
+    {
+        $this->db->select('*');
+        $this->db->from('temp_sales_dropship');
+        $this->db->join('ms_product', 'temp_sales_dropship.temp_dropship_product_id = ms_product.product_id');
+        $this->db->join('ms_user', 'temp_sales_dropship.temp_dropship_user_id = ms_user.user_id');
+        $this->db->where('temp_dropship_user_id ', $user_id);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function get_edit_temp_sales_dropship($temp_product_id, $temp_user_id)
+    {
+        $this->db->select('*');
+        $this->db->from('temp_sales_dropship');
+        $this->db->join('ms_product', 'temp_sales_dropship.temp_dropship_product_id = ms_product.product_id');
+        $this->db->where('temp_dropship_product_id', $temp_product_id);
+        $this->db->where('temp_dropship_user_id', $temp_user_id);
+        $query = $this->db->get();
+        return $query;
+    }   
+
+    public function check_temp_sales_dropship_input($product_id, $user_id)
+    {
+        $query = $this->db->query("select * from temp_sales_dropship where temp_dropship_product_id = '".$product_id."' and temp_dropship_user_id = '".$user_id."'");
+        $result = $query->result();
+        return $result;
+    }
+
+    public function check_temp_sales_dropship($user_id)
+    {
+        $this->db->select('sum(temp_dropship_sales_total) as sub_total');
+        $this->db->from('temp_sales_dropship');
+        $this->db->where('temp_dropship_user_id', $user_id);
+        $query = $this->db->get();
+        return $query;
+    }
+    
+    public function delete_temp_sales_dropship($product_id, $user_id)
+    {
+        $this->db->where('temp_dropship_product_id', $product_id);
+        $this->db->where('temp_dropship_user_id', $user_id);
+        $this->db->delete('temp_sales_dropship');
+    }
+
+    public function save_sales_dropship($data_insert)
+    {
+        $this->db->trans_start();
+        $this->db->insert('hd_sales_dropship', $data_insert);
+        $insert_id = $this->db->insert_id();
+        $this->db->trans_complete();
+        return  $insert_id;
+    }
+
+    public function save_detail_sales_dropship($data_insert_detail)
+    {
+        $this->db->insert('dt_sales_dropship', $data_insert_detail);
+    }
+
+    public function last_sales_dropship_inv()
+    {
+        $query = $this->db->query("select hd_dropship_sales_inv from hd_sales_dropship order by hd_dropship_sales_id desc limit 1");
+        $result = $query->result();
+        return $result;
+    }
+
+    public function update_sales_dropship_status($sales_id)
+    {
+        $this->db->set('hd_sales_dropship_status', 'Success');
+        $this->db->where('hd_sales_id', $sales_id);
+        $this->db->update('hd_sales');
+    }
+
+    // end sales dropship
+
     // retur sales
 
     public function retursales_list($search, $length, $start)

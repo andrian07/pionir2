@@ -7,6 +7,9 @@ require 'vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Reportsales extends CI_Controller {
@@ -33,6 +36,89 @@ class Reportsales extends CI_Controller {
 			);
 			return($array);
 		}
+	}
+
+	private function apply_excel_report_theme($sheet, $title, $lastColumn, $periodText = null){
+		$sheet->setCellValue('A1', $title);
+		$sheet->mergeCells('A1:' . $lastColumn . '1');
+		$sheet->getStyle('A1')->applyFromArray([
+			'font' => ['bold' => true, 'size' => 14, 'color' => ['argb' => 'FFFFFFFF']],
+			'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF1F4E79']],
+			'alignment' => ['horizontal' => 'left', 'vertical' => 'center'],
+		]);
+		$sheet->getRowDimension(1)->setRowHeight(32);
+
+		if($periodText !== null){
+			$sheet->setCellValue('A2', $periodText);
+			$sheet->mergeCells('A2:' . $lastColumn . '2');
+			$sheet->getStyle('A2')->applyFromArray([
+				'font' => ['italic' => true, 'size' => 10, 'color' => ['argb' => 'FF1F4E79']],
+				'alignment' => ['horizontal' => 'left', 'vertical' => 'center'],
+				'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFD6E4F0']],
+			]);
+			$sheet->getRowDimension(2)->setRowHeight(20);
+		}
+	}
+
+	private function apply_excel_header_style($sheet, $range){
+		$sheet->getStyle($range)->applyFromArray([
+			'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
+			'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2E75B6']],
+			'alignment' => ['horizontal' => 'center', 'vertical' => 'center', 'wrapText' => true],
+			'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FFFFFFFF']]],
+		]);
+		$sheet->getRowDimension(3)->setRowHeight(28);
+	}
+
+	private function apply_excel_data_style($sheet, $rowIndex, $lastColumn, $fillColor){
+		$sheet->getStyle('A' . $rowIndex . ':' . $lastColumn . $rowIndex)->applyFromArray([
+			'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => $fillColor]],
+			'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FFB8CCE4']]],
+			'alignment' => ['vertical' => 'center'],
+		]);
+		$sheet->getRowDimension($rowIndex)->setRowHeight(18);
+	}
+
+	private function write_grouped_excel_rows($sheet, $rows, $groupColumns, $detailColumns, $groupKey, $startRow = 4, $lastColumn = 'V'){
+		$rowIndex = $startRow;
+		$lastGroupValue = null;
+		$groupStartRow = $startRow;
+		$colorToggle = true;
+
+		foreach($rows as $row){
+			$currentGroupValue = $row[$groupKey];
+			if($currentGroupValue !== $lastGroupValue){
+				if($lastGroupValue !== null && ($rowIndex - 1) > $groupStartRow){
+					foreach(array_keys($groupColumns) as $col){
+						$sheet->mergeCells($col . $groupStartRow . ':' . $col . ($rowIndex - 1));
+						$sheet->getStyle($col . $groupStartRow . ':' . $col . ($rowIndex - 1))->getAlignment()->setVertical('center');
+					}
+				}
+				$groupStartRow = $rowIndex;
+				$colorToggle = !$colorToggle;
+				$lastGroupValue = $currentGroupValue;
+				foreach($groupColumns as $col => $field){
+					$sheet->setCellValue($col . $rowIndex, $row[$field]);
+				}
+			}
+
+			foreach($detailColumns as $col => $field){
+				$sheet->setCellValue($col . $rowIndex, $row[$field]);
+			}
+
+			$fillColor = $colorToggle ? 'FFDCE6F1' : 'FFFFFFFF';
+			$this->apply_excel_data_style($sheet, $rowIndex, $lastColumn, $fillColor);
+			$rowIndex++;
+		}
+
+		if($lastGroupValue !== null && ($rowIndex - 1) > $groupStartRow){
+			foreach(array_keys($groupColumns) as $col){
+				$sheet->mergeCells($col . $groupStartRow . ':' . $col . ($rowIndex - 1));
+				$sheet->getStyle($col . $groupStartRow . ':' . $col . ($rowIndex - 1))->getAlignment()->setVertical('center');
+			}
+		}
+
+		return $rowIndex - 1;
 	}
 
 	public function index(){
@@ -88,98 +174,67 @@ class Reportsales extends CI_Controller {
 
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
-			$sheet->setCellValue('A1', "Laporan Sales Order"); 
-			$sheet->mergeCells('A1:S1');
-			$sheet->getStyle('A1')->getFont()->setBold(true);
-			$sheet->getStyle('A3:S3')->getFont()->setBold(true);
-			$sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
-			$sheet->getStyle('A3:S3')->getAlignment()->setHorizontal('center');
-			$sheet->setCellValue('A3', "Invoice"); 
-			$sheet->setCellValue('B3', "Tanggal"); 
-			$sheet->setCellValue('C3', "Pelanggan");
-			$sheet->setCellValue('D3', "Rate"); 
-			$sheet->setCellValue('E3', "Pembayaran"); 
-			$sheet->setCellValue('F3', "Ekspedisi");
-            $sheet->setCellValue('G3', "Nama Barang");
-            $sheet->setCellValue('H3', "Satuan");
-            $sheet->setCellValue('I3', "Qty");
-            $sheet->setCellValue('J3', "Harga");
-            $sheet->setCellValue('K3', "Total Harga Barang");
-			$sheet->setCellValue('L3', "TOP");
-			$sheet->setCellValue('M3', "Salsesman");
-			$sheet->setCellValue('N3', "Prepare By");
-			$sheet->setCellValue('O3', "Koli");
-			$sheet->setCellValue('P3', "Cabang");
-            $sheet->setCellValue('Q3', "Subtotal");
-            $sheet->setCellValue('R3', "Diskon");
-            $sheet->setCellValue('S3', "PPN");
-            $sheet->setCellValue('T3', "Total");
-            $sheet->setCellValue('U3', "Catatan");
-             $sheet->setCellValue('V3', "Di Buat Oleh");
+			$this->apply_excel_report_theme($sheet, 'Laporan Sales Order', 'V', 'Periode: ' . $start_date . ' s/d ' . $end_date);
+			$sheet->setCellValue('A3', 'Invoice');
+			$sheet->setCellValue('B3', 'Tanggal');
+			$sheet->setCellValue('C3', 'Pelanggan');
+			$sheet->setCellValue('D3', 'Rate');
+			$sheet->setCellValue('E3', 'Pembayaran');
+			$sheet->setCellValue('F3', 'Ekspedisi');
+			$sheet->setCellValue('G3', 'Nama Barang');
+			$sheet->setCellValue('H3', 'Satuan');
+			$sheet->setCellValue('I3', 'Qty');
+			$sheet->setCellValue('J3', 'Harga');
+			$sheet->setCellValue('K3', 'Total Harga Barang');
+			$sheet->setCellValue('L3', 'TOP');
+			$sheet->setCellValue('M3', 'Salesman');
+			$sheet->setCellValue('N3', 'Prepare By');
+			$sheet->setCellValue('O3', 'Koli');
+			$sheet->setCellValue('P3', 'Cabang');
+			$sheet->setCellValue('Q3', 'Subtotal');
+			$sheet->setCellValue('R3', 'Diskon');
+			$sheet->setCellValue('S3', 'PPN');
+			$sheet->setCellValue('T3', 'Total');
+			$sheet->setCellValue('U3', 'Catatan');
+			$sheet->setCellValue('V3', 'Di Buat Oleh');
+			$this->apply_excel_header_style($sheet, 'A3:V3');
 
 			$data = $this->reportsales_model->get_report_sales_order($start_date, $end_date, $customer_report, $salesman_report, $warehouse_report)->result_array();
-			$i = 4;
+			$this->write_grouped_excel_rows($sheet, $data, ['A' => 'hd_sales_order_inv', 'B' => 'hd_sales_order_date', 'C' => 'customer_name', 'D' => 'customer_rate', 'E' => 'payment_name', 'F' => 'ekspedisi_name', 'L' => 'hd_sales_order_top', 'M' => 'salesman_name', 'N' => 'hd_sales_order_prepare', 'O' => 'hd_sales_order_colly', 'P' => 'warehouse_name', 'Q' => 'hd_sales_order_sub_total', 'R' => 'hd_sales_order_total_discount', 'S' => 'hd_sales_order_ppn', 'T' => 'hd_sales_order_total', 'U' => 'hd_sales_order_note', 'V' => 'user_name'], ['G' => 'product_name', 'H' => 'unit_name', 'I' => 'dt_so_qty', 'J' => 'dt_so_price', 'K' => 'dt_so_total'], 'hd_sales_order_inv', 4, 'V');
 
-			foreach($data as $row){
-				$sheet->setCellValue('A'.$i, $row['hd_sales_order_inv']); 
-				$sheet->setCellValue('B'.$i, $row['hd_sales_order_date']); 
-				$sheet->setCellValue('C'.$i, $row['customer_name']);
-				$sheet->setCellValue('D'.$i, $row['customer_rate']);
-				$sheet->setCellValue('E'.$i, $row['payment_name']); 
-				$sheet->setCellValue('F'.$i, $row['ekspedisi_name']); 
-				$sheet->setCellValue('G'.$i, $row['product_name']);
-				$sheet->setCellValue('H'.$i, $row['unit_name']);
-				$sheet->setCellValue('I'.$i, $row['dt_so_qty']); 
-				$sheet->setCellValue('J'.$i, $row['dt_so_price']); 
-				$sheet->setCellValue('K'.$i, $row['dt_so_total']); 
-                $sheet->setCellValue('L'.$i, $row['hd_sales_order_top']); 
-                $sheet->setCellValue('M'.$i, $row['salesman_name']); 
-                $sheet->setCellValue('N'.$i, $row['hd_sales_order_prepare']); 
-                $sheet->setCellValue('O'.$i, $row['hd_sales_order_colly']); 
-                $sheet->setCellValue('P'.$i, $row['warehouse_name']); 
-                $sheet->setCellValue('Q'.$i, $row['hd_sales_order_sub_total']); 
-                $sheet->setCellValue('R'.$i, $row['hd_sales_order_total_discount']); 
-                $sheet->setCellValue('S'.$i, $row['hd_sales_order_ppn']); 
-                $sheet->setCellValue('T'.$i, $row['hd_sales_order_total']); 
-                $sheet->setCellValue('U'.$i, $row['hd_sales_order_note']); 
-                $sheet->setCellValue('V'.$i, $row['user_name']); 
-				$i++;
-			};
+			$sheet->getColumnDimension('A')->setWidth(20);
+			$sheet->getColumnDimension('B')->setWidth(15);
+			$sheet->getColumnDimension('C')->setWidth(20);
+			$sheet->getColumnDimension('D')->setWidth(12);
+			$sheet->getColumnDimension('E')->setWidth(18);
+			$sheet->getColumnDimension('F')->setWidth(18);
+			$sheet->getColumnDimension('G')->setWidth(40);
+			$sheet->getColumnDimension('H')->setWidth(12);
+			$sheet->getColumnDimension('I')->setWidth(12);
+			$sheet->getColumnDimension('J')->setWidth(15);
+			$sheet->getColumnDimension('K')->setWidth(18);
+			$sheet->getColumnDimension('L')->setWidth(12);
+			$sheet->getColumnDimension('M')->setWidth(15);
+			$sheet->getColumnDimension('N')->setWidth(15);
+			$sheet->getColumnDimension('O')->setWidth(10);
+			$sheet->getColumnDimension('P')->setWidth(18);
+			$sheet->getColumnDimension('Q')->setWidth(15);
+			$sheet->getColumnDimension('R')->setWidth(15);
+			$sheet->getColumnDimension('S')->setWidth(12);
+			$sheet->getColumnDimension('T')->setWidth(15);
+			$sheet->getColumnDimension('U')->setWidth(25);
+			$sheet->getColumnDimension('V')->setWidth(15);
 
-			$sheet->getColumnDimension('A')->setWidth(35); 
-			$sheet->getColumnDimension('B')->setWidth(25); 
-			$sheet->getColumnDimension('C')->setWidth(25);
-			$sheet->getColumnDimension('D')->setWidth(25);
-			$sheet->getColumnDimension('E')->setWidth(25);
-			$sheet->getColumnDimension('F')->setWidth(25);
-			$sheet->getColumnDimension('G')->setWidth(65);
-			$sheet->getColumnDimension('H')->setWidth(20);
-			$sheet->getColumnDimension('I')->setWidth(20);
-			$sheet->getColumnDimension('J')->setWidth(20);
-            $sheet->getColumnDimension('K')->setWidth(30);
-            $sheet->getColumnDimension('L')->setWidth(35);
-            $sheet->getColumnDimension('M')->setWidth(30);
-            $sheet->getColumnDimension('N')->setWidth(20);
-            $sheet->getColumnDimension('O')->setWidth(30);
-            $sheet->getColumnDimension('P')->setWidth(30);
-            $sheet->getColumnDimension('Q')->setWidth(30);
-            $sheet->getColumnDimension('R')->setWidth(30);
-            $sheet->getColumnDimension('S')->setWidth(30);
-            $sheet->getColumnDimension('T')->setWidth(30);
-            $sheet->getColumnDimension('U')->setWidth(50);
-            $sheet->getColumnDimension('V')->setWidth(30);
+			$sheet->getStyle('J')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('K')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('Q')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('R')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('S')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('T')->getNumberFormat()->setFormatCode('#,##0');
 
-
-            $sheet->getStyle('J')->getNumberFormat()->setFormatCode('#,##0');	
-            $sheet->getStyle('K')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('Q')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('R')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('S')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('T')->getNumberFormat()->setFormatCode('#,##0');	
-
-
+			$sheet->freezePane('A4');
 			$sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
-			$sheet->setTitle("Excell");
+			$sheet->setTitle('Excell');
 			ob_end_clean();
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment;filename="sales_order_' .date('Y-m-d') . '.xlsx"');
@@ -246,99 +301,67 @@ class Reportsales extends CI_Controller {
 
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
-			$sheet->setCellValue('A1', "Laporan Penjualan"); 
-			$sheet->mergeCells('A1:S1');
-			$sheet->getStyle('A1')->getFont()->setBold(true);
-			$sheet->getStyle('A3:S3')->getFont()->setBold(true);
-			$sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
-			$sheet->getStyle('A3:S3')->getAlignment()->setHorizontal('center');
-			$sheet->setCellValue('A3', "Invoice"); 
-			$sheet->setCellValue('B3', "Tanggal"); 
-			$sheet->setCellValue('C3', "Pelanggan");
-			$sheet->setCellValue('D3', "Rate");  
-			$sheet->setCellValue('E3', "Pembayaran"); 
-			$sheet->setCellValue('F3', "Ekspedisi");
-            $sheet->setCellValue('G3', "Nama Barang");
-            $sheet->setCellValue('H3', "Satuan");
-            $sheet->setCellValue('I3', "Qty");
-            $sheet->setCellValue('J3', "Harga");
-            $sheet->setCellValue('K3', "Total Harga Barang");
-			$sheet->setCellValue('L3', "TOP");
-			$sheet->setCellValue('M3', "Salsesman");
-			$sheet->setCellValue('N3', "Prepare By");
-			$sheet->setCellValue('O3', "Koli");
-			$sheet->setCellValue('P3', "Cabang");
-            $sheet->setCellValue('Q3', "Subtotal");
-            $sheet->setCellValue('R3', "Diskon");
-            $sheet->setCellValue('S3', "PPN");
-            $sheet->setCellValue('T3', "Total");
-            $sheet->setCellValue('U3', "Catatan");
-            $sheet->setCellValue('V3', "Di Buat Oleh");
+			$this->apply_excel_report_theme($sheet, 'Laporan Penjualan', 'V', 'Periode: ' . $start_date . ' s/d ' . $end_date);
+			$sheet->setCellValue('A3', 'Invoice');
+			$sheet->setCellValue('B3', 'Tanggal');
+			$sheet->setCellValue('C3', 'Pelanggan');
+			$sheet->setCellValue('D3', 'Rate');
+			$sheet->setCellValue('E3', 'Pembayaran');
+			$sheet->setCellValue('F3', 'Ekspedisi');
+			$sheet->setCellValue('G3', 'Nama Barang');
+			$sheet->setCellValue('H3', 'Satuan');
+			$sheet->setCellValue('I3', 'Qty');
+			$sheet->setCellValue('J3', 'Harga');
+			$sheet->setCellValue('K3', 'Total Harga Barang');
+			$sheet->setCellValue('L3', 'TOP');
+			$sheet->setCellValue('M3', 'Salesman');
+			$sheet->setCellValue('N3', 'Prepare By');
+			$sheet->setCellValue('O3', 'Koli');
+			$sheet->setCellValue('P3', 'Cabang');
+			$sheet->setCellValue('Q3', 'Subtotal');
+			$sheet->setCellValue('R3', 'Diskon');
+			$sheet->setCellValue('S3', 'PPN');
+			$sheet->setCellValue('T3', 'Total');
+			$sheet->setCellValue('U3', 'Catatan');
+			$sheet->setCellValue('V3', 'Di Buat Oleh');
+			$this->apply_excel_header_style($sheet, 'A3:V3');
 
 			$data = $this->reportsales_model->get_report_sales($start_date, $end_date, $customer_report, $salesman_report, $warehouse_report)->result_array();
-			$i = 4;
+			$this->write_grouped_excel_rows($sheet, $data, ['A' => 'hd_sales_inv', 'B' => 'hd_sales_date', 'C' => 'customer_name', 'D' => 'customer_rate', 'E' => 'payment_name', 'F' => 'ekspedisi_name', 'L' => 'hd_sales_top', 'M' => 'salesman_name', 'N' => 'hd_sales_prepare', 'O' => 'hd_sales_colly', 'P' => 'warehouse_name', 'Q' => 'hd_sales_sub_total', 'R' => 'hd_sales_total_discount', 'S' => 'hd_sales_ppn', 'T' => 'hd_sales_total', 'U' => 'hd_sales_note', 'V' => 'user_name'], ['G' => 'product_name', 'H' => 'unit_name', 'I' => 'dt_sales_qty', 'J' => 'dt_sales_price', 'K' => 'dt_sales_total'], 'hd_sales_inv', 4, 'V');
 
-			foreach($data as $row){
-				$sheet->setCellValue('A'.$i, $row['hd_sales_inv']); 
-				$sheet->setCellValue('B'.$i, $row['hd_sales_date']); 
-				$sheet->setCellValue('C'.$i, $row['customer_name']);
-				$sheet->setCellValue('D'.$i, $row['customer_rate']);
-				$sheet->setCellValue('E'.$i, $row['payment_name']); 
-				$sheet->setCellValue('F'.$i, $row['ekspedisi_name']); 
-				$sheet->setCellValue('G'.$i, $row['product_name']);
-				$sheet->setCellValue('H'.$i, $row['unit_name']);
-				$sheet->setCellValue('I'.$i, $row['dt_sales_qty']); 
-				$sheet->setCellValue('J'.$i, $row['dt_sales_price']); 
-				$sheet->setCellValue('K'.$i, $row['dt_sales_total']); 
-                $sheet->setCellValue('L'.$i, $row['hd_sales_top']); 
-                $sheet->setCellValue('M'.$i, $row['salesman_name']); 
-                $sheet->setCellValue('N'.$i, $row['hd_sales_prepare']); 
-                $sheet->setCellValue('O'.$i, $row['hd_sales_colly']); 
-                $sheet->setCellValue('P'.$i, $row['warehouse_name']); 
-                $sheet->setCellValue('Q'.$i, $row['hd_sales_sub_total']); 
-                $sheet->setCellValue('R'.$i, $row['hd_sales_total_discount']); 
-                $sheet->setCellValue('S'.$i, $row['hd_sales_ppn']); 
-                $sheet->setCellValue('T'.$i, $row['hd_sales_total']); 
-                $sheet->setCellValue('U'.$i, $row['hd_sales_note']); 
-                $sheet->setCellValue('V'.$i, $row['user_name']); 
-				$i++;
-			};
+			$sheet->getColumnDimension('A')->setWidth(20);
+			$sheet->getColumnDimension('B')->setWidth(15);
+			$sheet->getColumnDimension('C')->setWidth(20);
+			$sheet->getColumnDimension('D')->setWidth(12);
+			$sheet->getColumnDimension('E')->setWidth(18);
+			$sheet->getColumnDimension('F')->setWidth(18);
+			$sheet->getColumnDimension('G')->setWidth(40);
+			$sheet->getColumnDimension('H')->setWidth(12);
+			$sheet->getColumnDimension('I')->setWidth(12);
+			$sheet->getColumnDimension('J')->setWidth(15);
+			$sheet->getColumnDimension('K')->setWidth(18);
+			$sheet->getColumnDimension('L')->setWidth(12);
+			$sheet->getColumnDimension('M')->setWidth(15);
+			$sheet->getColumnDimension('N')->setWidth(15);
+			$sheet->getColumnDimension('O')->setWidth(10);
+			$sheet->getColumnDimension('P')->setWidth(18);
+			$sheet->getColumnDimension('Q')->setWidth(15);
+			$sheet->getColumnDimension('R')->setWidth(15);
+			$sheet->getColumnDimension('S')->setWidth(12);
+			$sheet->getColumnDimension('T')->setWidth(15);
+			$sheet->getColumnDimension('U')->setWidth(25);
+			$sheet->getColumnDimension('V')->setWidth(15);
 
-			$sheet->getColumnDimension('A')->setWidth(35); 
-			$sheet->getColumnDimension('B')->setWidth(25); 
-			$sheet->getColumnDimension('C')->setWidth(25);
-			$sheet->getColumnDimension('D')->setWidth(25);
-			$sheet->getColumnDimension('E')->setWidth(25);
-			$sheet->getColumnDimension('F')->setWidth(30);
-			$sheet->getColumnDimension('G')->setWidth(65);
-			$sheet->getColumnDimension('H')->setWidth(20);
-			$sheet->getColumnDimension('I')->setWidth(20);
-			$sheet->getColumnDimension('J')->setWidth(20);
-            $sheet->getColumnDimension('K')->setWidth(30);
-            $sheet->getColumnDimension('L')->setWidth(35);
-            $sheet->getColumnDimension('M')->setWidth(30);
-            $sheet->getColumnDimension('N')->setWidth(20);
-            $sheet->getColumnDimension('O')->setWidth(30);
-            $sheet->getColumnDimension('P')->setWidth(30);
-            $sheet->getColumnDimension('Q')->setWidth(30);
-            $sheet->getColumnDimension('R')->setWidth(30);
-            $sheet->getColumnDimension('S')->setWidth(30);
-            $sheet->getColumnDimension('T')->setWidth(30);
-            $sheet->getColumnDimension('U')->setWidth(30);
-            $sheet->getColumnDimension('U')->setWidth(50);
-			$sheet->getColumnDimension('V')->setWidth(30);
+			$sheet->getStyle('J')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('K')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('Q')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('R')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('S')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('T')->getNumberFormat()->setFormatCode('#,##0');
 
-
-            $sheet->getStyle('J')->getNumberFormat()->setFormatCode('#,##0');	
-            $sheet->getStyle('K')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('Q')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('R')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('S')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('T')->getNumberFormat()->setFormatCode('#,##0');	
-
-
+			$sheet->freezePane('A4');
 			$sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
-			$sheet->setTitle("Excell");
+			$sheet->setTitle('Excell');
 			ob_end_clean();
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment;filename="sales_' .date('Y-m-d') . '.xlsx"');
@@ -404,98 +427,67 @@ class Reportsales extends CI_Controller {
 
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
-			$sheet->setCellValue('A1', "Laporan Revisi Penjualan"); 
-			$sheet->mergeCells('A1:S1');
-			$sheet->getStyle('A1')->getFont()->setBold(true);
-			$sheet->getStyle('A3:S3')->getFont()->setBold(true);
-			$sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
-			$sheet->getStyle('A3:S3')->getAlignment()->setHorizontal('center');
-			$sheet->setCellValue('A3', "Invoice"); 
-			$sheet->setCellValue('B3', "Tanggal"); 
-			$sheet->setCellValue('C3', "Pelanggan"); 
-			$sheet->setCellValue('D3', "Rate");
-			$sheet->setCellValue('E3', "Pembayaran"); 
-			$sheet->setCellValue('F3', "Ekspedisi");
-            $sheet->setCellValue('G3', "Nama Barang");
-            $sheet->setCellValue('H3', "Satuan");
-            $sheet->setCellValue('I3', "Qty");
-            $sheet->setCellValue('J3', "Harga");
-            $sheet->setCellValue('K3', "Total Harga Barang");
-			$sheet->setCellValue('L3', "TOP");
-			$sheet->setCellValue('M3', "Salsesman");
-			$sheet->setCellValue('N3', "Prepare By");
-			$sheet->setCellValue('O3', "Koli");
-			$sheet->setCellValue('P3', "Cabang");
-            $sheet->setCellValue('Q3', "Subtotal");
-            $sheet->setCellValue('R3', "Diskon");
-            $sheet->setCellValue('S3', "PPN");
-            $sheet->setCellValue('T3', "Total");
-            $sheet->setCellValue('U3', "Catatan");
-            $sheet->setCellValue('V3', "Di Buat Oleh");
+			$this->apply_excel_report_theme($sheet, 'Laporan Revisi Penjualan', 'V', 'Periode: ' . $start_date . ' s/d ' . $end_date);
+			$sheet->setCellValue('A3', 'Invoice');
+			$sheet->setCellValue('B3', 'Tanggal');
+			$sheet->setCellValue('C3', 'Pelanggan');
+			$sheet->setCellValue('D3', 'Rate');
+			$sheet->setCellValue('E3', 'Pembayaran');
+			$sheet->setCellValue('F3', 'Ekspedisi');
+			$sheet->setCellValue('G3', 'Nama Barang');
+			$sheet->setCellValue('H3', 'Satuan');
+			$sheet->setCellValue('I3', 'Qty');
+			$sheet->setCellValue('J3', 'Harga');
+			$sheet->setCellValue('K3', 'Total Harga Barang');
+			$sheet->setCellValue('L3', 'TOP');
+			$sheet->setCellValue('M3', 'Salesman');
+			$sheet->setCellValue('N3', 'Prepare By');
+			$sheet->setCellValue('O3', 'Koli');
+			$sheet->setCellValue('P3', 'Cabang');
+			$sheet->setCellValue('Q3', 'Subtotal');
+			$sheet->setCellValue('R3', 'Diskon');
+			$sheet->setCellValue('S3', 'PPN');
+			$sheet->setCellValue('T3', 'Total');
+			$sheet->setCellValue('U3', 'Catatan');
+			$sheet->setCellValue('V3', 'Di Buat Oleh');
+			$this->apply_excel_header_style($sheet, 'A3:V3');
 
 			$data = $this->reportsales_model->get_report_revisi_sales($start_date, $end_date, $customer_report, $salesman_report, $warehouse_report)->result_array();
-			$i = 4;
+			$this->write_grouped_excel_rows($sheet, $data, ['A' => 'hd_sales_inv', 'B' => 'hd_sales_date', 'C' => 'customer_name', 'D' => 'customer_rate', 'E' => 'payment_name', 'F' => 'ekspedisi_name', 'L' => 'hd_sales_top', 'M' => 'salesman_name', 'N' => 'hd_sales_prepare', 'O' => 'hd_sales_colly', 'P' => 'warehouse_name', 'Q' => 'hd_sales_sub_total', 'R' => 'hd_sales_total_discount', 'S' => 'hd_sales_ppn', 'T' => 'hd_sales_total', 'U' => 'hd_sales_note', 'V' => 'user_name'], ['G' => 'product_name', 'H' => 'unit_name', 'I' => 'dt_sales_qty', 'J' => 'dt_sales_price', 'K' => 'dt_sales_total'], 'hd_sales_inv', 4, 'V');
 
-			foreach($data as $row){
-				$sheet->setCellValue('A'.$i, $row['hd_sales_inv']); 
-				$sheet->setCellValue('B'.$i, $row['hd_sales_date']); 
-				$sheet->setCellValue('C'.$i, $row['customer_name']);
-				$sheet->setCellValue('D'.$i, $row['customer_rate']);
-				$sheet->setCellValue('E'.$i, $row['payment_name']); 
-				$sheet->setCellValue('F'.$i, $row['ekspedisi_name']); 
-				$sheet->setCellValue('G'.$i, $row['product_name']);
-				$sheet->setCellValue('H'.$i, $row['unit_name']);
-				$sheet->setCellValue('I'.$i, $row['dt_sales_qty']); 
-				$sheet->setCellValue('J'.$i, $row['dt_sales_price']); 
-				$sheet->setCellValue('K'.$i, $row['dt_sales_total']); 
-                $sheet->setCellValue('L'.$i, $row['hd_sales_top']); 
-                $sheet->setCellValue('M'.$i, $row['salesman_name']); 
-                $sheet->setCellValue('N'.$i, $row['hd_sales_prepare']); 
-                $sheet->setCellValue('O'.$i, $row['hd_sales_colly']); 
-                $sheet->setCellValue('P'.$i, $row['warehouse_name']); 
-                $sheet->setCellValue('Q'.$i, $row['hd_sales_sub_total']); 
-                $sheet->setCellValue('R'.$i, $row['hd_sales_total_discount']); 
-                $sheet->setCellValue('S'.$i, $row['hd_sales_ppn']); 
-                $sheet->setCellValue('T'.$i, $row['hd_sales_total']); 
-                $sheet->setCellValue('U'.$i, $row['hd_sales_note']); 
-                $sheet->setCellValue('V'.$i, $row['user_name']); 
-				$i++;
-			};
+			$sheet->getColumnDimension('A')->setWidth(20);
+			$sheet->getColumnDimension('B')->setWidth(15);
+			$sheet->getColumnDimension('C')->setWidth(20);
+			$sheet->getColumnDimension('D')->setWidth(12);
+			$sheet->getColumnDimension('E')->setWidth(18);
+			$sheet->getColumnDimension('F')->setWidth(18);
+			$sheet->getColumnDimension('G')->setWidth(40);
+			$sheet->getColumnDimension('H')->setWidth(12);
+			$sheet->getColumnDimension('I')->setWidth(12);
+			$sheet->getColumnDimension('J')->setWidth(15);
+			$sheet->getColumnDimension('K')->setWidth(18);
+			$sheet->getColumnDimension('L')->setWidth(12);
+			$sheet->getColumnDimension('M')->setWidth(15);
+			$sheet->getColumnDimension('N')->setWidth(15);
+			$sheet->getColumnDimension('O')->setWidth(10);
+			$sheet->getColumnDimension('P')->setWidth(18);
+			$sheet->getColumnDimension('Q')->setWidth(15);
+			$sheet->getColumnDimension('R')->setWidth(15);
+			$sheet->getColumnDimension('S')->setWidth(12);
+			$sheet->getColumnDimension('T')->setWidth(15);
+			$sheet->getColumnDimension('U')->setWidth(25);
+			$sheet->getColumnDimension('V')->setWidth(15);
 
-			$sheet->getColumnDimension('A')->setWidth(35); 
-			$sheet->getColumnDimension('B')->setWidth(25); 
-			$sheet->getColumnDimension('C')->setWidth(25);
-			$sheet->getColumnDimension('D')->setWidth(25);
-			$sheet->getColumnDimension('E')->setWidth(25);
-			$sheet->getColumnDimension('F')->setWidth(30);
-			$sheet->getColumnDimension('G')->setWidth(65);
-			$sheet->getColumnDimension('H')->setWidth(20);
-			$sheet->getColumnDimension('I')->setWidth(20);
-			$sheet->getColumnDimension('J')->setWidth(20);
-            $sheet->getColumnDimension('K')->setWidth(30);
-            $sheet->getColumnDimension('L')->setWidth(35);
-            $sheet->getColumnDimension('M')->setWidth(30);
-            $sheet->getColumnDimension('N')->setWidth(20);
-            $sheet->getColumnDimension('O')->setWidth(30);
-            $sheet->getColumnDimension('P')->setWidth(30);
-            $sheet->getColumnDimension('Q')->setWidth(30);
-            $sheet->getColumnDimension('R')->setWidth(30);
-            $sheet->getColumnDimension('S')->setWidth(30);
-            $sheet->getColumnDimension('T')->setWidth(30);
-            $sheet->getColumnDimension('U')->setWidth(50);
-            $sheet->getColumnDimension('v')->setWidth(30);
+			$sheet->getStyle('J')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('K')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('Q')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('R')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('S')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('T')->getNumberFormat()->setFormatCode('#,##0');
 
-
-            $sheet->getStyle('J')->getNumberFormat()->setFormatCode('#,##0');	
-            $sheet->getStyle('K')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('Q')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('R')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('S')->getNumberFormat()->setFormatCode('#,##0');	
-			$sheet->getStyle('T')->getNumberFormat()->setFormatCode('#,##0');	
-
-
+			$sheet->freezePane('A4');
 			$sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
-			$sheet->setTitle("Excell");
+			$sheet->setTitle('Excell');
 			ob_end_clean();
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment;filename="sales_revisi_' .date('Y-m-d') . '.xlsx"');
@@ -557,58 +549,47 @@ class Reportsales extends CI_Controller {
 
 			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$sheet = $excel->getActiveSheet();
-			$sheet->setCellValue('A1', "Laporan Retur Penjualan"); 
-			$sheet->mergeCells('A1:O1');
-			$sheet->getStyle('A1')->getFont()->setBold(true);
-			$sheet->getStyle('A3:O3')->getFont()->setBold(true);
-			$sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
-			$sheet->getStyle('A3:O3')->getAlignment()->setHorizontal('center');
-			$sheet->setCellValue('A3', "Invoice"); 
-			$sheet->setCellValue('B3', "Tanggal"); 
-			$sheet->setCellValue('C3', "Pelanggan"); 
-			$sheet->setCellValue('D3', "Rate"); 
-            $sheet->setCellValue('E3', "Nama Barang");
-            $sheet->setCellValue('F3', "Satuan");
-            $sheet->setCellValue('G3', "Qty");
-            $sheet->setCellValue('H3', "Harga");
-            $sheet->setCellValue('I3', "Total Harga Barang");
-			$sheet->setCellValue('J3', "Catatan Barang");
-            $sheet->setCellValue('K3', "Total");
-			$sheet->setCellValue('L3', "Status Retur");
-			$sheet->setCellValue('M3', "Jenis Pembayaran");
-            $sheet->setCellValue('N3', "Catatan");
-            $sheet->setCellValue('O3', "Di Buat Oleh");
+			$this->apply_excel_report_theme($sheet, 'Laporan Retur Penjualan', 'O', 'Periode: ' . $start_date . ' s/d ' . $end_date);
+			$sheet->setCellValue('A3', 'Invoice');
+			$sheet->setCellValue('B3', 'Tanggal');
+			$sheet->setCellValue('C3', 'Pelanggan');
+			$sheet->setCellValue('D3', 'Rate');
+			$sheet->setCellValue('E3', 'Nama Barang');
+			$sheet->setCellValue('F3', 'Satuan');
+			$sheet->setCellValue('G3', 'Qty');
+			$sheet->setCellValue('H3', 'Harga');
+			$sheet->setCellValue('I3', 'Total Harga Barang');
+			$sheet->setCellValue('J3', 'Catatan Barang');
+			$sheet->setCellValue('K3', 'Total');
+			$sheet->setCellValue('L3', 'Status Retur');
+			$sheet->setCellValue('M3', 'Jenis Pembayaran');
+			$sheet->setCellValue('N3', 'Catatan');
+			$sheet->setCellValue('O3', 'Di Buat Oleh');
+			$this->apply_excel_header_style($sheet, 'A3:O3');
 
-			$data = $this->reportsales_model->get_report_retur_sales($start_date, $end_date, $customer_report, $salesman_report, $warehouse_report)->result_array();
-			$i = 4;
+			$data = $this->reportsales_model->get_report_retur_sales($start_date, $end_date, $customer_report)->result_array();
+			
+			// For return sales, we need custom logic since payment type has conditional values
+			$groupColumns = ['A' => 'hd_retur_sales_inv', 'B' => 'hd_retur_sales_date', 'C' => 'customer_name', 'D' => 'customer_rate', 'K' => 'hd_retur_sales_total', 'L' => 'hd_retur_sales_status', 'N' => 'hd_retur_sales_note', 'O' => 'user_name'];
+			$detailColumns = ['E' => 'product_name', 'F' => 'unit_name', 'G' => 'dt_retur_sales_qty', 'H' => 'dt_retur_sales_price', 'I' => 'dt_retur_sales_total', 'J' => 'dt_retur_sales_note'];
+			
+			$this->write_grouped_excel_rows($sheet, $data, $groupColumns, $detailColumns, 'hd_retur_sales_inv', 4, 'O');
 
-			foreach($data as $row){
-				$sheet->setCellValue('A'.$i, $row['hd_retur_sales_inv']); 
-				$sheet->setCellValue('B'.$i, $row['hd_retur_sales_date']); 
-				$sheet->setCellValue('C'.$i, $row['customer_name']);
-				$sheet->setCellValue('D'.$i, $row['customer_rate']); 
-				$sheet->setCellValue('E'.$i, $row['product_name']); 
-				$sheet->setCellValue('F'.$i, $row['unit_name']); 
-				$sheet->setCellValue('G'.$i, $row['dt_retur_sales_qty']);
-				$sheet->setCellValue('H'.$i, $row['dt_retur_sales_price']);
-				$sheet->setCellValue('I'.$i, $row['dt_retur_sales_total']);
-				$sheet->setCellValue('J'.$i, $row['dt_retur_sales_note']); 
-				$sheet->setCellValue('K'.$i, $row['hd_retur_sales_total']);
-                $sheet->setCellValue('L'.$i, $row['hd_retur_sales_status']); 
-				if($row['hd_retur_sales_payment_type'] == 'PN'){
-                	$sheet->setCellValue('M'.$i, 'Potong Nota'); 
-				}else if($row['hd_retur_sales_payment_type'] == 'Cash'){
-                	$sheet->setCellValue('M'.$i, 'Cash'); 
-				}else{
-					$sheet->setCellValue('M'.$i, 'Garansi'); 
+			// Set payment type column with conditional values
+			$rowIndex = 4;
+			$prevInvoice = null;
+			foreach($data as $row) {
+				$currentInvoice = $row['hd_retur_sales_inv'];
+				if($currentInvoice !== $prevInvoice) {
+					$paymentType = ($row['hd_retur_sales_payment_type'] === 'PN') ? 'Potong Nota' : (($row['hd_retur_sales_payment_type'] === 'Cash') ? 'Cash' : 'Garansi');
+					$sheet->setCellValue('M' . $rowIndex, $paymentType);
 				}
-                $sheet->setCellValue('N'.$i, $row['hd_retur_sales_note']); 
-                $sheet->setCellValue('O'.$i, $row['user_name']); 
-				$i++;
-			};
+				$prevInvoice = $currentInvoice;
+				$rowIndex++;
+			}
 
-			$sheet->getColumnDimension('A')->setWidth(35); 
-			$sheet->getColumnDimension('B')->setWidth(25); 
+			$sheet->getColumnDimension('A')->setWidth(20);
+			$sheet->getColumnDimension('B')->setWidth(15);
 			$sheet->getColumnDimension('C')->setWidth(35);
 			$sheet->getColumnDimension('D')->setWidth(35);
 			$sheet->getColumnDimension('E')->setWidth(65);
@@ -617,19 +598,19 @@ class Reportsales extends CI_Controller {
 			$sheet->getColumnDimension('H')->setWidth(30);
 			$sheet->getColumnDimension('I')->setWidth(45);
 			$sheet->getColumnDimension('J')->setWidth(30);
-            $sheet->getColumnDimension('K')->setWidth(30);
-            $sheet->getColumnDimension('L')->setWidth(30);
-            $sheet->getColumnDimension('M')->setWidth(45);
-            $sheet->getColumnDimension('N')->setWidth(30);
+			$sheet->getColumnDimension('K')->setWidth(30);
+			$sheet->getColumnDimension('L')->setWidth(30);
+			$sheet->getColumnDimension('M')->setWidth(45);
+			$sheet->getColumnDimension('N')->setWidth(30);
+			$sheet->getColumnDimension('O')->setWidth(15);
 
-
-            $sheet->getStyle('H')->getNumberFormat()->setFormatCode('#,##0');	
-            $sheet->getStyle('I')->getNumberFormat()->setFormatCode('#,##0');	
+			$sheet->getStyle('H')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('I')->getNumberFormat()->setFormatCode('#,##0');
 			$sheet->getStyle('K')->getNumberFormat()->setFormatCode('#,##0');
 
-
+			$sheet->freezePane('A4');
 			$sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
-			$sheet->setTitle("Excell");
+			$sheet->setTitle('Excell');
 			ob_end_clean();
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment;filename="laporan_retur_sales_' .date('Y-m-d') . '.xlsx"');

@@ -329,8 +329,6 @@ require DOC_ROOT_PATH . $this->config->item('header');
             </div>
           </div>
 
-          <hr class="section-divider">
-
           <!-- Row 2: Harga, Qty, Berat, Ongkir -->
           <div class="row mb-3">
             <div class="col-md-3 mb-2">
@@ -361,8 +359,6 @@ require DOC_ROOT_PATH . $this->config->item('header');
               <input id="temp_total" name="temp_total" type="text" class="form-control text-right" value="0" readonly="">
             </div>
           </div>
-
-          <hr class="section-divider">
 
           <!-- Row 3: Catatan + Tambah -->
           <div class="item-row-note">

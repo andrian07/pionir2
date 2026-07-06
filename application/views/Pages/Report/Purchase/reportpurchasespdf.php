@@ -59,6 +59,7 @@
                 </tr>
             </thead>
             <tbody>
+                <?php $last_invoice = null; ?>
                 <?php foreach($data as $row){ ?>
                     <tr>
                         <td><?php echo $row['hd_purchase_invoice']; ?> </td>
@@ -68,8 +69,13 @@
                         <td><?php echo $row['product_name']; ?></td>
                         <td><?php echo $row['dt_purchase_qty']; ?></td>
                         <td>Rp. <?php echo number_format($row['dt_purchase_total']); ?></td>
-                        <td>Rp. <?php echo number_format($row['hd_purchase_grand_total']); ?></td>
+                        <td>
+                            <?php if($last_invoice !== $row['hd_purchase_invoice']){ ?>
+                                Rp. <?php echo number_format($row['hd_purchase_grand_total']); ?>
+                            <?php } ?>
+                        </td>
                     </tr>
+                    <?php $last_invoice = $row['hd_purchase_invoice']; ?>
                 <?php } ?>
             </tbody>
         </table>
