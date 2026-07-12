@@ -135,7 +135,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
 <div class="container-fluid">
 	<div class="sales-page-wrap">
 		<div class="sales-page-header">
-			<div class="header-icon"><i class="fas fa-cash-register"></i></div>
+			<div class="header-icon"><i class="fas fa-shipping-fast"></i></div>
 			<div>
 				<h5>Tambah Penjualan Dropship</h5>
 				<small>Silahkan isi data penjualan dropship dengan lengkap</small>
@@ -152,8 +152,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
 					<div class="sales-section-body">
 						<div class="mb-3">
 							<div class="sales-field-label"><i class="fas fa-hashtag"></i> No Invoice</div>
-							<input id="sales_invoice" name="sales_invoice" type="text" class="form-control" value="AUTO" readonly="">
-							<input id="sales_id" name="sales_id" type="hidden" class="form-control">
+							<input id="sales_dropship_invoice" name="sales_dropship_invoice" type="text" class="form-control" value="AUTO" readonly="">
+							<input id="sales_dropship_id" name="sales_dropship_id" type="hidden" class="form-control">
 						</div>
 						<div class="mb-3">
 							<div class="sales-field-label"><i class="fas fa-file-import"></i> Kode Penjualan</div>
@@ -300,7 +300,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
 						<h6>Dropship</h6>
 					</div>
 					<div class="sales-section-body">
-						<div id="dropship-container" style="display:none;">
+						<div id="dropship-container">
 							<div class="mb-3">
 								<div class="sales-field-label"><i class="fas fa-user"></i> Nama</div>
 								<input id="dropship_name" name="dropship_name" type="text" class="form-control" placeholder="Nama Dropship Pelanggan">
@@ -314,7 +314,6 @@ require DOC_ROOT_PATH . $this->config->item('header');
 								<textarea id="dropship_address" name="dropship_address" class="form-control" placeholder="Alamat Dropship" maxlength="500" rows="4"></textarea>
 							</div>
 						</div>
-						<div class="text-muted small">Pilih opsi dropship untuk menampilkan detail penerima.</div>
 					</div>
 				</div>
 			</div>
@@ -839,18 +838,6 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 				}
 			});
 		},
-	});
-
-	$('#drop_ship').on('change', function() {
-		var value = $(this).val();
-		if (value == 'Y') {
-			$('#dropship-container').show();
-		}else{
-			$('#dropship-container').hide();
-			$('#dropship_name').val("");
-			$('#dropship_phone').val("");
-			$('#dropship_address').val("");
-		}
 	});
 
 	function change_rate()

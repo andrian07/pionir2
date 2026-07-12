@@ -132,6 +132,11 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <span class="name-specification">Laporan Penjualan</span>
                         </li>
                       </a>
+                       <a href="<?php echo base_url(); ?>Reportsales/reportsalessdropship">
+                        <li>
+                          <span class="name-specification">Laporan Penjualan Dropship</span>
+                        </li>
+                      </a>
                       <a href="<?php echo base_url(); ?>Reportsales/reportrevisisales">
                       <li>
                         <span class="name-specification">Laporan Revisi Penjualan</span>

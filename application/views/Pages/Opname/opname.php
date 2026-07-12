@@ -35,9 +35,14 @@ require DOC_ROOT_PATH . $this->config->item('header');
                     <thead>
                       <tr>
                         <th>Kode Opname</th>
-                        <th>Gudang</th>
+                        <th>Nama Produk</th>
                         <th>Tanggal</th>
-                        <th>Total</th>
+                        <th>Satuan</th>
+                        <th>Selisih Stok</th>
+                        <th>Gudang</th>
+                        <th>Stok Sistem</th>
+                        <th>Stok Fisik</th>
+                        <th>Catatan</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
@@ -87,7 +92,12 @@ require DOC_ROOT_PATH . $this->config->item('footer');
         {data: 1},
         {data: 2},
         {data: 3},
-        {data: 4}
+        {data: 4},
+        {data: 5},
+        {data: 6},
+        {data: 7},
+        {data: 8},
+        {data: 9},
       ]
     });
   }

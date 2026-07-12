@@ -540,12 +540,12 @@ class Purchase extends CI_Controller {
 					$nominal_discount_satuan = $row['temp_purchase_price'];
 				}
 
-					
+				$minus_nominal_discount_satuan = $row['temp_purchase_price'] - $nominal_discount_satuan;
 
 				$get_ekspedisi_name = $this->masterdata_model->get_ekspedisi_name($purchase_ekspedisi);
 				$ekspedisi_name = $get_ekspedisi_name[0]->ekspedisi_name;
 
-				$product_desc = $supplier_name.' '.$purchase_date.' '.$ekspedisi_name.'<br />Rp. '.number_format($row['temp_purchase_price'], 0, ',', '.').' - ('.$edit_footer_discount_percentage1_submit.'% +'.$edit_footer_discount_percentage2_submit.'% +'.$edit_footer_discount_percentage3_submit.'%) = @Rp. '.number_format($nominal_discount_satuan, 0, ',', '.').' ('.$row['temp_purchase_qty'].') PCS '.$row['temp_purchase_note']. '<br />Ongkir: Rp. '.number_format($row['temp_purchase_total_ongkir'], 0, ',', '.'). '<br />';
+				$product_desc = $supplier_name.' '.$purchase_date.' '.$ekspedisi_name.'<br />Rp. '.number_format($row['temp_purchase_price'], 0, ',', '.').' - ('.$edit_footer_discount_percentage1_submit.'% +'.$edit_footer_discount_percentage2_submit.'% +'.$edit_footer_discount_percentage3_submit.'%) = @Rp. '.number_format($minus_nominal_discount_satuan, 0, ',', '.').' ('.$row['temp_purchase_qty'].') PCS '.$row['temp_purchase_note']. '<br />Ongkir: Rp. '.number_format($row['temp_purchase_total_ongkir'], 0, ',', '.'). '<br />';
 				$data_insert_note = array(
 					'product_id'			=> $row['temp_product_id'],
 					'product_desc'			=> $product_desc
@@ -558,6 +558,12 @@ class Purchase extends CI_Controller {
 				$new_note = $last_note.'<br />'.$product_desc;
 				$update_note_product = $this->purchase_model->update_note_product($product_id_note, $new_note);
 
+				$product_last_stock = $this->purchase_model->get_product_stock($row['temp_product_id'])->result_array();
+				$stock_all = $product_last_stock[0]['product_stock'];
+				$last_hpp = $product_last_stock[0]['product_hpp'];
+				$new_hpp = $minus_nominal_discount_satuan;
+				$update_hpp = $last_hpp + $new_hpp / $stock_all;
+				$this->purchase_model->update_hpp($row['temp_product_id'], $update_hpp);
 			}
 
 			$this->purchase_model->update_purchase_po($po_id);
@@ -972,16 +978,9 @@ class Purchase extends CI_Controller {
 			$search 			= $this->input->post('search');
 			$length 			= $this->input->post('length');
 			$start 			  	= $this->input->post('start');
-
-			if($this->input->post('start_date_val') != null){
-				$start_date_val 	 = $this->input->post('start_date_val');
-				$end_date_val 		 = $this->input->post('end_date_val');
-				$supplier_filter_val = $this->input->post('supplier_filter_val');
-			}else{
-				$start_date_val 	 = "";
-				$end_date_val 		 = "";
-				$supplier_filter_val = "";
-			}
+			$start_date_val 	 = $this->input->post('start_date_val');
+			$end_date_val 		 = $this->input->post('end_date_val');
+			$supplier_filter_val = $this->input->post('supplier_filter_val');
 
 			if($search != null){
 				$search = $search['value'];
@@ -1093,6 +1092,22 @@ class Purchase extends CI_Controller {
 			$detail_po['detail_po'] = $this->purchase_model->detail_po($po_id);
 			$data['data'] = array_merge($header_po, $detail_po);
 			$this->load->view('Pages/Purchase/printmemo', $data);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+
+	public function printponotehalflokasi()
+	{
+		$modul = 'PO';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->edit == 'Y'){
+			$po_id = $this->input->get('id');
+			$header_po['header_po'] = $this->purchase_model->header_po($po_id);
+			$detail_po['detail_po'] = $this->purchase_model->detail_po($po_id);
+			$data['data'] = array_merge($header_po, $detail_po);
+			$this->load->view('Pages/Purchase/printmemolokasi', $data);
 		}else{
 			$msg = "No Access";
 			echo json_encode(['code'=>0, 'result'=>$msg]);die();
@@ -1834,12 +1849,29 @@ class Purchase extends CI_Controller {
 		$modul = 'Purchase';
 		$check_auth = $this->check_auth($modul);
 		if($check_auth['check_access'][0]->view == 'Y'){
-			$id  	      = $this->input->get('print_type');
-			$hd_purchase_id  = $this->input->get('purchase_id');
+			$id  	      = $this->input->get('id');
+			$hd_purchase_id  = $id;
 			$header_po['header_po'] = $this->purchase_model->header_po($hd_purchase_id);
 			$detail_po['detail_po'] = $this->purchase_model->detail_po($hd_purchase_id);
 			$data['data'] = array_merge($header_po, $detail_po);
 			$this->load->view('Pages/Purchase/printnota1p', $data);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+
+	public function printnotapostok()
+	{
+		$modul = 'Purchase';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->view == 'Y'){
+				$id  	      = $this->input->get('id');
+			$hd_purchase_id  = $id;
+			$header_po['header_po'] = $this->purchase_model->header_po($hd_purchase_id);
+			$detail_po['detail_po'] = $this->purchase_model->detail_po_stock($hd_purchase_id);
+			$data['data'] = array_merge($header_po, $detail_po);
+			$this->load->view('Pages/Purchase/printnota1pstock', $data);
 		}else{
 			$msg = "No Access";
 			echo json_encode(['code'=>0, 'result'=>$msg]);die();

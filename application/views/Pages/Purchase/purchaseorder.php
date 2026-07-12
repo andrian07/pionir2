@@ -55,7 +55,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <div class="col-md-12 p-0">
                             <select class="form-control input-full js-example-basic-single" id="supplier_filter" name="supplier_filter">
                               <option value="">-- Pilih Supplier --</option>
-                              <?php foreach ($supplier_list as $row) { ?>
+                              <?php foreach ($data['supplier_list'] as $row) { ?>
                                 <option value="<?php echo $row->supplier_id; ?>"><?php echo $row->supplier_name; ?></option>  
                               <?php } ?>
                             </select>
@@ -86,6 +86,8 @@ require DOC_ROOT_PATH . $this->config->item('header');
                           <option value="">-- Pilih Jenis Print --</option>
                           <option value="1">Print 80mm (1Ply)</option> 
                           <option value="2">Print Half Letter (2Ply)</option>
+                          <option value="3">Print Half Letter (Lokasi Stok/2Ply)</option>
+                          <option value="4">Print 80mm (Detail Stok/1Ply)</option>
                         </select>
 
                         <input type="hidden" id="purchase_id" name="purchase_id" value="">
@@ -147,10 +149,6 @@ require DOC_ROOT_PATH . $this->config->item('footer');
     purchaseorder_table();
   });
 
-  var start_date_val      = $("#start_date").val();
-  var end_date_val        = $("#end_date").val();
-  var supplier_filter_val = $("#supplier_filter").val();
-
   function purchaseorder_table(){
     $('#po-list').DataTable( {
       serverSide: true,
@@ -161,7 +159,11 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       ajax: {
         url: '<?php echo base_url(); ?>Purchase/po_list',
         type: 'POST',
-        data:  {start_date_val:start_date_val, end_date_val:end_date_val, supplier_filter_val:supplier_filter_val},
+        data: function (d) {
+          d.start_date_val = $('#start_date').val();
+          d.end_date_val = $('#end_date').val();
+          d.supplier_filter_val = $('#supplier_filter').val();
+        },
       },
       columns: 
       [
@@ -225,11 +227,22 @@ require DOC_ROOT_PATH . $this->config->item('footer');
   }
 
   $("#btnsearch").click(function (e) {
-    var start_date      = $("#start_date").val();
-    var end_date        = $("#end_date").val();
-    var supplier_filter = $("#supplier_filter").val();
-    window.location.href = "<?php echo base_url(); ?>Purchase/po?start_date="+start_date+"&end_date="+end_date+"&supplier_filter="+supplier_filter;
-    Swal.fire('Saved!', '', 'success');
+    e.preventDefault();
+
+    var start_date = $("#start_date").val();
+    var end_date = $("#end_date").val();
+
+    if (start_date !== '' && end_date !== '' && start_date > end_date) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Tanggal awal tidak boleh lebih besar dari tanggal akhir',
+      });
+      return;
+    }
+
+    $('#po-list').DataTable().ajax.reload();
+    $('.editmodal').modal('hide');
   });
 
   function note(id)
@@ -244,9 +257,13 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       let purchase_id      = $('#purchase_id').val();
       let url = '';
       if(print_type == '1') {
-         url = '<?php echo base_url(); ?>Purchase/printnotapo?purchase_id='+purchase_id;
-      }else{
+         url = '<?php echo base_url(); ?>Purchase/printnotapo?id='+purchase_id;
+      }else if(print_type == '2'){
          url = '<?php echo base_url(); ?>Purchase/printponote?id='+purchase_id;
+      }else if(print_type == '3'){
+         url = '<?php echo base_url(); ?>Purchase/printponotehalflokasi?id='+purchase_id;
+      }else{
+        url = '<?php echo base_url(); ?>Purchase/printnotapostok?id='+purchase_id;
       }
       window.open(url, '_blank');
     }else{

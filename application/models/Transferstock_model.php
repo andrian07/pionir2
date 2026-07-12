@@ -16,6 +16,7 @@ class transferstock_model extends CI_Model {
         if($search != null){
             $this->db->where('ms_product.product_name like "%'.$search.'%"');
             $this->db->or_where('hd_transfer_stock.hd_transfer_stock_code like "%'.$search.'%"');
+            $this->db->or_where('hd_transfer_stock.hd_transfer_stock_initial like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_supplier_name like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_key like "%'.$search.'%"');
@@ -60,7 +61,7 @@ class transferstock_model extends CI_Model {
         $this->db->join('ms_user', 'hd_transfer_stock.user_id = ms_user.user_id');
         if($search != null){
             $this->db->where('ms_product.product_name like "%'.$search.'%"');
-            $this->db->or_where('hd_transfer_stock.hd_transfer_stock_code like "%'.$search.'%"');
+            $this->db->or_where('hd_transfer_stock.hd_transfer_stock_initial like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_supplier_name like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_key like "%'.$search.'%"');

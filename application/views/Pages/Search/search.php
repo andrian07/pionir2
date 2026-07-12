@@ -377,6 +377,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
             <?php } ?>
           </select>
         </div>
+        <?php if($_SESSION['user_role'] == 'Superadmin'){ ?>
         <div class="col-md-3 col-sm-6 mb-3">
           <div class="filter-label"><i class="fas fa-truck"></i> Supplier</div>
           <select id="filter_supplier" class="form-control js-example-basic-single">
@@ -386,6 +387,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
             <?php } ?>
           </select>
         </div>
+        <?php } ?>
         <div class="col-md-3 col-sm-6 mb-2">
           <div class="filter-label"><i class="fas fa-toggle-on"></i> Status</div>
           <select id="filter_status" class="form-control js-example-basic-single">

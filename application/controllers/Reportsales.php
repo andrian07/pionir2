@@ -377,6 +377,138 @@ class Reportsales extends CI_Controller {
 	}
     // End Report Sales
 
+	// Report Sales Dropship
+    public function reportsalessdropship()
+	{
+		$modul = 'Report';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->view == 'Y'){
+			$customer_list['customer_list'] = $this->masterdata_model->customer_list();
+            $salesman_list['salesman_list'] = $this->masterdata_model->salesman_list();
+            $warehouse_list['warehouse_list'] = $this->masterdata_model->warehouse_list();
+			$check_auth['check_auth'] = $check_auth;
+			$data['data'] = array_merge($customer_list, $salesman_list, $warehouse_list, $check_auth);
+			$this->load->view('Pages/Report/Sales/reportsalessdropship', $data);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+    
+    public function reportsalessdropshippdf()
+    {
+        $start_date       = $this->input->get('start_date');
+		$end_date 	      = $this->input->get('end_date');
+		$customer_report  = $this->input->get('customer_report');
+        $dropship_name    = $this->input->get('dropship_name');
+        $warehouse_report = $this->input->get('warehouse_report');
+
+		$data['data'] = $this->reportsales_model->get_report_sales_dropship($start_date, $end_date, $customer_report, $dropship_name, $warehouse_report)->result_array();
+		$htmlView   = $this->load->view('Pages/Report/Sales/reportsalessdropshippdf', $data, true);
+		$dompdf = new Dompdf();
+		$dompdf->loadHtml($htmlView);
+		$dompdf->setPaper('A4', 'landscape');
+		$dompdf->render();
+		$dompdf->stream('penjualan_dropship.pdf', array("Attachment" => false));
+		exit();
+    }
+
+	public function reportsalessdropship_excell()
+	{
+		$modul = 'Report';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->view == 'Y'){
+			$start_date       = $this->input->get('start_date');
+			$end_date 	      = $this->input->get('end_date');
+		    $customer_report  = $this->input->get('customer_report');
+            $dropship_name    = $this->input->get('dropship_name');
+            $warehouse_report = $this->input->get('warehouse_report');
+
+			$excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+			$sheet = $excel->getActiveSheet();
+			$this->apply_excel_report_theme($sheet, 'Laporan Penjualan Dropship', 'V', 'Periode: ' . $start_date . ' s/d ' . $end_date);
+			$sheet->setCellValue('A3', 'Invoice');
+			$sheet->setCellValue('B3', 'Tanggal');
+			$sheet->setCellValue('C3', 'Pelanggan');
+			$sheet->setCellValue('D3', 'Nama Dropship');
+			$sheet->setCellValue('E3', 'Alamat Dropship');
+			$sheet->setCellValue('F3', 'No Telp Dropship');
+			$sheet->setCellValue('G3', 'Rate');
+			$sheet->setCellValue('H3', 'Pembayaran');
+			$sheet->setCellValue('I3', 'Ekspedisi');
+			$sheet->setCellValue('J3', 'Nama Barang');
+			$sheet->setCellValue('K3', 'Satuan');
+			$sheet->setCellValue('L3', 'Qty');
+			$sheet->setCellValue('M3', 'Harga');
+			$sheet->setCellValue('N3', 'Total Harga Barang');
+			$sheet->setCellValue('O3', 'TOP');
+			$sheet->setCellValue('P3', 'Salesman');
+			$sheet->setCellValue('Q3', 'Prepare By');
+			$sheet->setCellValue('R3', 'Koli');
+			$sheet->setCellValue('S3', 'Cabang');
+			$sheet->setCellValue('T3', 'Subtotal');
+			$sheet->setCellValue('U3', 'Diskon');
+			$sheet->setCellValue('V3', 'PPN');
+			$sheet->setCellValue('W3', 'Total');
+			$sheet->setCellValue('X3', 'Catatan');
+			$sheet->setCellValue('Y3', 'Di Buat Oleh');
+			$this->apply_excel_header_style($sheet, 'A3:Y3');
+
+			$data = $this->reportsales_model->get_report_sales_dropship($start_date, $end_date, $customer_report, $dropship_name, $warehouse_report)->result_array();
+			$this->write_grouped_excel_rows($sheet, $data, ['A' => 'hd_dropship_sales_inv', 'B' => 'hd_dropship_sales_date', 'C' => 'customer_name', 'D'=> 'hd_dropship_sales_dropship_name', 'E'=> 'hd_dropship_sales_dropship_address', 'F'=> 'hd_dropship_sales_dropship_phone', 'G' => 'customer_rate', 'H' => 'payment_name', 'I' => 'ekspedisi_name', 'O' => 'hd_dropship_sales_top', 'P' => 'salesman_name', 'Q' => 'hd_dropship_sales_prepare', 'R' => 'hd_dropship_sales_colly', 'S' => 'warehouse_name', 'T' => 'hd_dropship_sales_sub_total', 'U' => 'hd_dropship_sales_total_discount', 'V' => 'hd_dropship_sales_ppn', 'W' => 'hd_dropship_sales_total', 'X' => 'hd_dropship_sales_note', 'Y' => 'user_name'], ['J' => 'product_name', 'K' => 'unit_name', 'L' => 'dt_dropship_sales_qty', 'M' => 'dt_dropship_sales_price', 'N' => 'dt_dropship_sales_total'], 'hd_dropship_sales_inv', 4, 'Y');
+
+			$sheet->getColumnDimension('A')->setWidth(20);
+			$sheet->getColumnDimension('B')->setWidth(15);
+			$sheet->getColumnDimension('C')->setWidth(20);
+			$sheet->getColumnDimension('D')->setWidth(20);
+			$sheet->getColumnDimension('E')->setWidth(20);
+			$sheet->getColumnDimension('F')->setWidth(20);
+			$sheet->getColumnDimension('G')->setWidth(12);
+			$sheet->getColumnDimension('H')->setWidth(18);
+			$sheet->getColumnDimension('I')->setWidth(18);
+			$sheet->getColumnDimension('J')->setWidth(40);
+			$sheet->getColumnDimension('K')->setWidth(12);
+			$sheet->getColumnDimension('L')->setWidth(12);
+			$sheet->getColumnDimension('M')->setWidth(15);
+			$sheet->getColumnDimension('N')->setWidth(18);
+			$sheet->getColumnDimension('O')->setWidth(12);
+			$sheet->getColumnDimension('P')->setWidth(15);
+			$sheet->getColumnDimension('Q')->setWidth(15);
+			$sheet->getColumnDimension('R')->setWidth(15);
+			$sheet->getColumnDimension('S')->setWidth(12);
+			$sheet->getColumnDimension('T')->setWidth(15);
+			$sheet->getColumnDimension('U')->setWidth(25);
+			$sheet->getColumnDimension('V')->setWidth(15);
+			$sheet->getColumnDimension('W')->setWidth(15);
+			$sheet->getColumnDimension('X')->setWidth(25);
+			$sheet->getColumnDimension('Y')->setWidth(15);
+
+			$sheet->getStyle('M')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('N')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('T')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('U')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('V')->getNumberFormat()->setFormatCode('#,##0');
+			$sheet->getStyle('W')->getNumberFormat()->setFormatCode('#,##0');
+
+
+			$sheet->freezePane('A4');
+			$sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+			$sheet->setTitle('Excell');
+			ob_end_clean();
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header('Content-Disposition: attachment;filename="sales_dropship_' .date('Y-m-d') . '.xlsx"');
+			header('Cache-Control: max-age=0');
+
+			$xlsxWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+			$xlsxWriter = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($excel);
+			exit($xlsxWriter->save('php://output'));
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}
+    // End Report Sales Dropship
+
 
 	// Report Revisi Sales
     public function reportrevisisales()

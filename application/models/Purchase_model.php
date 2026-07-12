@@ -171,7 +171,7 @@ class purchase_model extends CI_Model {
     public function po_list($search, $length, $start, $start_date_val, $end_date_val, $supplier_filter_val)
     {
         $this->db->select('*');
-        $this->db->from('hd_po');
+        $this->db->from('hd_po ');
         $this->db->join('dt_po', 'hd_po.hd_po_id  = dt_po.hd_po_id ');
         $this->db->join('ms_product', 'dt_po.dt_product_id = ms_product.product_id');
         $this->db->join('ms_unit', 'ms_unit.unit_id = ms_product.product_unit');
@@ -182,7 +182,7 @@ class purchase_model extends CI_Model {
             $this->db->where('hd_po_date between "'.$start_date_val.'" and "'.$end_date_val.'" ');
         }
         if($supplier_filter_val != null){
-            $this->db->where('hd_po_supplier','"'.$supplier_filter_val.'"');
+            $this->db->where('hd_po_supplier', $supplier_filter_val);
         }
         if($search != null){
             $this->db->where('ms_product.product_name like "%'.$search.'%"');
@@ -211,7 +211,7 @@ class purchase_model extends CI_Model {
             $this->db->where('hd_po_date between "'.$start_date_val.'" and "'.$end_date_val.'" ');
         }
         if($supplier_filter_val != null){
-            $this->db->where('hd_po_supplier','"'.$supplier_filter_val.'"');
+            $this->db->where('hd_po_supplier', $supplier_filter_val);
         }
         if($search != null){
             $this->db->where('ms_product.product_name like "%'.$search.'%"');
@@ -226,7 +226,7 @@ class purchase_model extends CI_Model {
 
     public function header_po($po_id)
     {
-        $query = $this->db->query("select *, a.created_at as tanggal_po from hd_po a, ms_warehouse b, ms_supplier c, ms_user d, ms_ekspedisi e, ms_payment f where a.hd_po_warehouse = b.warehouse_id and a.hd_po_supplier = c.supplier_id and a.hd_po_payment = f.payment_id and a.created_by = d.user_id and a.hd_po_ekspedisi = e.ekspedisi_id and hd_po_id  = '".$po_id."'");
+        $query = $this->db->query("select *, a.created_at as tanggal_po from hd_po a, ms_warehouse b, ms_supplier c, ms_user d, ms_ekspedisi e, ms_payment f where a.hd_po_warehouse = b.warehouse_id and a.hd_po_supplier = c.supplier_id and a.hd_po_payment = f.payment_id and a.created_by = d.user_id and a.hd_po_ekspedisi = e.ekspedisi_id and a.hd_po_id  = '".$po_id."'");
         $result = $query->result();
         return $result;
     }
@@ -234,6 +234,13 @@ class purchase_model extends CI_Model {
     public function detail_po($po_id)
     {
         $query = $this->db->query("select * from dt_po a, hd_po b, ms_product c, ms_unit d, ms_user e where a.hd_po_id = b.hd_po_id and a.dt_product_id = c.product_id and c.product_unit = d.unit_id and b.created_by = e.user_id and a.hd_po_id  = '".$po_id."'");
+        $result = $query->result();
+        return $result;
+    }
+
+     public function detail_po_stock($po_id)
+    {
+        $query = $this->db->query("select * from dt_po a, hd_po b, ms_product c, ms_unit d, ms_user e, ms_product_stock f, ms_warehouse g where a.hd_po_id = b.hd_po_id and a.dt_product_id = c.product_id and c.product_unit = d.unit_id and b.created_by = e.user_id and a.dt_product_id = f.product_id and f.warehouse_id = g.warehouse_id and a.hd_po_id  = '".$po_id."'");
         $result = $query->result();
         return $result;
     }
@@ -713,6 +720,16 @@ class purchase_model extends CI_Model {
         return $query;
     }
 
+    public function get_product_stock($product_id)
+    {
+        $this->db->select('sum(ms_product_stock.stock) as product_stock, ms_product.product_hpp');
+        $this->db->from('ms_product_stock');
+        $this->db->join('ms_product', 'ms_product_stock.product_id = ms_product.product_id');
+        $this->db->where('ms_product_stock.product_id', $product_id);
+        $query = $this->db->get();
+        return $query;
+    }
+
     public function update_note_product($product_id_note, $new_note)
     {
         $this->db->set('product_note', $new_note);
@@ -723,6 +740,13 @@ class purchase_model extends CI_Model {
     public function copy_temp_purchase($data_copy_temp)
     {
         $this->db->insert('temp_purchase', $data_copy_temp);
+    }
+
+    public function update_hpp($product_id, $update_hpp)
+    {
+        $this->db->set('product_hpp', $update_hpp);
+        $this->db->where('product_id', $product_id);
+        $this->db->update('ms_product');
     }
 
     public function purchase_list($search, $length, $start, $start_date_val, $end_date_val, $supplier_filter_val, $purchase_type)

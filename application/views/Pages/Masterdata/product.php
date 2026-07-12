@@ -101,7 +101,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                   <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown"><span class="btn-label"><i class="fas fa-file-excel"></i></span> Excell</button>
                   <ul class="dropdown-menu" role="menu">
                     <li>
-                      <a class="dropdown-item" href="#">Download Template</a>
+                       <a class="dropdown-item" href="<?php echo base_url(); ?>Masterdata/export_sample_import_product">Download Template</a>
                       <a class="dropdown-item" href="#">Import Excell</a>
                     </li>
                   </ul>

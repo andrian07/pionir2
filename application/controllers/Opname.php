@@ -78,9 +78,14 @@ class Opname extends CI_Controller {
 				$no++;
 				$row = array();
 				$row[] 	= $field['opname_code'];
+				$row[] 	= $field['product_name'];
 				$row[] 	= date_format($date,"d-M-Y");
-				$row[] 	= $field['user_name'];
-				$row[] 	= 'Rp. '.number_format($field['opname_total']);
+				$row[] 	= $field['unit_name'];
+				$row[] 	= $field['dt_opname_stock_difference'];
+				$row[] 	= $field['warehouse_name'];
+				$row[] 	= $field['dt_opname_stock_awal'];
+				$row[] 	= $field['dt_opname_stock_akhir'];
+				$row[] 	= $field['dt_opname_note'];
 				$row[] 	= $detail;
 				$data[] = $row;
 			}
@@ -324,6 +329,7 @@ class Opname extends CI_Controller {
 					'dt_opname_stock_akhir'				=> $row['temp_opname_fisik_stock'],
 					'dt_opname_stock_difference'		=> $row['temp_opname_diferent_stock'],
 					'dt_opname_stock_difference_hpp'	=> $row['temp_opname_diferent_hpp'],
+					'dt_opname_note'					=> $row['temp_opname_note'],
 					'dt_opname_stock_status'			=> $status,
 				);
 

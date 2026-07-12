@@ -1611,6 +1611,21 @@ class Masterdata extends CI_Controller {
 
 	}
 
+	public function export_sample_import_product()
+	{
+		$modul = 'Product';
+		$check_auth = $this->check_auth($modul);
+		if($check_auth['check_access'][0]->view == 'Y'){
+			$this->load->helper('download');
+			$data = file_get_contents(base_url().'excell/sample_import_product.xlsx'); // Read the file's contents
+			$name = 'sample_import_product.xlsx';
+			force_download($name, $data);
+		}else{
+			$msg = "No Access";
+			echo json_encode(['code'=>0, 'result'=>$msg]);die();
+		}
+	}	
+
 	//end product
 
 

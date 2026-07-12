@@ -718,6 +718,40 @@ class sales_model extends CI_Model {
         $this->db->update('hd_sales');
     }
 
+    public function get_hd_sales_dropship($sales_id)
+    {
+        $query = $this->db->query("select * from hd_sales_dropship a, ms_warehouse b, ms_customer c, ms_user d, ms_ekspedisi e, ms_payment f, hd_sales g where a.hd_dropship_sales_warehouse = b.warehouse_id and a.hd_dropship_sales_customer = c.customer_id and a.hd_dropship_sales_payment = f.payment_id and a.created_by = d.user_id and a.hd_dropship_sales_ekspedisi = e.ekspedisi_id and a.hd_sales_id = g.hd_sales_id and a.hd_dropship_sales_id = '".$sales_id."'");
+        $result = $query->result();
+        return $result;
+    }
+
+    public function get_dt_sales_dropship($sales_id)
+    {
+        $query = $this->db->query("select * from dt_sales_dropship a, hd_sales_dropship b, ms_product c, ms_unit d, ms_user e where a.hd_dropship_sales_id  = b.hd_dropship_sales_id  and a.dt_dropship_sales_product_id = c.product_id and c.product_unit = d.unit_id and b.created_by = e.user_id and a.hd_dropship_sales_id  = '".$sales_id."'");
+        $result = $query->result();
+        return $result;
+    }
+
+    public function delete_sales_dropship($sales_id)
+    {
+        $this->db->set('hd_dropship_sales_status', 'Cancel');
+        $this->db->where('hd_dropship_sales_id', $sales_id);
+        $this->db->update('hd_sales_dropship');
+    }
+
+    public function update_sales_dropship($sales_dropship_id, $data_update)
+    {
+        $this->db->set($data_update);
+        $this->db->where('hd_dropship_sales_id', $sales_dropship_id);
+        $this->db->update('hd_sales_dropship');
+    }
+
+    public function delete_detail_sales_dropship($sales_dropship_id)
+    {
+        $this->db->where('hd_dropship_sales_id', $sales_dropship_id);
+        $this->db->delete('dt_sales_dropship');
+    }
+
     // end sales dropship
 
     // retur sales
@@ -732,12 +766,12 @@ class sales_model extends CI_Model {
         $this->db->join('ms_unit', 'ms_unit.unit_id = ms_product.product_unit');
         $this->db->join('ms_user', 'hd_retur_sales.created_by = ms_user.user_id');
         if($search != null){
-            $this->db->where('ms_product.product_name like "%'.$search.'%"');
+            $this->db->where('(ms_product.product_name like "%'.$search.'%"');
             $this->db->or_where('hd_retur_sales.hd_retur_sales_inv like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_supplier_name like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_key like "%'.$search.'%"');
-            $this->db->or_where('ms_product.product_desc like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_desc like "%'.$search.'%")');
         }
         $this->db->order_by('hd_retur_sales.created_at', 'desc');
         $this->db->limit($length);
@@ -756,12 +790,12 @@ class sales_model extends CI_Model {
         $this->db->join('ms_unit', 'ms_unit.unit_id = ms_product.product_unit');
         $this->db->join('ms_user', 'hd_retur_sales.created_by = ms_user.user_id');
         if($search != null){
-            $this->db->where('ms_product.product_name like "%'.$search.'%"');
+            $this->db->where('(ms_product.product_name like "%'.$search.'%"');
             $this->db->or_where('hd_retur_sales.hd_retur_sales_inv like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_supplier_name like "%'.$search.'%"');
             $this->db->or_where('ms_product.product_key like "%'.$search.'%"');
-            $this->db->or_where('ms_product.product_desc like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_desc like "%'.$search.'%")');
         }
         $query = $this->db->get();
         return $query;
@@ -773,12 +807,13 @@ class sales_model extends CI_Model {
         $this->db->from('hd_sales');
         $this->db->join('dt_sales', 'hd_sales.hd_sales_id = dt_sales.hd_sales_id');
         $this->db->join('ms_product', 'dt_sales.dt_sales_product_id = ms_product.product_id');
+        $this->db->join('ms_unit', 'ms_product.product_unit = ms_unit.unit_id');
         if($keyword != null){
-            $this->db->where('ms_product.product_name like "%'.$keyword.'%"');
+            $this->db->where('(ms_product.product_name like "%'.$keyword.'%"');
             $this->db->or_where('ms_product.product_code like "%'.$keyword.'%"');
             $this->db->or_where('ms_product.product_supplier_name like "%'.$keyword.'%"');
             $this->db->or_where('ms_product.product_key like "%'.$keyword.'%"');
-            $this->db->or_where('ms_product.product_desc like "%'.$keyword.'%"');
+            $this->db->or_where('ms_product.product_desc like "%'.$keyword.'%")');
         }
         $this->db->where('hd_sales.hd_sales_id', $sales_id);
         $this->db->group_by('ms_product.product_id');

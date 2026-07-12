@@ -134,6 +134,38 @@ class reportsales_model extends CI_Model {
         return $query;
     }
 
-}
 
-?>
+    public function get_report_sales_dropship($start_date, $end_date, $customer_report, $dropship_name, $warehouse_report)
+    {
+        if($start_date == null){
+            $start_date = date('Y-m-01');
+        }
+        if($end_date == null){
+            $end_date = date('Y-m-d');
+        }
+        $this->db->select('*');
+        $this->db->from('hd_sales_dropship');
+        $this->db->join('dt_sales_dropship', 'hd_sales_dropship.hd_dropship_sales_id = dt_sales_dropship.hd_dropship_sales_id');
+        $this->db->join('ms_customer', 'hd_sales_dropship.hd_dropship_sales_customer = ms_customer.customer_id');
+        $this->db->join('ms_payment', 'hd_sales_dropship.hd_dropship_sales_payment = ms_payment.payment_id');
+        $this->db->join('ms_warehouse', 'hd_sales_dropship.hd_dropship_sales_warehouse = ms_warehouse.warehouse_id');
+        $this->db->join('ms_ekspedisi', 'hd_sales_dropship.hd_dropship_sales_ekspedisi = ms_ekspedisi.ekspedisi_id');
+        $this->db->join('ms_product', 'dt_sales_dropship.dt_dropship_sales_product_id = ms_product.product_id');
+        $this->db->join('ms_unit', 'ms_product.product_unit = ms_unit.unit_id');
+        if($start_date != null){
+            $this->db->where('hd_sales_dropship.hd_dropship_sales_date between "'.$start_date.'" and "'.$end_date.'"');
+        }
+        if($customer_report != null){
+            $this->db->where('hd_sales_dropship.hd_dropship_sales_customer', $customer_report);
+        }
+        if($dropship_name != null){
+            $this->db->where('hd_sales_dropship.hd_dropship_sales_dropship_name', $dropship_name);
+        }
+        if($warehouse_report != null){
+            $this->db->where('hd_sales_dropship.hd_dropship_sales_warehouse', $warehouse_report);
+        }
+        $query = $this->db->get();
+        return $query;
+    }
+
+}

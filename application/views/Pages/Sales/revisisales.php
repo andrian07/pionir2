@@ -92,9 +92,10 @@ require DOC_ROOT_PATH . $this->config->item('header');
                   <th>No Invoice</th>
                   <th>Tanggal</th>
                   <th>Customer</th>
+                   <th>Rate</th>
                   <th>Produk</th>
                   <th>Qty</th>
-                  <th>Rate</th>
+                 
                   <th>Total Harga</th>
                   <th>Status Pembayaran</th>
                   <th>Sisa Pembayaran</th>

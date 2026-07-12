@@ -141,12 +141,13 @@ td,th{
 <table class="header-table">
     <tr>
 
-             <td width="15%" align="center">
+        <td width="15%" align="center">
             <img src="<?php echo base_url(); ?>assets/logo.png" width="80">
         </td>
 
         <td width="40%">
             <span style="color:#FE0000;font-size:24px;font-weight:bold;"><?php echo $data['header_po'][0]->warehouse_name; ?></span><br>
+            
             <span style="font-size:12px;display:inline-block;width:80%;"><?php echo $data['header_po'][0]->warehouse_address; ?></span><br>
             <span style="font-size:12px;"><?php echo $data['header_po'][0]->warehouse_phone; ?></span>
         </td>
@@ -222,7 +223,7 @@ td,th{
         <th width="45%">Nama Barang</th>
         <th width="10%">Qty</th>
         <th width="15%">Satuan</th>
-        <th width="25%">Catatan</th>
+        <th width="25%">Lokasi</th>
     </tr>
 
     <?php
@@ -238,7 +239,7 @@ td,th{
             <td class="text-left"><?php echo $row->product_name ?></td>
             <td class="text-center"><?php echo $row->dt_po_qty ?></td>
             <td class="text-center"><?php echo $row->unit_name ?></td>
-            <td class="text-center"><?php echo $row->dt_po_note ?></td>
+            <td class="text-center"><?php echo $row->product_location ?></td>
         </tr>
 
         <?php 

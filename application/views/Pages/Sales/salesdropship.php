@@ -93,11 +93,10 @@ require DOC_ROOT_PATH . $this->config->item('header');
                       <div class="col-md-12 p-0">
                         <select class="form-control input-full" id="print_type" name="print_type">
                           <option value="">-- Pilih Jenis Print --</option>
-                          <option value="1">Nota Item</option>
-                          <option value="2">Alamat Konsumen</option>
-                          <option value="3">Nota Lunas 1(Ply)</option> 
-                          <option value="4">Nota Piutang 2(ply)</option>
-                          <option value="5">Surat Jalan</option> 
+                          <option value="1">Alamat Konsumen</option>
+                          <option value="2">Nota Lunas 1(Ply)</option> 
+                          <option value="3">Nota Piutang 2(ply)</option>
+                          <option value="4">Surat Jalan</option> 
                         </select>
 
                         <input type="hidden" id="sales_id" name="sales_id" value="">
@@ -125,7 +124,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
                   <th>No Invoice</th>
                   <th>Tanggal</th>
                   <th>Pelanggan</th>
-                  <th>Rate</th>
+                  <th>Nama Dropship</th>
                   <th>Produk</th>
                   <th>Qty</th>
                   <th>Total Harga</th>
@@ -211,7 +210,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       if (result.isConfirmed) {
         $.ajax({
           type: "POST",
-          url: "<?php echo base_url(); ?>Sales/delete_sales",
+          url: "<?php echo base_url(); ?>Sales/delete_sales_dropship",
           dataType: "json",
           data: {id:id},
           success : function(data){
@@ -251,7 +250,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
     if(print_type != '') {
       let print_type       = $('#print_type').val();
       let sales_id         = $('#sales_id').val();
-      let url = '<?php echo base_url(); ?>Sales/printnota?';
+      let url = '<?php echo base_url(); ?>Sales/printnotadropship?';
       url += '&print_type=' + print_type;
       url += '&sales_id=' + sales_id;
       window.open(url, '_blank');
@@ -271,5 +270,13 @@ require DOC_ROOT_PATH . $this->config->item('footer');
     var modal = $(this)
     modal.find('#sales_id').val(id)
   })
+
+  $('#reload').on('click', function () {
+    $('#sales-list').DataTable().ajax.reload();
+  });
+
+  function edits(id) {
+    window.location.href = '<?php echo base_url(); ?>Sales/editsalesdropship?id=' + id;
+}
 
 </script>

@@ -51,6 +51,27 @@ require DOC_ROOT_PATH . $this->config->item('header');
     gap: 5px;
   }
   .sales-field-label i { font-size: 0.72rem; color: #9ca3af; }
+  .sales-help-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid #94a3b8;
+    color: #475569;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #ffffff;
+    cursor: pointer;
+    margin-left: 4px;
+    line-height: 1;
+  }
+  .sales-help-trigger:hover {
+    background: #f8fafc;
+    border-color: #64748b;
+    color: #1e293b;
+  }
   .sales-section-body .form-control,
   .sales-section-body .select2-container--default .select2-selection--single {
     border-radius: 9px !important;
@@ -156,7 +177,18 @@ require DOC_ROOT_PATH . $this->config->item('header');
               <input id="sales_id" name="sales_id" type="hidden" class="form-control">
             </div>
             <div class="mb-3">
-              <div class="sales-field-label"><i class="fas fa-file-import"></i> Sales Invoice</div>
+              <div class="sales-field-label">
+                <i class="fas fa-file-import"></i> Sales Invoice
+                <span
+                  class="sales-help-trigger"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-trigger="click"
+                  title="Revisi penjualkan hanya untuk penjualan yang sudah di cancel"
+                  tabindex="0"
+                  role="button"
+                >?</span>
+              </div>
               <input id="sales_inv_sales" name="sales_inv_sales" type="text" class="form-control ui-autocomplete-input" placeholder="No Penjualan" value="" required="" autocomplete="off">
               <input id="sales_inv_id" type="hidden" name="sales_inv_id">
               <input id="hd_sales_type" name="hd_sales_type" type="hidden" value="REVISI">
@@ -365,7 +397,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
             </div>
             <div class="col-md-4 mb-2">
               <div class="sales-field-label"><i class="fas fa-sticky-note"></i> Keterangan</div>
-              <input id="desc_item" name="desc_item" type="text" class="form-control text-left" required="">
+              <input id="desc_item" name="desc_item" type="text" class="form-control text-left">
             </div>
             <div class="col-md-4 mb-2">
               <div class="sales-field-label"><i class="fas fa-calculator"></i> Total</div>
@@ -508,6 +540,24 @@ require DOC_ROOT_PATH . $this->config->item('header');
               <button type="button" id="btneditdisc" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="descItemConfirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Konfirmasi</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            deskripsi item tidak di isi apakah akan tetap di lanjutkan?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="button" id="btn-desc-item-continue" class="btn btn-primary">Lanjutkan</button>
+          </div>
         </div>
       </div>
     </div>
@@ -998,10 +1048,11 @@ require DOC_ROOT_PATH . $this->config->item('footer');
     $('#temp_qty').val(0);
     temp_discount.set(0);
     temp_total.set(0);
+    $('#desc_item').val("");
   }
 
-  $('#btnadd_temp').click(function(e){
-    e.preventDefault();
+  function submit_temp_sales_item()
+  {
     var warehouse_id            = $("#sales_warehouse").val();
     var product_id              = $("#product_id").val();
     var temp_rate               = $("#temp_rate").val();
@@ -1011,31 +1062,52 @@ require DOC_ROOT_PATH . $this->config->item('footer');
     var temp_total_val          = parseInt(temp_total.get());
     var desc_item               = $("#desc_item").val();
 
-    if($('#formaddtemp').parsley().validate({force: true})){
-      $.ajax({
-        type: "POST",
-        url: "<?php echo base_url(); ?>Sales/add_temp_sales",
-        dataType: "json",
-        data: {warehouse_id:warehouse_id, product_id:product_id, temp_rate:temp_rate, temp_price_val:temp_price_val, temp_qty:temp_qty, temp_discount_val:temp_discount_val, temp_total_val:temp_total_val, desc_item:desc_item},
-        success : function(data){
-          if (data.code == "200"){
-            let title = 'Tambah Data';
-            let message = 'Data Berhasil Di Tambah';
-            let state = 'info';
-            notif_success(title, message, state);
-            $('#temp-sales-list').DataTable().ajax.reload();
-            check_tempt_data();
-            clear_input();
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: data.result,
-            })
-          }
+    $.ajax({
+      type: "POST",
+      url: "<?php echo base_url(); ?>Sales/add_temp_sales",
+      dataType: "json",
+      data: {warehouse_id:warehouse_id, product_id:product_id, temp_rate:temp_rate, temp_price_val:temp_price_val, temp_qty:temp_qty, temp_discount_val:temp_discount_val, temp_total_val:temp_total_val, desc_item:desc_item},
+      success : function(data){
+        if (data.code == "200"){
+          let title = 'Tambah Data';
+          let message = 'Data Berhasil Di Tambah';
+          let state = 'info';
+          notif_success(title, message, state);
+          $('#temp-sales-list').DataTable().ajax.reload();
+          check_tempt_data();
+          clear_input();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: data.result,
+          })
         }
-      });
+      }
+    });
+  }
+
+  $('#btnadd_temp').click(function(e){
+    e.preventDefault();
+    if($('#formaddtemp').parsley().validate({force: true})){
+      var desc_item = ($("#desc_item").val() || '').trim();
+      if(desc_item === ''){
+        const descItemConfirmModal = new bootstrap.Modal(document.getElementById('descItemConfirmModal'), {backdrop: 'static', keyboard: false});
+        descItemConfirmModal.show();
+        return;
+      }
+
+      submit_temp_sales_item();
     }
+  });
+
+  $('#btn-desc-item-continue').on('click', function(){
+    const modalElement = document.getElementById('descItemConfirmModal');
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    if(modalInstance){
+      modalInstance.hide();
+    }
+    submit_temp_sales_item();
   });
 
   $('#btnsave').click(function(e){
@@ -1328,5 +1400,10 @@ $("#btncancel").click(function (e) {
 });
 
 new bootstrap.Modal(document.getElementById('footerdiscount'), {backdrop: 'static', keyboard: false})  
+
+const salesInvoiceHelpTooltip = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+salesInvoiceHelpTooltip.forEach(function (el) {
+  new bootstrap.Tooltip(el);
+});
 
 </script>

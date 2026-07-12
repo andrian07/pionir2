@@ -14,6 +14,8 @@ class payment_model extends CI_Model {
         if($search != null){
             $this->db->or_where('ms_supplier.supplier_name like "%'.$search.'%"');
             $this->db->or_where('ms_supplier.supplier_code like "%'.$search.'%"');
+            $this->db->or_where('ms_supplier.supplier_address like "%'.$search.'%"');
+            $this->db->or_where('ms_supplier.supplier_phone like "%'.$search.'%"');
         }
         $this->db->group_by('hd_purchase.hd_purchase_supplier');
         $this->db->order_by('ms_supplier.supplier_name', 'desc');
@@ -32,6 +34,8 @@ class payment_model extends CI_Model {
         if($search != null){
             $this->db->or_where('ms_supplier.supplier_name like "%'.$search.'%"');
             $this->db->or_where('ms_supplier.supplier_code like "%'.$search.'%"');
+            $this->db->or_where('ms_supplier.supplier_address like "%'.$search.'%"');
+            $this->db->or_where('ms_supplier.supplier_phone like "%'.$search.'%"');
         }
         $this->db->group_by('hd_purchase.hd_purchase_supplier');
         $this->db->order_by('ms_supplier.supplier_name', 'desc');

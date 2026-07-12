@@ -80,16 +80,16 @@
 				<td width="50%">
 
 					<div class="header-title">
-						<?php echo $data['header_sales'][0]->warehouse_name; ?>
+						<?php echo $data['header_sales_dropship'][0]->customer_name; ?>
 					</div>
 
-					<?php echo $data['header_sales'][0]->warehouse_address; ?><br>
-					<?php echo $data['header_sales'][0]->warehouse_phone; ?><br>
+					<?php echo $data['header_sales_dropship'][0]->customer_address; ?><br>
+					<?php echo $data['header_sales_dropship'][0]->customer_phone; ?><br>
 
 					<br><br>
 
-					NO SURAT JALAN : <?php echo $data['header_sales'][0]->hd_sales_inv; ?><br>
-					KIRIM VIA : <?php echo $data['header_sales'][0]->ekspedisi_name; ?>
+					NO SURAT JALAN : <?php echo $data['header_sales_dropship'][0]->hd_dropship_sales_inv; ?><br>
+					KIRIM VIA : <?php echo $data['header_sales_dropship'][0]->ekspedisi_name; ?>
 
 				</td>
 
@@ -99,15 +99,15 @@
 
 						<tr>
 							<td class="text-left">
-								<?php echo $data['header_sales'][0]->hd_sales_date; ?><br>
+								<?php echo $data['header_sales_dropship'][0]->hd_dropship_sales_date; ?><br>
 								Kepada,
 							</td>
 						</tr>
 
 						<tr>
 							<td>
-								<b><?php echo $data['header_sales'][0]->customer_name; ?> - <?php echo $data['header_sales'][0]->customer_phone; ?></b><br><br>
-								<?php echo $data['header_sales'][0]->customer_address; ?>
+								<b><?php echo $data['header_sales_dropship'][0]->hd_dropship_sales_dropship_name; ?> - <?php echo $data['header_sales_dropship'][0]->hd_dropship_sales_dropship_phone; ?></b><br><br>
+								<?php echo $data['header_sales_dropship'][0]->hd_dropship_sales_dropship_address; ?>
 							</td>
 						</tr>
 
@@ -149,7 +149,7 @@
 
 						<tr>
 							<td class="text-center colly-box">
-								<?php echo $data['header_sales'][0]->hd_sales_colly; ?> X
+								<?php echo $data['header_sales_dropship'][0]->hd_dropship_sales_colly; ?> X
 							</td>
 						</tr>
 						
@@ -195,9 +195,9 @@
 						<?php 
 							$no = 1;
 							$max_row = 10;
-							$current_row = count($data['detail_sales']);
+							$current_row = count($data['detail_sales_dropship']);
 
-							foreach($data['detail_sales'] as $item){ 
+							foreach($data['detail_sales_dropship'] as $item){ 
 							?>
 							<?php } ?>
 
@@ -226,7 +226,7 @@
 
 				<br>
 
-				Item prepared by : <?php echo $data['header_sales'][0]->hd_sales_prepare; ?>
+				Item prepared by : <?php echo $data['header_sales_dropship'][0]->hd_dropship_sales_prepare; ?>
 
 			</div>
 

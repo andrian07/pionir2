@@ -1090,7 +1090,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
             var data_ongkir = parseInt(data.ongkir, 0);
             var data_sub_total = parseInt(data.sub_total, 0);
             var data_ppn_cal = parseInt(ppn_cal, 0);
-            var footer_total_invoice_cal = (data_ongkir + data_sub_total + data_ppn_cal);
+            var footer_total_invoice_cal = (data_sub_total + data_ppn_cal);
             footer_total_invoice.set(footer_total_invoice_cal);
           }
         }
@@ -1150,7 +1150,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
       ppn_val = (footer_sub_total_val - total_disc) * 11 / 100;
     }
     footer_total_ppn.set(ppn_val);
-    footer_total_invoice.set(((footer_sub_total_val - total_disc) + ppn_val) + footer_total_ongkir_val);
+    footer_total_invoice.set(((footer_sub_total_val - total_disc) + ppn_val));
     $('#footerdiscount').modal('hide')
   });
 
@@ -1170,7 +1170,7 @@ require DOC_ROOT_PATH . $this->config->item('footer');
     }
 
     footer_total_ppn.set(ppn_val);
-    footer_total_invoice.set(((footer_sub_total_val - total_disc) + ppn_val) + footer_total_ongkir_val);
+    footer_total_invoice.set(((footer_sub_total_val - total_disc) + ppn_val));
   });
 
   new bootstrap.Modal(document.getElementById('footerdiscount'), {backdrop: 'static', keyboard: false})  

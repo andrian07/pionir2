@@ -90,7 +90,7 @@
         <td class="text-center" width="20%"><?php echo $detail->unit_name ?></td>
       </tr>
       <tr class="dash">
-        <td colspan="3" class="text-left" style="font-size:11px;">Lokasi Stock: <?php echo $detail->product_location; ?><br /><br /><br /><br /><br /></td>
+        <td colspan="3" class="text-left" style="font-size:11px;"><?php echo $detail->warehouse_name; ?>: <?php echo $detail->stock; ?><br /><br /><br /><br /><br /></td>
       </tr>
     <?php } ?>
   </table>

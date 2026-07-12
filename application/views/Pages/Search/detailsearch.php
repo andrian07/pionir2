@@ -119,11 +119,18 @@
                 <tr>
                    <th scope="col" class="productinfo-text-right">Catatan Penting:</th>
                 <?php
+                if($row->product_note == null || $row->product_note == ''){
+                  $row->product_note = 'Tidak ada catatan penting';
+                }else{
+                  $row->product_note = $row->product_note;
+                }
                 $note = str_replace(['<br />', '<br>', '<br/>'], "\n", $row->product_note);
                 ?>
                 
-                <td colspan="4" style="white-space: pre-line;">
+                <td colspan="4">
+                  <div class="note-scroll" style="max-height: 250px; overflow-y: auto; white-space: pre-line; padding-right: 6px;">
                     <?= $note; ?>
+                  </div>
                 </td>
                 </tr>
                 <tr>
@@ -237,6 +244,14 @@
   </div>
 </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var noteScrollElements = document.querySelectorAll('.note-scroll');
+    noteScrollElements.forEach(function (el) {
+      el.scrollTop = el.scrollHeight;
+    });
+  });
+</script>
 </body>
 
 </html>  

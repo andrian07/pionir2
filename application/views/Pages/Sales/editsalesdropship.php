@@ -135,10 +135,10 @@ require DOC_ROOT_PATH . $this->config->item('header');
 <div class="container-fluid">
 	<div class="sales-page-wrap">
 		<div class="sales-page-header">
-			<div class="header-icon"><i class="fas fa-cash-register"></i></div>
+			<div class="header-icon"><i class="fas fa-shipping-fast"></i></div>
 			<div>
-				<h5>Tambah Penjualan</h5>
-				<small>Silahkan isi data penjualan dengan lengkap</small>
+				<h5>Tambah Penjualan Dropship</h5>
+				<small>Silahkan isi data penjualan dropship dengan lengkap</small>
 			</div>
 		</div>
 
@@ -152,13 +152,13 @@ require DOC_ROOT_PATH . $this->config->item('header');
 					<div class="sales-section-body">
 						<div class="mb-3">
 							<div class="sales-field-label"><i class="fas fa-hashtag"></i> No Invoice</div>
-							<input id="sales_invoice" name="sales_invoice" type="text" class="form-control" value="AUTO" readonly="">
-							<input id="sales_id" name="sales_id" type="hidden" class="form-control">
+							<input id="sales_dropship_invoice" name="sales_dropship_invoice" type="text" class="form-control" value="AUTO" readonly="">
+							<input id="sales_dropship_id" name="sales_dropship_id" type="hidden" class="form-control">
 						</div>
 						<div class="mb-3">
-							<div class="sales-field-label"><i class="fas fa-file-import"></i> Sales Order</div>
-							<input id="sales_inv_order" name="sales_inv_order" type="text" class="form-control ui-autocomplete-input" placeholder="No Sales Order" value="" required="" autocomplete="off">
-							<input id="sales_order_id" type="hidden" name="sales_order_id">
+							<div class="sales-field-label"><i class="fas fa-file-import"></i> Kode Penjualan</div>
+							<input id="sales_inv" name="sales_inv" type="text" class="form-control ui-autocomplete-input" placeholder="No Penjualan" value="" required="" autocomplete="off" readonly data-parsley-required data-parsley-required-message="*Masukan No Penjualan">
+							<input id="sales_id" type="hidden" name="sales_id">
 							<input id="hd_sales_type" name="hd_sales_type" type="hidden" value="SALES">
 						</div>
 						<div class="mb-3">
@@ -300,7 +300,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
 						<h6>Dropship</h6>
 					</div>
 					<div class="sales-section-body">
-						<div id="dropship-container" style="display:none;">
+						<div id="dropship-container">
 							<div class="mb-3">
 								<div class="sales-field-label"><i class="fas fa-user"></i> Nama</div>
 								<input id="dropship_name" name="dropship_name" type="text" class="form-control" placeholder="Nama Dropship Pelanggan">
@@ -314,7 +314,6 @@ require DOC_ROOT_PATH . $this->config->item('header');
 								<textarea id="dropship_address" name="dropship_address" class="form-control" placeholder="Alamat Dropship" maxlength="500" rows="4"></textarea>
 							</div>
 						</div>
-						<div class="text-muted small">Pilih opsi dropship untuk menampilkan detail penerima.</div>
 					</div>
 				</div>
 			</div>
@@ -330,12 +329,12 @@ require DOC_ROOT_PATH . $this->config->item('header');
 					<div class="row mb-3">
 						<div class="col-md-4 mb-2">
 							<div class="sales-field-label"><i class="fas fa-box"></i> Produk</div>
-							<input id="product_name" name="product_name" type="text" class="form-control ui-autocomplete-input" placeholder="Ketikkan nama produk..." value="" required="" autocomplete="off" data-parsley-required data-parsley-required-message="*Masukan Nama Produk">
+							<input id="product_name" name="product_name" type="text" class="form-control ui-autocomplete-input" placeholder="Ketikkan nama produk..." value="" required="" autocomplete="off" data-parsley-required data-parsley-required-message="*Masukan Nama Produk" readonly>
 							<input id="product_id" type="hidden" name="product_id">
 						</div>
 						<div class="col-md-2 mb-2">
 							<div class="sales-field-label"><i class="fas fa-tags"></i> Rate Produk</div>
-							<select class="form-control js-example-basic-single" id="temp_rate" name="temp_rate">
+							<select class="form-control js-example-basic-single" id="temp_rate" name="temp_rate" disabled>
 								<option value="Umum">Umum</option>
 								<option value="Toko">Toko</option>
 								<option value="Sales">Sales</option>
@@ -352,7 +351,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
 						</div>
 						<div class="col-md-2 mb-2">
 							<div class="sales-field-label"><i class="fas fa-sort-numeric-up"></i> Qty</div>
-							<input id="temp_qty" name="temp_qty" type="text" class="form-control text-right" value="0" required="">
+							<input id="temp_qty" name="temp_qty" type="text" class="form-control text-right" value="0" required="" readonly>
 						</div>
 					</div>
 
@@ -382,7 +381,7 @@ require DOC_ROOT_PATH . $this->config->item('header');
 				<hr class="sales-divider" style="margin-top:20px;">
 
 				<div class="table-responsive">
-					<table id="temp-sales-list" class="display table table-striped table-hover">
+					<table id="temp-sales-dropship-list" class="display table table-striped table-hover">
 						<thead>
 							<tr>
 								<th>SKU</th>
@@ -511,6 +510,24 @@ require DOC_ROOT_PATH . $this->config->item('header');
 				</div>
 			</div>
 		</div>
+
+		<div class="modal fade" id="refreshConfirmModal" tabindex="-1" aria-labelledby="refreshConfirmModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="refreshConfirmModalLabel">Konfirmasi Refresh</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						Apakah anda akan menghapus data yang telah di ubah?
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" id="btnRefreshNo" data-bs-dismiss="modal">Tidak</button>
+						<button type="button" class="btn btn-danger" id="btnRefreshYes">Ya, Hapus & Refresh</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -519,6 +536,77 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 ?>
 
 <script>
+	let shouldSkipUnloadWarning = false;
+	let refreshConfirmModal = null;
+
+	function hasDropshipUnsavedData()
+	{
+		let subTotal = 0;
+		if (typeof footer_sub_total !== 'undefined' && footer_sub_total !== null) {
+			subTotal = parseInt(footer_sub_total.get(), 10) || 0;
+		}
+
+		return subTotal > 0 ||
+		($('#sales_inv').val() || '').trim() !== '' ||
+		($('#sales_customer').val() || '').trim() !== '' ||
+		($('#sales_remark').val() || '').trim() !== '';
+	}
+
+	window.addEventListener('beforeunload', function(e) {
+		if (shouldSkipUnloadWarning || !hasDropshipUnsavedData()) {
+			return;
+		}
+		e.preventDefault();
+		e.returnValue = 'Data akan di-reset jika halaman direfresh atau ditutup.';
+	});
+
+	window.addEventListener('unload', function() {
+		if (shouldSkipUnloadWarning || !hasDropshipUnsavedData()) {
+			return;
+		}
+		navigator.sendBeacon('<?php echo base_url(); ?>Sales/clear_temp_sales_dropship');
+	});
+
+	function showRefreshConfirmModal()
+	{
+		if (!refreshConfirmModal) {
+			refreshConfirmModal = new bootstrap.Modal(document.getElementById('refreshConfirmModal'), {backdrop: 'static', keyboard: false});
+		}
+
+		refreshConfirmModal.show();
+	}
+
+	document.addEventListener('keydown', function(e) {
+		const isF5 = e.key === 'F5';
+		const isCtrlR = (e.ctrlKey || e.metaKey) && (e.key === 'r' || e.key === 'R');
+
+		if (!isF5 && !isCtrlR) {
+			return;
+		}
+
+		if (shouldSkipUnloadWarning || !hasDropshipUnsavedData()) {
+			return;
+		}
+
+		e.preventDefault();
+		showRefreshConfirmModal();
+	});
+
+	$('#btnRefreshYes').on('click', function() {
+		$.ajax({
+			type: "POST",
+			url: "<?php echo base_url(); ?>Sales/clear_temp_sales_dropship",
+			dataType: "json",
+			data: {},
+			complete: function(){
+				shouldSkipUnloadWarning = true;
+				if (refreshConfirmModal) {
+					refreshConfirmModal.hide();
+				}
+				window.location.reload();
+			}
+		});
+	});
 
 	$('#purchase_top').prop('disabled', true);
 	$('#purchase_payment_method').prop('disabled', true);
@@ -650,18 +738,21 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 
 	$(document).ready(function() {
 		tempsales_table();
-		check_So_data();
+		check_tempt_data();
+		setTimeout(function() {
+			check_sales_data();
+		}, 300);
 	});
 
 	function tempsales_table(){
-		$('#temp-sales-list').DataTable( {
+		$('#temp-sales-dropship-list').DataTable( {
 			serverSide: true,
 			search: true,
 			processing: true,
 			ordering: false,
 			retrieve: true,
 			ajax: {
-				url: '<?php echo base_url(); ?>Sales/temp_sales_list',
+				url: '<?php echo base_url(); ?>Sales/temp_sales_dropship_list',
 				type: 'POST',
 				data:  {},
 			},
@@ -680,7 +771,8 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 		});
 		check_tempt_data();
 	}
-	
+
+
 	$('#product_name').autocomplete({ 
 		minLength: 2,
 		source: function(req, add) {
@@ -717,106 +809,6 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 		},
 	});
 
-	$('#sales_inv_order').autocomplete({ 
-		minLength: 2,
-		source: function(req, add) {
-			$.ajax({
-				url: '<?php echo base_url(); ?>/Sales/search_so',
-				dataType: 'json',
-				type: 'GET',
-				data: req,
-				success: function(res) {
-					if (res.success == true) {
-						add(res.data);
-					}
-				},
-			});
-		},
-		select: function(event, ui) {
-			let id = ui.item.id;
-			$.ajax({
-				type: "POST",
-				url: "<?php echo base_url(); ?>Sales/get_header_so",
-				dataType: "json",
-				data: {id:id},
-				success : function(data){
-					if (data.code == "200"){
-						var row = data.data[0];
-						$('#sales_order_id').val(row.hd_sales_order_id );
-						$('#sales_customer').val(row.hd_sales_order_customer);
-						$('#sales_customer').trigger('change');
-						$('#sales_rate_customer').val(row.customer_rate);
-						$('#sales_payment').val(row.hd_sales_order_payment);
-						$('#sales_payment').trigger('change');
-						$('#sales_top').val(row.hd_sales_order_top_id);
-						$('#sales_top').trigger('change');
-						$('#drop_ship').val(row.hd_sales_order_dropship);
-						$('#drop_ship').trigger('change');
-						if(row.hd_sales_order_dropship == 'Y'){
-							$('#dropship_name').val(row.hd_sales_order_dropship_name);
-							$('#dropship_phone').val(row.hd_sales_order_dropship_phone);
-							$('#dropship_address').val(row.hd_sales_order_dropship_address);
-						}else{
-							$('#dropship_name').val("");
-							$('#dropship_phone').val("");
-							$('#dropship_address').val("");
-						}
-						$('#sales_salesman').val(row.hd_sales_order_salesman);
-						$('#sales_salesman').trigger('change');
-						$('#sales_prepare').val(row.hd_sales_order_prepare);
-						$('#sales_colly').val(row.hd_sales_order_colly);
-						$('#sales_warehouse').val(row.hd_sales_order_warehouse);
-						$('#sales_warehouse').trigger('change');
-						$('#sales_ekspedisi').val(row.hd_sales_order_ekspedisi);
-						$('#sales_ekspedisi').trigger('change');
-						$('#footerdiscount').on('show.bs.modal', function (event) {
-							edit_footer_discount_percentage1.set(row.hd_sales_order_percentage1);
-							edit_footer_discount_percentage2.set(row.hd_sales_order_percentage2);
-							edit_footer_discount_percentage3.set(row.hd_sales_order_percentage3);
-							edit_footer_discount1.set(row.hd_sales_order_disc1);
-							edit_footer_discount2.set(row.hd_sales_order_disc2);
-							edit_footer_discount3.set(row.hd_sales_order_disc3);
-						})
-						footer_sub_total.set(row.hd_sales_order_sub_total);
-						footer_total_discount.set(row.hd_sales_order_total_discount);
-						footer_total_ppn.set(row.hd_sales_order_ppn);
-						if(row.hd_sales_order_ppn > 0){
-							$("#ppnchecked").prop("checked", true);
-						}
-						footer_total_invoice.set(row.hd_sales_order_total);
-						footer_dp.set(row.hd_sales_order_dp);
-						footer_remaining_debt.set(row.hd_sales_order_remaining_debt);
-						$('#sales_remark').val(row.hd_sales_order_note);
-						let title = 'Pilih Sales Order';
-						let message = 'Sales Order Berhasil Di Pilih';
-						let state = 'info';
-						notif_success(title, message, state);
-						$('#temp-sales-list').DataTable().ajax.reload();
-            //check_tempt_data();
-						clear_input();
-					}else{
-						Swal.fire({
-							icon: 'error',
-							title: 'Oops...',
-							text: data.result,
-						})
-					}
-				}
-			});
-		},
-	});
-
-	$('#drop_ship').on('change', function() {
-		var value = $(this).val();
-		if (value == 'Y') {
-			$('#dropship-container').show();
-		}else{
-			$('#dropship-container').hide();
-			$('#dropship_name').val("");
-			$('#dropship_phone').val("");
-			$('#dropship_address').val("");
-		}
-	});
 
 	function change_rate()
 	{
@@ -839,42 +831,6 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 			}
 		});
 	}
-
-
-	$('#temp_rate').on('change', function (event) {
-		let product_id = $("#product_id").val();
-		let rate_val   = $(this).val();  
-		$.ajax({
-			type: "POST",
-			url: "<?php echo base_url(); ?>Sales/get_rate",
-			dataType: "json",
-			data: {product_id:product_id},
-			success : function(data){
-				if (data.code == "200"){
-					var row = data.result[0];
-					if(rate_val == 'Umum'){
-						temp_price.set(row.Normal);
-						calculation_total_temp();
-					}else if(rate_val == 'Toko'){
-						temp_price.set(row.Toko);
-						calculation_total_temp();
-					}else if(rate_val == 'Sales'){
-						temp_price.set(row.Sales);
-						calculation_total_temp();
-					}else{
-						temp_price.set(row.Khusus);
-						calculation_total_temp();
-					}
-				}else{
-					Swal.fire({
-						icon: 'error',
-						title: 'Oops...',
-						text: data.result,
-					})
-				}
-			}
-		});  
-	})
 
 	$('#temp_price').on('input', function (event) {
 		calculation_total_temp();
@@ -902,22 +858,22 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 	{
 		$.ajax({
 			type: "POST",
-			url: "<?php echo base_url(); ?>Sales/get_edit_temp_sales",
+			url: "<?php echo base_url(); ?>Sales/get_edit_temp_sales_dropship",
 			dataType: "json",
 			data: {id:id},
 			success : function(data){
 				if (data.code == "200"){
 					console.log(data);
-					var row = data.result[0];
+					var row = data.data[0];
 					$("#product_name").val(row.product_name);
-					$("#product_id").val(row.temp_product_id);
-					$('#temp_rate').val(row.temp_sales_rate);
+					$("#product_id").val(row.temp_dropship_product_id);
+					$('#temp_rate').val(row.temp_dropship_sales_rate);
 					$('#temp_rate').trigger('change');
-					temp_price.set(row.temp_sales_price);
-					$("#temp_qty").val(row.temp_sales_qty);
-					$("#desc_item").val(row.temp_desc_item);
-					temp_discount.set(row.temp_sales_discount);
-					temp_total.set(row.temp_sales_total);
+					temp_price.set(row.temp_dropship_sales_price);
+					$("#temp_qty").val(row.temp_dropship_sales_qty);
+					$("#desc_item").val(row.temp_dropship_desc_item);
+					temp_discount.set(row.temp_dropship_sales_discount);
+					temp_total.set(row.temp_dropship_sales_total);
 				}
 			}
 		});  
@@ -951,10 +907,20 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 		$('#temp_qty').val(0);
 		temp_discount.set(0);
 		temp_total.set(0);
+		footer_total_discount.set(0);
+		edit_footer_discount_percentage1.set(0);
+		edit_footer_discount_percentage2.set(0);
+		edit_footer_discount_percentage3.set(0);
+		edit_footer_discount1.set(0);
+		edit_footer_discount2.set(0);
+		edit_footer_discount3.set(0);
+		footer_total_ppn.set(0);
+		$(ppnchecked).prop("checked", false);
 	}
 
 	$('#btnadd_temp').click(function(e){
 		e.preventDefault();
+		var sales_id                = $("#sales_id").val();
 		var warehouse_id            = $("#sales_warehouse").val();
 		var product_id              = $("#product_id").val();
 		var temp_rate               = $("#temp_rate").val();
@@ -967,16 +933,16 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 		if($('#formaddtemp').parsley().validate({force: true})){
 			$.ajax({
 				type: "POST",
-				url: "<?php echo base_url(); ?>Sales/add_temp_sales",
+				url: "<?php echo base_url(); ?>Sales/add_temp_sales_dropship",
 				dataType: "json",
-				data: {warehouse_id:warehouse_id, product_id:product_id, temp_rate:temp_rate, temp_price_val:temp_price_val, temp_qty:temp_qty, temp_discount_val:temp_discount_val, temp_total_val:temp_total_val, desc_item:desc_item},
+				data: {sales_id:sales_id, warehouse_id:warehouse_id, product_id:product_id, temp_rate:temp_rate, temp_price_val:temp_price_val, temp_qty:temp_qty, temp_discount_val:temp_discount_val, temp_total_val:temp_total_val, desc_item:desc_item},
 				success : function(data){
 					if (data.code == "200"){
 						let title = 'Tambah Data';
 						let message = 'Data Berhasil Di Tambah';
 						let state = 'info';
 						notif_success(title, message, state);
-						$('#temp-sales-list').DataTable().ajax.reload();
+						$('#temp-sales-dropship-list').DataTable().ajax.reload();
 						check_tempt_data();
 						clear_input();
 					} else {
@@ -993,9 +959,10 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 
 	$('#btnsave').click(function(e){
 		e.preventDefault();
+        var sales_dropship_id                        = $("#sales_dropship_id").val();
 		var sales_customer                           = $("#sales_customer").val();
-		var sales_type                               = $("#hd_sales_type").val();
-		var sales_order_id                           = $("#sales_order_id").val();       
+		var sales_type                               = 'Sales';
+		var sales_id                                 = $("#sales_id").val();       
 		var sales_rate_customer                      = $("#sales_rate_customer").val();
 		var sales_payment                            = $("#sales_payment").val();
 		var sales_top_id                             = $("#sales_top").val();
@@ -1026,12 +993,13 @@ require DOC_ROOT_PATH . $this->config->item('footer');
 		var sales_date                               = $("#sales_date").val();
 		$.ajax({
 			type: "POST",
-			url: "<?php echo base_url(); ?>Sales/save_sales",
+			url: "<?php echo base_url(); ?>Sales/update_sales_dropship",
 			dataType: "json",
-			data: {sales_customer:sales_customer, sales_type:sales_type, sales_order_id:sales_order_id, sales_rate_customer:sales_rate_customer, sales_payment:sales_payment, sales_top_id:sales_top_id, sales_top:sales_top, drop_ship:drop_ship, dropship_name:dropship_name, dropship_phone:dropship_phone, dropship_address:dropship_address, drop_ship:drop_ship, sales_salesman:sales_salesman, sales_prepare:sales_prepare, sales_colly:sales_colly, sales_warehouse:sales_warehouse, sales_ekspedisi:sales_ekspedisi, footer_sub_total_submit:footer_sub_total_submit, footer_total_discount_submit:footer_total_discount_submit, edit_footer_discount_percentage1_submit:edit_footer_discount_percentage1_submit, edit_footer_discount_percentage2_submit:edit_footer_discount_percentage2_submit, edit_footer_discount_percentage3_submit:edit_footer_discount_percentage3_submit, edit_footer_discount1_submit:edit_footer_discount1_submit, edit_footer_discount2_submit:edit_footer_discount2_submit, edit_footer_discount3_submit:edit_footer_discount3_submit, footer_total_ppn_val:footer_total_ppn_val, footer_total_invoice_val:footer_total_invoice_val, footer_dp_val:footer_dp_val, footer_remaining_debt_val:footer_remaining_debt_val, sales_remark:sales_remark, sales_due_date:sales_due_date, sales_date:sales_date},
+			data: {sales_dropship_id:sales_dropship_id, sales_customer:sales_customer, sales_type:sales_type, sales_id:sales_id, sales_rate_customer:sales_rate_customer, sales_payment:sales_payment, sales_top_id:sales_top_id, sales_top:sales_top, drop_ship:drop_ship, dropship_name:dropship_name, dropship_phone:dropship_phone, dropship_address:dropship_address, drop_ship:drop_ship, sales_salesman:sales_salesman, sales_prepare:sales_prepare, sales_colly:sales_colly, sales_warehouse:sales_warehouse, sales_ekspedisi:sales_ekspedisi, footer_sub_total_submit:footer_sub_total_submit, footer_total_discount_submit:footer_total_discount_submit, edit_footer_discount_percentage1_submit:edit_footer_discount_percentage1_submit, edit_footer_discount_percentage2_submit:edit_footer_discount_percentage2_submit, edit_footer_discount_percentage3_submit:edit_footer_discount_percentage3_submit, edit_footer_discount1_submit:edit_footer_discount1_submit, edit_footer_discount2_submit:edit_footer_discount2_submit, edit_footer_discount3_submit:edit_footer_discount3_submit, footer_total_ppn_val:footer_total_ppn_val, footer_total_invoice_val:footer_total_invoice_val, footer_dp_val:footer_dp_val, footer_remaining_debt_val:footer_remaining_debt_val, sales_remark:sales_remark, sales_due_date:sales_due_date, sales_date:sales_date},
 			success : function(data){
 				if (data.code == "200"){
-					window.location.href = "<?php echo base_url(); ?>/Sales/salespage";
+					shouldSkipUnloadWarning = true;
+					window.location.href = "<?php echo base_url(); ?>/Sales/salesdropship";
 				} else {
 					Swal.fire({
 						icon: 'error',
@@ -1105,28 +1073,13 @@ $('#footer_dp').on('input', function (event) {
 })
 
 
-$('#sales_customer').on('change', function (event) {
-	let customer_id = this.value;
-	$.ajax({
-		type: "POST",
-		url: "<?php echo base_url(); ?>Sales/get_customer_rate",
-		dataType: "json",
-		data: {customer_id:customer_id},
-		success : function(data){
-			if (data.code == "200"){
-				$('#sales_rate_customer').val(data.result[0].customer_rate)
-			}
-		}
-	});
-})
-
 
 
 function check_tempt_data()
 {
 	$.ajax({
 		type: "POST",
-		url: "<?php echo base_url(); ?>Sales/check_temp_sales",
+		url: "<?php echo base_url(); ?>Sales/check_temp_sales_dropship",
 		dataType: "json",
 		data: {},
 		success : function(data){
@@ -1147,55 +1100,62 @@ function check_tempt_data()
 	});
 }
 
-function check_So_data()
+function check_sales_data()
 {
-	var id = $("#sales_id").val();
+	$get = window.location.search;
+    let id = new URLSearchParams($get).get('id');
 	if(id != null){
 		$.ajax({
 			type: "POST",
-			url: "<?php echo base_url(); ?>Sales/refresh_header_so",
+			url: "<?php echo base_url(); ?>Sales/get_header_sales_dropship_edit",
 			dataType: "json",
 			data: {id:id},
 			success : function(data){
+				console.log(data);
 				if (data.code == "200"){
 					var row = data.data[0];
-					$('#sales_id').val(row.hd_sales_order_id );
-					$('#sales_inv_order').val(row.hd_sales_order_inv);
-					$('#sales_customer').val(row.hd_sales_order_customer);
+
+                    $("#sales_dropship_invoice").val(row.hd_dropship_sales_inv);
+					$('#sales_dropship_id').val(row.hd_dropship_sales_id);
+                    $("#sales_id").val(row.hd_sales_id);
+                    $("#sales_inv").val(row.hd_sales_inv);
+					$('#sales_customer').val(row.hd_dropship_sales_customer);
 					$('#sales_customer').trigger('change');
 					$('#sales_rate_customer').val(row.customer_rate);
-					$('#sales_payment').val(row.hd_sales_order_payment);
+					$('#sales_payment').val(row.hd_dropship_sales_payment);
 					$('#sales_payment').trigger('change');
-					$('#sales_top').val(row.hd_sales_order_top_id);
+					$('#sales_top').val(row.hd_dropship_sales_top_id);
 					$('#sales_top').trigger('change');
-					$('#sales_salesman').val(row.hd_sales_order_salesman);
+					$('#sales_salesman').val(row.hd_dropship_sales_salesman);
 					$('#sales_salesman').trigger('change');
-					$('#sales_prepare').val(row.hd_sales_order_prepare_id);
-					$('#sales_prepare').trigger('change');
-					$('#sales_colly').val(row.hd_sales_order_colly);
-					$('#sales_warehouse').val(row.hd_sales_order_warehouse);
+					$('#sales_prepare').val(row.hd_dropship_sales_prepare);
+					$('#sales_colly').val(row.hd_dropship_sales_colly);
+					$('#sales_warehouse').val(row.hd_dropship_sales_warehouse);
 					$('#sales_warehouse').trigger('change');
-					$('#sales_ekspedisi').val(row.hd_sales_order_ekspedisi);
+					$('#sales_ekspedisi').val(row.hd_dropship_sales_ekspedisi);
 					$('#sales_ekspedisi').trigger('change');
+                    $('#dropship_name').val(row.hd_dropship_sales_dropship_name);
+                    $('#dropship_phone').val(row.hd_dropship_sales_dropship_phone);
+                    $('#dropship_address').val(row.hd_dropship_sales_dropship_address);
 					$('#footerdiscount').on('show.bs.modal', function (event) {
-						edit_footer_discount_percentage1.set(row.hd_sales_order_percentage1);
-						edit_footer_discount_percentage2.set(row.hd_sales_order_percentage2);
-						edit_footer_discount_percentage3.set(row.hd_sales_order_percentage3);
-						edit_footer_discount1.set(row.hd_sales_order_disc1);
-						edit_footer_discount2.set(row.hd_sales_order_disc2);
-						edit_footer_discount3.set(row.hd_sales_order_disc3);
+						edit_footer_discount_percentage1.set(row.hd_dropship_sales_percentage1);
+						edit_footer_discount_percentage2.set(row.hd_dropship_sales_percentage2);
+						edit_footer_discount_percentage3.set(row.hd_dropship_sales_percentage3);
+						edit_footer_discount1.set(row.hd_dropship_sales_disc1);
+						edit_footer_discount2.set(row.hd_dropship_sales_disc2);
+						edit_footer_discount3.set(row.hd_dropship_sales_disc3);
 					})
-					footer_sub_total.set(row.hd_sales_order_sub_total);
-					footer_total_discount.set(row.hd_sales_order_total_discount);
-					footer_total_ppn.set(row.hd_sales_order_ppn);
-					if(row.hd_sales_order_ppn > 0){
+					footer_sub_total.set(row.hd_dropship_sales_sub_total);
+					footer_total_discount.set(row.hd_dropship_sales_total_discount);
+					footer_total_ppn.set(row.hd_dropship_sales_ppn);
+					if(row.hd_dropship_sales_ppn > 0){
 						$("#ppnchecked").prop("checked", true);
 					}
-					footer_total_invoice.set(row.hd_sales_order_total);
-					footer_dp.set(row.hd_sales_order_dp);
-					footer_remaining_debt.set(row.hd_sales_order_remaining_debt);
-					$('#sales_remark').val(row.hd_sales_order_note)
-					$('#temp-sales-list').DataTable().ajax.reload();
+					footer_total_invoice.set(row.hd_dropship_sales_total_invoice);
+					footer_dp.set(row.hd_dropship_sales_dp);
+					footer_remaining_debt.set(row.hd_dropship_sales_remaining_debt);
+					$('#sales_remark').val(row.hd_dropship_sales_note)
+					$('#temp-sales-dropship-list').DataTable().ajax.reload();
 					check_tempt_data();
 					clear_input();
 				}else{
@@ -1224,16 +1184,18 @@ function deletes(id)
 		if (result.isConfirmed) {
 			$.ajax({
 				type: "POST",
-				url: "<?php echo base_url(); ?>Sales/delete_temp_sales",
+				url: "<?php echo base_url(); ?>Sales/delete_temp_sales_dropship",
 				dataType: "json",
 				data: {id:id},
 				success : function(data){
 					if (data.code == "200"){
-						$('#temp-sales-list').DataTable().ajax.reload();
+						$('#temp-sales-dropship-list').DataTable().ajax.reload();
 						let title = 'Hapus Data';
 						let message = 'Data Berhasil Di Hapus';
 						let state = 'danger';
 						notif_success(title, message, state);
+						check_tempt_data();
+						clear_input();
 					} else {
 						Swal.fire({
 							icon: 'error',
@@ -1260,12 +1222,13 @@ $("#btncancel").click(function (e) {
 		if (result.isConfirmed) {
 			$.ajax({
 				type: "POST",
-				url: "<?php echo base_url(); ?>Sales/clear_temp_sales",
+				url: "<?php echo base_url(); ?>Sales/clear_temp_sales_dropship",
 				dataType: "json",
 				data: {},
 				success : function(data){
 					if (data.code == "200"){
-						window.location.href = "<?php echo base_url(); ?>/Sales/salespage";
+						shouldSkipUnloadWarning = true;
+						window.location.href = "<?php echo base_url(); ?>/Sales/salesdropship";
 					}else {
 						Swal.fire({
 							icon: 'error',
@@ -1280,5 +1243,7 @@ $("#btncancel").click(function (e) {
 });
 
 new bootstrap.Modal(document.getElementById('footerdiscount'), {backdrop: 'static', keyboard: false})  
+
+refreshConfirmModal = new bootstrap.Modal(document.getElementById('refreshConfirmModal'), {backdrop: 'static', keyboard: false});
 
 </script>

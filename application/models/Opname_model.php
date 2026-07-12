@@ -8,8 +8,17 @@ class opname_model extends CI_Model {
         $this->db->select('*');
         $this->db->from('hd_opname');
         $this->db->join('ms_user', 'hd_opname.opname_user = ms_user.user_id');
+        $this->db->join('dt_opanme', 'hd_opname.opname_id = dt_opanme.opname_id');
+        $this->db->join('ms_product', 'dt_opanme.dt_opname_product_id = ms_product.product_id');
+        $this->db->join('ms_warehouse', 'hd_opname.opname_warehouse = ms_warehouse.warehouse_id');
+        $this->db->join('ms_unit', 'ms_product.product_unit = ms_unit.unit_id');
         if($search != null){
             $this->db->or_where('hd_opname.opname_code like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_name like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_supplier_name like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_desc like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_key like "%'.$search.'%"');
         }
         $this->db->order_by('hd_opname.opname_id', 'desc');
         $this->db->limit($length);
@@ -23,8 +32,17 @@ class opname_model extends CI_Model {
         $this->db->select('count(*) as total_row');
         $this->db->from('hd_opname');
         $this->db->join('ms_user', 'hd_opname.opname_user = ms_user.user_id');
+        $this->db->join('dt_opanme', 'hd_opname.opname_id = dt_opanme.opname_id');
+        $this->db->join('ms_product', 'dt_opanme.dt_opname_product_id = ms_product.product_id');
+        $this->db->join('ms_warehouse', 'hd_opname.opname_warehouse = ms_warehouse.warehouse_id');
+        $this->db->join('ms_unit', 'ms_product.product_unit = ms_unit.unit_id');
         if($search != null){
             $this->db->or_where('hd_opname.opname_code like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_name like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_code like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_supplier_name like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_desc like "%'.$search.'%"');
+            $this->db->or_where('ms_product.product_key like "%'.$search.'%"');
         }
         $this->db->order_by('hd_opname.opname_id', 'desc');
         $query = $this->db->get();
