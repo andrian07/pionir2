@@ -1626,6 +1626,156 @@ class Masterdata extends CI_Controller {
 		}
 	}	
 
+	
+	public function import_product_excell()
+	{
+		$modul = 'Product';
+		$check_auth = $this->check_auth($modul);
+		$user_id = $_SESSION['user_id'];
+		if($check_auth['check_access'][0]->add == 'Y'){
+			if(isset($_FILES["file"]["name"])){
+				$path = $_FILES["file"]["tmp_name"];
+				$object = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
+				foreach($object->getWorksheetIterator() as $worksheet){
+					$highestRow = $worksheet->getHighestRow();
+					$highestColumn = $worksheet->getHighestColumn();
+
+					for($row=2; $row<=$highestRow; $row++){
+						$product_name 				= $worksheet->getCellByColumnAndRow(1, $row)->getValue();
+						$product_supplier 			= $worksheet->getCellByColumnAndRow(2, $row)->getValue();
+						$product_brand 				= $worksheet->getCellByColumnAndRow(3, $row)->getValue();
+						$product_unit				= $worksheet->getCellByColumnAndRow(4, $row)->getValue();
+						$product_category 			= $worksheet->getCellByColumnAndRow(5, $row)->getValue();
+						$product_supplier_name		= $worksheet->getCellByColumnAndRow(6, $row)->getValue();
+						$product_paket 				= $worksheet->getCellByColumnAndRow(7, $row)->getValue();
+						$product_ppn 				= $worksheet->getCellByColumnAndRow(8, $row)->getValue();
+						$product_min_stock 			= $worksheet->getCellByColumnAndRow(9, $row)->getValue();
+						$product_min_order 			= $worksheet->getCellByColumnAndRow(10, $row)->getValue();
+						$product_weight 			= $worksheet->getCellByColumnAndRow(11, $row)->getValue();
+						$product_location 			= $worksheet->getCellByColumnAndRow(12, $row)->getValue();
+						$product_desc 				= $worksheet->getCellByColumnAndRow(13, $row)->getValue();
+						$product_key_name 			= $worksheet->getCellByColumnAndRow(14, $row)->getValue();
+						$product_image 				= $worksheet->getCellByColumnAndRow(15, $row)->getValue();
+						$product_cogs 				= $worksheet->getCellByColumnAndRow(16, $row)->getValue();
+						$product_price_umum 		= $worksheet->getCellByColumnAndRow(17, $row)->getValue();
+						$product_price_toko 		= $worksheet->getCellByColumnAndRow(18, $row)->getValue();
+						$product_price_sales 		= $worksheet->getCellByColumnAndRow(19, $row)->getValue();
+						$product_price_khusus 		= $worksheet->getCellByColumnAndRow(20, $row)->getValue();
+						$stock_awal = $worksheet->getCellByColumnAndRow(21, $row)->getValue();
+
+						if($product_code == null){
+							$product_code = strtoupper(substr($product_name, 0, 3));
+							$randomString = $this->generateRandomStringproduct();
+							$last_code = $product_code.$randomString;
+						}else{
+							$last_code = $product_code;
+						}
+						
+						$check_product_brand = $this->masterdata_model->check_product_brand($product_brand);
+						if(!$check_product_brand){
+							$data_insert_brand = array(
+							'brand_name' => $product_brand
+							);
+							$product_brand_id = $this->masterdata_model->save_brand($data_insert_brand);
+						}else{
+							$product_brand_id = $check_product_brand[0]->brand_id;
+						}
+
+						$check_product_category = $this->masterdata_model->check_product_category($product_category);
+						if(!$check_product_category){
+							$data_insert_category = array(
+							'category_name' => $product_category
+							);
+							$product_category_id = $this->masterdata_model->save_category($data_insert_category);
+						}else{
+							$product_category_id = $check_product_category[0]->category_id;
+						}
+
+						$check_product_unit = $this->masterdata_model->check_product_unit($product_unit);
+						if(!$check_product_unit){
+							$data_insert_unit = array(
+							'unit_name' => $product_unit
+							);
+							$product_unit_id = $this->masterdata_model->save_unit($data_insert_unit);
+						}else{
+							$product_unit_id = $check_product_unit[0]->unit_id;
+						}
+
+						$check_product_supplier = $this->masterdata_model->check_product_supplier($product_supplier);
+						if(!$check_product_supplier){
+							$data_insert_supplier = array(
+							'supplier_code' => strtoupper(substr($product_supplier, 0, 3)).$this->generateRandomStringproduct(),
+							'supplier_name' => $product_supplier
+							);
+							$product_supplier_id = $this->masterdata_model->save_supplier($data_insert_supplier);
+						}else{
+							$product_supplier_id = $check_product_supplier[0]->supplier_id;
+						}
+
+						if($product_desc == null){
+							$product_desc = ' - ';
+						}	
+
+						$insert_product = array(
+						'product_code' => strtoupper($last_code),
+						'product_name' => strtoupper($product_name),
+						'product_brand' => strtoupper($product_brand_id),
+						'product_unit' => strtoupper($product_unit_id),
+						'product_category' => strtoupper($product_category_id),
+						'product_supplier_id_tag' => strtoupper($product_supplier_id),
+						'product_supplier_tag' => strtoupper($product_supplier),
+						'is_package' => strtoupper($product_paket),
+						'is_ppn' => strtoupper($product_ppn),
+						'product_desc' => strtoupper($product_desc),
+						'product_price' => strtoupper($product_cogs),
+						'product_hpp' => strtoupper($product_cogs),
+						'product_sell_percentage_1' => strtoupper($product_price_umum / $product_cogs * 100),
+						'product_sell_percentage_2' => strtoupper($product_price_toko / $product_cogs * 100),
+						'product_sell_percentage_3' => strtoupper($product_price_sales / $product_cogs * 100),
+						'product_sell_percentage_4' => strtoupper($product_price_khusus / $product_cogs * 100),
+						'product_sell_price_1' => strtoupper($product_price_umum),
+						'product_sell_price_2' => strtoupper($product_price_toko),
+						'product_sell_price_3' => strtoupper($product_price_sales),
+						'product_sell_price_4' => strtoupper($product_price_khusus)
+						);
+						
+						$product_id = $this->masterdata_model->save_product($insert_product);
+
+						$insert_supplier = array(
+						'product_id' => $product_id,
+						'supplier_id' => $product_supplier_id
+						);
+						$this->masterdata_model->save_product_supplier($insert_supplier);
+
+						$insert_stock = array(
+						'product_id' => $product_id,
+						'warehouse_id' => 1,
+						'stock' => $stock_awal
+						);
+						$this->masterdata_model->save_product_stock($insert_stock);
+
+						$movement_stock = array(
+						'stock_movement_product_id'		=> $product_id,
+						'stock_movement_qty'			=> $stock_awal,
+						'stock_movement_before_stock'	=> 0,
+						'stock_movement_new_stock'		=> $stock_awal,
+						'stock_movement_desc'			=> 'Import Excell',
+						'stock_movement_inv'			=> 'EXCEL',
+						'stock_movement_calculate'		=> 'Plus',
+						'stock_movement_date'			=> date('Y-m-d'),
+						'stock_movement_creted_by'		=> $user_id,	
+						);	
+						$this->global_model->insert_movement_stock($movement_stock);
+					}
+
+					$msg = "Succes Import";
+					echo json_encode(['code'=>200, 'result'=>$msg]);die();
+				}
+			}
+		}
+	}
+
+
 	//end product
 
 
